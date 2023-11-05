@@ -3,6 +3,7 @@ import openai
 import numpy as np
 import torch
 from constants import *
+import tiktoken
 
 class Agent(ABC):
     pass
@@ -17,20 +18,23 @@ class LearningAgent(Agent):
         if self.source == "openai":
             openai.api_key = OPENAI_KEY
         self.model = model
+        self.tokenizer = tiktoken.encoding_for_model(self.model)
         self.system_message = None
         self.prompts = []
         self.responses = []
         self.rounds = 0
         self.interactions = 0
+        self.instruction = None
     
     def set_instruction(self, instruction):
-        self.system_message = {"role": "system", "content": "You are an agent who is trying to complete a task in an unknown environment. Your abilities include moving forward, turning left, turning right, picking things up, and using things on other things. Your task is: " + instruction}
+        self.system_message = {"role": "system", "content": SETTING_DESCRIPTION + "\nYOUR TASK IS: " + instruction}
+        self.instruction = instruction
         self.prompts = []
         self.responses = []
         self.rounds += 1
         self.interactions = 0
     
-    def get_action(self, observation = None):
+    def get_action(self, observation = None, action_failed = False):
         if self.source == "openai":
             messages = [self.system_message]
             for i in range(self.interactions):
@@ -40,11 +44,16 @@ class LearningAgent(Agent):
                 except IndexError:
                     break
             if observation:
-                complete_instruction = observation + " " + INQUIRY
+                if action_failed:
+                    complete_instruction = "The previous action you did achieved nothing. "
+                else:
+                    complete_instruction = ""
+                complete_instruction += observation + "Reminder that your task is, " + self.instruction + " " + INQUIRY
                 messages.append({"role": "user", "content": complete_instruction})
             else:
                 self.responses.pop()
                 messages.pop()
+            messages = self.clean_messages(messages)
             response_obj = openai.ChatCompletion.create(
                 model = self.model,
                 messages = messages,
@@ -56,6 +65,18 @@ class LearningAgent(Agent):
         self.responses.append(response)
         self.interactions += 1
         return response
+    
+    def clean_messages(self, messages):
+        content_length = 0
+        for message in messages:
+            content_length += len(self.tokenizer.encode(message["content"]))
+        while content_length > MAX_MSG_TOKENS:
+            messages = messages[:1] + messages[3:]  # keep system message, throw out the oldest user/assistant pair
+            content_length = 0
+            for message in messages:
+                token_count = len(self.tokenizer.encode(message["content"]))
+                content_length += token_count
+        return messages
     
     def display_history(self):
         messages = [self.system_message]

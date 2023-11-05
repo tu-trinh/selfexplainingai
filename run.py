@@ -16,6 +16,8 @@ np.random.seed(RANDOM_SEED)
 random.seed(RANDOM_SEED)
 
 
+instruction_types = ["high", "low", "mid-direct", "mid-explore", "mid-direct-explore", "mid-avoid", "mid-explore-avoid"]
+
 def manual_test(env):
     manual_control = ManualControl(env, seed = 42)
     manual_control.start()
@@ -239,7 +241,7 @@ def main(scenario, instruction, inst_type):
                 elif tries == MAX_TRIES:
                     print(f"{la.name} has failed to complete the task. This took {la.interactions} interactions.")
                     break
-            with open(f"scenario{scenario}_type{inst_type}.csv", "a") as f:
+            with open(f"scenario{scenario}_type{instruction_types.index(inst_type)}.csv", "a") as f:
                 steps_to_succeed = total_steps if success else float("inf")
                 f.write(f"{scenario},{learning_env.env_id},{inst_type},{instruction},{success},{steps_to_succeed},{la.interactions}\n")
         except Exception as e:
@@ -253,14 +255,13 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--inst_type", type = int, required = True)
     args = parser.parse_args()
     # manual_test(learning_env)
-    instruction_types = ["high", "low", "mid-direct", "mid-explore", "mid-direct-explore", "mid-avoid", "mid-explore-avoid"]
     experiment_mapping = {
         1: {
             "high": "Get to the goal.",
             "low": "Go forward all the way until you hit a wall, then turn right, then go forward all the way again until you hit the goal.",
             "mid-direct": "Find and pick up a key, use it to unlock the door, and go through the door to get to the goal.",
             "mid-explore": "Get to the goal. If you don't see the goal at first, explore the room more until you see it.",
-            "mid-direct-explore": "Pick up the key, use it to unlock the door, and go through the door to get to the goal. For each of those three items, if you don't see it first, explore the room until you find it."
+            "mid-direct-explore": "Pick up the key, use it to unlock the door, and go through the door to get to the goal. For each of those three items, if you don't see it first, explore the room until you find it.",
             "mid-avoid": "Get to the goal. You may need to remove some obstacles in order to see and reach this goal.",
             "mid-explore-avoid": "Get to the goal. You may need to remove some obstacles in order to see and reach this goal. Always look around in case the goal is nearby."
         },

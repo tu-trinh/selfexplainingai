@@ -1,4 +1,4 @@
-from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
+# from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 import gymnasium as gym
 import torch
 import torch.nn as nn

@@ -11,6 +11,8 @@ from agent import *
 import numpy as np
 import random
 import time
+import copy
+import re
 
 np.random.seed(RANDOM_SEED)
 random.seed(RANDOM_SEED)
@@ -190,11 +192,18 @@ def generate_env(scenario, env_num):
     return learning_env
 
 
-def main(scenario, instruction, inst_type):
+def main(scenario, instruction, inst_type, start_idx = 0, end_idx = 100):
     la = LearningAgent("Bartolomé de las Casas", "openai", "gpt-3.5-turbo")
-    for i in range(100):
+    iter_tries = {i: 0 for i in range(start_idx, end_idx)}
+    i = start_idx
+    retry_env = None
+    while i < end_idx:
         try:
-            learning_env = generate_env(scenario, i)
+            if iter_tries[i] == 0:
+                learning_env = generate_env(scenario, i)
+                retry_env = copy.deepcopy(learning_env)
+            else:
+                learning_env = retry_env
             success = False
             in_progress = False
             tries = 0
@@ -221,7 +230,12 @@ def main(scenario, instruction, inst_type):
                     tries += 1
                     print(f"{la.name} says: {agent_resp}\n")
                     if "stumped" not in agent_resp:
-                        action_choice = int(agent_resp.split(", ")[0])
+                        try:
+                            action_choice = int(agent_resp.split(", ")[0])
+                        except:  # stupid robot can't follow instructions
+                            action_choice = convert_response_to_action(agent_resp)
+                            if not action_choice:
+                                raise Exception("Could not parse agent's response")
                         obs, reward, done, truncated, info = learning_env.step(CUSTOM_ACTION_TO_TRUE_ACTION[action_choice])
                         tries = 0
                         total_steps += 1
@@ -244,15 +258,27 @@ def main(scenario, instruction, inst_type):
             with open(f"scenario{scenario}_type{instruction_types.index(inst_type)}.csv", "a") as f:
                 steps_to_succeed = total_steps if success else float("inf")
                 f.write(f"{scenario},{learning_env.env_id},{inst_type},{instruction},{success},{steps_to_succeed},{la.interactions}\n")
+            i += 1
         except Exception as e:
-            print(f"Scenario {scenario} with instruction type {inst_type} failed on environment {i} with the following exception: {e}")
-            continue
+            try_again_msg = "Trying again in one minute." if iter_tries[i] == 0 and "agent's response" not in str(e) else "Won't try again."
+            print(f"Scenario {scenario} with instruction type {inst_type} failed on environment {i} with the following exception: {e}. {try_again_msg}")
+            if iter_tries[i] > 0 or "agent's response" not in str(e):
+                i += 1
+            else:
+                time.sleep(60)
+                iter_tries[i] += 1
+                if "maximum context length" in str(e):
+                    match = re.search(r"However, your messages resulted in (\d+) tokens", str(e))
+                    diff = int(match.group(1)) - CONTEXT_WINDOWS[la.model]
+                    MAX_MSG_TOKENS -= diff
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--scenario", type = int, required = True)
     parser.add_argument("-t", "--inst_type", type = int, required = True)
+    parser.add_argument("-si", "--start_idx", type = int, default = 0)
+    parser.add_argument("-ei", "--end_idx", type = int, default = 100)
     args = parser.parse_args()
     # manual_test(learning_env)
     experiment_mapping = {
@@ -293,6 +319,11 @@ if __name__ == "__main__":
             "mid-explore-avoid": "Get to the green goal. If you cannot go through the door or wall, try finding a different way around them. If you do not see the goal at first, keep exploring the room until you find it."
         }
     }
-    main(args.scenario,
-         experiment_mapping[args.scenario][instruction_types[args.inst_type]],
-         instruction_types[args.inst_type])
+    start = time.time()
+    main(scenario = args.scenario,
+         instruction = experiment_mapping[args.scenario][instruction_types[args.inst_type]],
+         inst_type = instruction_types[args.inst_type],
+         start_idx = args.start_idx,
+         end_idx = args.end_idx)
+    end = time.time()
+    print(f"This took {format_seconds(end - start)} to run.")

@@ -1,1 +1,17 @@
 scenario,env_id,inst_type,instruction,succeeded,steps_to_succeed,total_interactions
+2,empty_8_19,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,2
+2,empty_8_21,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,2
+2,empty_10_22,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,2
+2,empty_10_25,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,2
+2,empty_11_29,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,2
+2,empty_11_30,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,2
+2,empty_8_31,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,5
+2,empty_11_32,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,2
+2,empty_8_33,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,2
+2,empty_11_35,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,2
+2,empty_9_36,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,3
+2,empty_7_37,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,2
+2,empty_8_38,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,2
+2,empty_10_40,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,2
+2,empty_9_41,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,2
+2,empty_9_43,mid-direct-explore,There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.,False,inf,2

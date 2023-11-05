@@ -239,8 +239,7 @@ def main(scenario, instruction, inst_type):
                 elif tries == MAX_TRIES:
                     print(f"{la.name} has failed to complete the task. This took {la.interactions} interactions.")
                     break
-            # scenario,env_id,instruction_id,instruction,succeeded,steps_to_succeed,total_interactions
-            with open("proof_of_concept_results.csv", "a") as f:
+            with open(f"scenario{scenario}_type{inst_type}.csv", "a") as f:
                 steps_to_succeed = total_steps if success else float("inf")
                 f.write(f"{scenario},{learning_env.env_id},{inst_type},{instruction},{success},{steps_to_succeed},{la.interactions}\n")
         except Exception as e:
@@ -249,55 +248,50 @@ def main(scenario, instruction, inst_type):
 
 
 if __name__ == "__main__":
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("-s", "--scenario", type = int, required = True)
-    # parser.add_argument("-t", "--inst_type", type = int, required = True)
-    # args = parser.parse_args()
-    # # manual_test(learning_env)
-    # instruction_types = ["high", "low", "mid-direct", "mid-explore", "mid-direct-explore", "mid-avoid", "mid-explore-avoid"]
-    # experiment_mapping = {
-    #     1: {
-    #         "high": "Get to the goal.",
-    #         "low": "Go forward all the way until you hit a wall, then turn right, then go forward all the way again until you hit the goal.",
-    #         "mid-direct": "Find and pick up a key, use it to unlock the door, and go through the door to get to the goal.",
-    #         "mid-explore": "Get to the goal. If you don't see the goal at first, explore the room more until you see it.",
-    #         "mid-direct-explore": "Pick up the key, use it to unlock the door, and go through the door to get to the goal. For each of those three items, if you don't see it first, explore the room until you find it."
-    #         "mid-avoid": "Get to the goal. You may need to remove some obstacles in order to see and reach this goal.",
-    #         "mid-explore-avoid": "Get to the goal. You may need to remove some obstacles in order to see and reach this goal. Always look around in case the goal is nearby."
-    #     },
-    #     2: {
-    #         "high": "Get to the goal.",
-    #         "low": "Turn right and move forward until you see a key and pick it up. Then turn around, go forward one step, and turn right to use the key to unlock the door. Then go through the door and continue walking until you hit a wall. Then turn right and go forward until you hit the goal.",
-    #         "mid-direct": "There are no obstacles around you. Find the goal and go straight to it.",
-    #         "mid-explore": "Get to the goal. If you don’t see the goal at first, try exploring the room more until you find it.",
-    #         "mid-direct-explore": "There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.",
-    #         "mid-avoid": "Get to the goal by walking around and seeing if you need to remove any obstacles or if you can see and reach the goal directly.",
-    #         "mid-explore-avoid": "Get to the goal by walking around and seeing if you need to remove obstacles first. If you don’t see the goal, try exploring around more until you find it."
-    #     },
-    #     3: {
-    #         "high": "Get to the goal.",
-    #         "low": "Walk forward until you hit a wall, then turn and keep walking forward until you hit the goal.",
-    #         "mid-direct": "There are no obstacles around you. Go straight to the green goal, not another color goal.",
-    #         "mid-explore": "Get to the green goal. If you don’t see it anywhere, explore the room more until you find it.",
-    #         "mid-direct-explore": "Go straight to the green goal, not another color goal. If you don’t see it anywhere, explore the room more until you find it.",
-    #         "mid-avoid": "Get to the green goal. Avoid everything else.",
-    #         "mid-explore-avoid": "Get to the green goal and avoid everything else. If you don't see it at first, explore the room more until you find it."
-    #     },
-    #     4: {
-    #         "high": "Get to the goal.",
-    #         "low": "Walk forward through the open door. Then keep walking forward until you get to the goal.",
-    #         "mid-direct": "Get to the goal by walking around the wall. There is no key to open the door for a shortcut.",
-    #         "mid-explore": "Get to the goal. If you don’t see it anywhere, explore the room more until you find it.",
-    #         "mid-direct-explore": "Get to the goal. If you get stuck at the door because there is no key, go around the wall. If you do not see the goal at first, explore the room until you find it.",
-    #         "mid-avoid": "Get to the green goal. If you cannot go through the door or wall, try finding a different way around them.",
-    #         "mid-explore-avoid": "Get to the green goal. If you cannot go through the door or wall, try finding a different way around them. If you do not see the goal at first, keep exploring the room until you find it."
-    #     }
-    # }
-    # main(args.scenario,
-    #      experiment_mapping[args.scenario][instruction_types[args.inst_type]],
-    #      instruction_types[args.inst_type])
-
-    for s in range(1, 5):
-        for t in range(7):
-            with open(f"scenario{s}_type{t}.csv", "w") as f:
-                f.write("scenario,env_id,inst_type,instruction,succeeded,steps_to_succeed,total_interactions\n")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--scenario", type = int, required = True)
+    parser.add_argument("-t", "--inst_type", type = int, required = True)
+    args = parser.parse_args()
+    # manual_test(learning_env)
+    instruction_types = ["high", "low", "mid-direct", "mid-explore", "mid-direct-explore", "mid-avoid", "mid-explore-avoid"]
+    experiment_mapping = {
+        1: {
+            "high": "Get to the goal.",
+            "low": "Go forward all the way until you hit a wall, then turn right, then go forward all the way again until you hit the goal.",
+            "mid-direct": "Find and pick up a key, use it to unlock the door, and go through the door to get to the goal.",
+            "mid-explore": "Get to the goal. If you don't see the goal at first, explore the room more until you see it.",
+            "mid-direct-explore": "Pick up the key, use it to unlock the door, and go through the door to get to the goal. For each of those three items, if you don't see it first, explore the room until you find it."
+            "mid-avoid": "Get to the goal. You may need to remove some obstacles in order to see and reach this goal.",
+            "mid-explore-avoid": "Get to the goal. You may need to remove some obstacles in order to see and reach this goal. Always look around in case the goal is nearby."
+        },
+        2: {
+            "high": "Get to the goal.",
+            "low": "Turn right and move forward until you see a key and pick it up. Then turn around, go forward one step, and turn right to use the key to unlock the door. Then go through the door and continue walking until you hit a wall. Then turn right and go forward until you hit the goal.",
+            "mid-direct": "There are no obstacles around you. Find the goal and go straight to it.",
+            "mid-explore": "Get to the goal. If you don’t see the goal at first, try exploring the room more until you find it.",
+            "mid-direct-explore": "There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.",
+            "mid-avoid": "Get to the goal by walking around and seeing if you need to remove any obstacles or if you can see and reach the goal directly.",
+            "mid-explore-avoid": "Get to the goal by walking around and seeing if you need to remove obstacles first. If you don’t see the goal, try exploring around more until you find it."
+        },
+        3: {
+            "high": "Get to the goal.",
+            "low": "Walk forward until you hit a wall, then turn and keep walking forward until you hit the goal.",
+            "mid-direct": "There are no obstacles around you. Go straight to the green goal, not another color goal.",
+            "mid-explore": "Get to the green goal. If you don’t see it anywhere, explore the room more until you find it.",
+            "mid-direct-explore": "Go straight to the green goal, not another color goal. If you don’t see it anywhere, explore the room more until you find it.",
+            "mid-avoid": "Get to the green goal. Avoid everything else.",
+            "mid-explore-avoid": "Get to the green goal and avoid everything else. If you don't see it at first, explore the room more until you find it."
+        },
+        4: {
+            "high": "Get to the goal.",
+            "low": "Walk forward through the open door. Then keep walking forward until you get to the goal.",
+            "mid-direct": "Get to the goal by walking around the wall. There is no key to open the door for a shortcut.",
+            "mid-explore": "Get to the goal. If you don’t see it anywhere, explore the room more until you find it.",
+            "mid-direct-explore": "Get to the goal. If you get stuck at the door because there is no key, go around the wall. If you do not see the goal at first, explore the room until you find it.",
+            "mid-avoid": "Get to the green goal. If you cannot go through the door or wall, try finding a different way around them.",
+            "mid-explore-avoid": "Get to the green goal. If you cannot go through the door or wall, try finding a different way around them. If you do not see the goal at first, keep exploring the room until you find it."
+        }
+    }
+    main(args.scenario,
+         experiment_mapping[args.scenario][instruction_types[args.inst_type]],
+         instruction_types[args.inst_type])

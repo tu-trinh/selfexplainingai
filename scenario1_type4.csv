@@ -1,1 +1,3 @@
 scenario,env_id,inst_type,instruction,succeeded,steps_to_succeed,total_interactions
+1,door_key_11_56,mid-direct-explore,Pick up the key, use it to unlock the door, and go through the door to get to the goal. For each of those three items, if you don't see it first, explore the room until you find it.,False,inf,2
+1,door_key_8_95,mid-direct-explore,Pick up the key, use it to unlock the door, and go through the door to get to the goal. For each of those three items, if you don't see it first, explore the room until you find it.,False,inf,3

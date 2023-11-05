@@ -1,10 +1,10 @@
 from minigrid.wrappers import *
-from stable_baselines3 import PPO
-from stable_baselines3.common.env_util import make_vec_env
+# from stable_baselines3 import PPO
+# from stable_baselines3.common.env_util import make_vec_env
 from minigrid.manual_control import ManualControl
 from mdp import GoalEnv
-from model import MinigridFeaturesExtractor
-import gymnasium as gym
+# from model import MinigridFeaturesExtractor
+# import gymnasium as gym
 from utils import *
 import argparse
 from agent import *

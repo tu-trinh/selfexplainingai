@@ -32,3 +32,10 @@ scenario,env_id,inst_type,instruction,succeeded,steps_to_succeed,total_interacti
 2,empty_7_37,high,Get to the goal.,False,inf,9
 2,empty_8_39,high,Get to the goal.,False,inf,7
 2,empty_10_40,high,Get to the goal.,False,inf,7
+2,empty_11_42,high,Get to the goal.,False,inf,10
+2,empty_8_44,high,Get to the goal.,False,inf,10
+2,empty_7_45,high,Get to the goal.,False,inf,10
+2,empty_9_46,high,Get to the goal.,False,inf,6
+2,empty_7_47,high,Get to the goal.,False,inf,10
+2,empty_8_48,high,Get to the goal.,False,inf,6
+2,empty_9_49,high,Get to the goal.,False,inf,8

@@ -1,1 +1,5 @@
 scenario,env_id,inst_type,instruction,succeeded,steps_to_succeed,total_interactions
+4,door_wall_8_0,mid-direct-explore,Get to the goal. If you get stuck at the door because there is no key, go around the wall. If you do not see the goal at first, explore the room until you find it.,True,7,8
+4,door_wall_7_1,mid-direct-explore,Get to the goal. If you get stuck at the door because there is no key, go around the wall. If you do not see the goal at first, explore the room until you find it.,False,inf,6
+4,door_wall_8_2,mid-direct-explore,Get to the goal. If you get stuck at the door because there is no key, go around the wall. If you do not see the goal at first, explore the room until you find it.,True,7,7
+4,door_wall_7_3,mid-direct-explore,Get to the goal. If you get stuck at the door because there is no key, go around the wall. If you do not see the goal at first, explore the room until you find it.,False,inf,10

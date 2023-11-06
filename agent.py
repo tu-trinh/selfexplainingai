@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import openai
 import numpy as np
 import torch
+import constants
 from constants import *
 import tiktoken
 
@@ -70,7 +71,7 @@ class LearningAgent(Agent):
         content_length = 0
         for message in messages:
             content_length += len(self.tokenizer.encode(message["content"]))
-        while content_length > MAX_MSG_TOKENS:
+        while content_length > constants.MAX_MSG_TOKENS:
             messages = messages[:1] + messages[3:]  # keep system message, throw out the oldest user/assistant pair
             content_length = 0
             for message in messages:

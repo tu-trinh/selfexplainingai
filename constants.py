@@ -20,21 +20,21 @@ SETTING_DESCRIPTION = """You are an agent who is trying to complete a task in an
 7. Open a door (if it is in a cell cardinally adjacent to you and you are facing it). For example, if you are in cell (0, 0) and facing east, and there is an unlocked door at (1, 0), you can open the door.
 8. Close a door (if it is in a cell cardinally adjacent to you and you are facing it). For example, if you are in cell (0, 0) and facing east, and there is an open door at (1, 0), you can close the door.
 Each of these abilities are primitive actions that must be performed step-by-step. For example, if you are in cell (0, 0) facing east and there is a closed door at (0, 3) which you want to go through, you cannot immediately perform an \"open door\" action. You must first \"move forward\" twice to (0, 2) so that the door is directly in front of you. Only then can you \"open door\"."""
-# INQUIRY = """What is the next action you take in order to complete your given task? Choose from the following list.
-# 1. Move forward one cell.
-# 2. Turn left.
-# 3. Turn right.
-# 4. Pick up [OBJECT]. (Object must be directly one cell in front of you!)
-# 5. Put down [OBJECT]. (You must be currently holding the object and there must be empty floor directly one cell in front of you!)
-# 6. Unlock door. (You must have a matching key and the door must be directly one cell in front of you!)
-# 7. Open door. (Door must be closed/unlocked and directly one cell in front of you!)
-# 8. Close door. (Door must be open and directly one cell in front of you!)
-# Adhere strictly to these response formatting rules: If you choose options 1-3 or 6-8, your response must be in the form \"[NUMBER]\"; for example, if you want to move forward, you must say \"1\". If you choose options 4 or 5, you must also specify the object you want to handle in the form \"[NUMBER], [OBJECT]\"; for example, to put down a key, you must say "5, key". Do not choose options 4 or 5 if the object you have in mind is not said to exist in the room. Do not choose options 6-8 if it is not said that a door exists in the room. If none of the options seem feasible, say, \"I'm stumped.\" Don't say anything else in your response that strays from these rules."""
 INQUIRY = """What is the next action you take in order to complete your given task? Choose from the following list.
 1. Move forward one cell.
 2. Turn left.
 3. Turn right.
-Adhere strictly to these response formatting rules: your response must be in the form \"[NUMBER]\"; for example, if you want to move forward, you must say \"1\". If none of the options seem feasible, say, \"I'm stumped.\" Don't say anything else in your response that strays from these rules."""
+4. Pick up [OBJECT]. (Object must be directly one cell in front of you!)
+5. Put down [OBJECT]. (You must be currently holding the object and there must be empty floor directly one cell in front of you!)
+6. Unlock door. (You must have a matching key and the door must be directly one cell in front of you!)
+7. Open door. (Door must be closed/unlocked and directly one cell in front of you!)
+8. Close door. (Door must be open and directly one cell in front of you!)
+Adhere strictly to these response formatting rules: If you choose options 1-3 or 6-8, your response must be in the form \"[NUMBER]\"; for example, if you want to move forward, you must say \"1\". If you choose options 4 or 5, you must also specify the object you want to handle in the form \"[NUMBER], [OBJECT]\"; for example, to put down a key, you must say "5, key". Do not choose options 4 or 5 if the object you have in mind is not said to exist in the room. Do not choose options 6-8 if it is not said that a door exists in the room. If none of the options seem feasible, say, \"I'm stumped.\" Don't say anything else in your response that strays from these rules."""
+# INQUIRY = """What is the next action you take in order to complete your given task? Choose from the following list.
+# 1. Move forward one cell.
+# 2. Turn left.
+# 3. Turn right.
+# Adhere strictly to these response formatting rules: your response must be in the form \"[NUMBER]\"; for example, if you want to move forward, you must say \"1\". If none of the options seem feasible, say, \"I'm stumped.\" Don't say anything else in your response that strays from these rules."""
 AGENT_VIEW_SIZE = 5
 DOOR_KEY_COLOR_NAMES = ["blue", "purple", "yellow", "red", "green"]
 GOAL_COLOR_NAMES = ["green", "red", "yellow", "purple", "blue"]

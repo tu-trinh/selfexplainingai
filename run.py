@@ -304,8 +304,8 @@ if __name__ == "__main__":
             "high": "Get to the goal.",
             "low": "Walk forward until you hit a wall, then turn and keep walking forward until you hit the goal.",
             "mid-direct": "There are no obstacles around you. Go straight to the green goal, not another color goal.",
-            "mid-explore": "Get to the green goal. If you don’t see it anywhere, explore the room more until you find it.",
-            "mid-direct-explore": "Go straight to the green goal, not another color goal. If you don’t see it anywhere, explore the room more until you find it.",
+            "mid-explore": "Get to the green goal. If you don't see it anywhere, explore the room more until you find it.",
+            "mid-direct-explore": "Go straight to the green goal. If you don't see it anywhere, explore the room more until you find it. Do not go to a goal of another color.",
             "mid-avoid": "Get to the green goal. Avoid everything else.",
             "mid-explore-avoid": "Get to the green goal and avoid everything else. If you don't see it at first, explore the room more until you find it."
         },

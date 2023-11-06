@@ -287,7 +287,7 @@ if __name__ == "__main__":
             "low": "Go forward all the way until you hit a wall, then turn right, then go forward all the way again until you hit the goal.",
             "mid-direct": "Find and pick up a key, use it to unlock the door, and go through the door to get to the goal.",
             "mid-explore": "Get to the goal. If you don't see the goal at first, explore the room more until you see it.",
-            "mid-direct-explore": "Pick up the key, use it to unlock the door, and go through the door to get to the goal. For each of those three items, if you don't see it first, explore the room until you find it.",
+            "mid-direct-explore": "Pick up the key, use it to unlock the door, and go through the door to get to the goal. For each of the key, door, and goal, if you don't see it first, explore the room until you find it.",
             "mid-avoid": "Get to the goal. You may need to remove some obstacles in order to see and reach this goal.",
             "mid-explore-avoid": "Get to the goal. You may need to remove some obstacles in order to see and reach this goal. Always look around in case the goal is nearby."
         },
@@ -296,7 +296,7 @@ if __name__ == "__main__":
             "low": "Turn right and move forward until you see a key and pick it up. Then turn around, go forward one step, and turn right to use the key to unlock the door. Then go through the door and continue walking until you hit a wall. Then turn right and go forward until you hit the goal.",
             "mid-direct": "There are no obstacles around you. Find the goal and go straight to it.",
             "mid-explore": "Get to the goal. If you don’t see the goal at first, try exploring the room more until you find it.",
-            "mid-direct-explore": "There are no obstacles aorund you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.",
+            "mid-direct-explore": "There are no obstacles around you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.",
             "mid-avoid": "Get to the goal by walking around and seeing if you need to remove any obstacles or if you can see and reach the goal directly.",
             "mid-explore-avoid": "Get to the goal by walking around and seeing if you need to remove obstacles first. If you don’t see the goal, try exploring around more until you find it."
         },

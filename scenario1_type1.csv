@@ -1,3 +1,10 @@
 scenario,env_id,inst_type,instruction,succeeded,steps_to_succeed,total_interactions
 1,door_key_10_19,low,Go forward all the way until you hit a wall, then turn right, then go forward all the way again until you hit the goal.,False,inf,14
 1,door_key_11_51,low,Go forward all the way until you hit a wall, then turn right, then go forward all the way again until you hit the goal.,False,inf,8
+1,door_key_10_1,low,Go forward all the way until you hit a wall, then turn right, then go forward all the way again until you hit the goal.,False,inf,5
+1,door_key_10_2,low,Go forward all the way until you hit a wall, then turn right, then go forward all the way again until you hit the goal.,False,inf,5
+1,door_key_10_3,low,Go forward all the way until you hit a wall, then turn right, then go forward all the way again until you hit the goal.,False,inf,7
+1,door_key_10_4,low,Go forward all the way until you hit a wall, then turn right, then go forward all the way again until you hit the goal.,False,inf,10
+1,door_key_10_5,low,Go forward all the way until you hit a wall, then turn right, then go forward all the way again until you hit the goal.,False,inf,9
+1,door_key_10_6,low,Go forward all the way until you hit a wall, then turn right, then go forward all the way again until you hit the goal.,False,inf,7
+1,door_key_10_7,low,Go forward all the way until you hit a wall, then turn right, then go forward all the way again until you hit the goal.,False,inf,8

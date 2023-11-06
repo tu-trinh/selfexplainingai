@@ -13,6 +13,8 @@ import random
 import time
 import copy
 import re
+import constants
+from constants import *
 
 np.random.seed(RANDOM_SEED)
 random.seed(RANDOM_SEED)
@@ -262,7 +264,7 @@ def main(scenario, instruction, inst_type, start_idx = 0, end_idx = 100):
         except Exception as e:
             try_again_msg = "Trying again in one minute." if iter_tries[i] == 0 and "agent's response" not in str(e) else "Won't try again."
             print(f"Scenario {scenario} with instruction type {inst_type} failed on environment {i} with the following exception: {e}. {try_again_msg}")
-            if iter_tries[i] > 0 or "agent's response" not in str(e):
+            if iter_tries[i] > 0 or "agent's response" in str(e):
                 i += 1
             else:
                 time.sleep(60)
@@ -270,7 +272,7 @@ def main(scenario, instruction, inst_type, start_idx = 0, end_idx = 100):
                 if "maximum context length" in str(e):
                     match = re.search(r"However, your messages resulted in (\d+) tokens", str(e))
                     diff = int(match.group(1)) - CONTEXT_WINDOWS[la.model]
-                    MAX_MSG_TOKENS -= diff
+                    constants.MAX_MSG_TOKENS -= diff
 
 
 if __name__ == "__main__":

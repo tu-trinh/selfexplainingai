@@ -13,9 +13,10 @@ import random
 import time
 import copy
 import re
-import constants
 from constants import *
 
+
+max_msg_tokens = MAX_MSG_TOKENS
 np.random.seed(RANDOM_SEED)
 random.seed(RANDOM_SEED)
 
@@ -272,17 +273,19 @@ def main(scenario, instruction, inst_type, start_idx = 0, end_idx = 100):
                 if "maximum context length" in str(e):
                     match = re.search(r"However, your messages resulted in (\d+) tokens", str(e))
                     diff = int(match.group(1)) - CONTEXT_WINDOWS[la.model]
-                    constants.MAX_MSG_TOKENS -= diff
+                    max_msg_tokens -= diff
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--scenario", type = int, required = True)
-    parser.add_argument("-t", "--inst_type", type = int, required = True)
-    parser.add_argument("-si", "--start_idx", type = int, default = 0)
-    parser.add_argument("-ei", "--end_idx", type = int, default = 100)
-    args = parser.parse_args()
-    # manual_test(learning_env)
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("-s", "--scenario", type = int, required = True)
+    # parser.add_argument("-t", "--inst_type", type = int, required = True)
+    # parser.add_argument("-si", "--start_idx", type = int, default = 0)
+    # parser.add_argument("-ei", "--end_idx", type = int, default = 100)
+    # args = parser.parse_args()
+    env = gymnasium.make("BabyAI-OpenRedDoor-v0")
+    manual_test(env)
+
     experiment_mapping = {
         1: {
             "high": "Get to the goal.",
@@ -321,11 +324,11 @@ if __name__ == "__main__":
             "mid-explore-avoid": "Get to the green goal. If you cannot go through the door or wall, try finding a different way around them. If you do not see the goal at first, keep exploring the room until you find it."
         }
     }
-    start = time.time()
-    main(scenario = args.scenario,
-         instruction = experiment_mapping[args.scenario][instruction_types[args.inst_type]],
-         inst_type = instruction_types[args.inst_type],
-         start_idx = args.start_idx,
-         end_idx = args.end_idx)
-    end = time.time()
-    print(f"This took {format_seconds(end - start)} to run.")
+    # start = time.time()
+    # main(scenario = args.scenario,
+    #      instruction = experiment_mapping[args.scenario][instruction_types[args.inst_type]],
+    #      inst_type = instruction_types[args.inst_type],
+    #      start_idx = args.start_idx,
+    #      end_idx = args.end_idx)
+    # end = time.time()
+    # print(f"This took {format_seconds(end - start)} to run.")

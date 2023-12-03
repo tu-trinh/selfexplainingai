@@ -27,8 +27,11 @@ class LearningAgent(Agent):
         self.interactions = 0
         self.instruction = None
     
-    def set_instruction(self, instruction):
-        self.system_message = {"role": "system", "content": SETTING_DESCRIPTION + "\nYOUR TASK IS: " + instruction}
+    def set_instruction(self, instruction, additional_actions = None):
+        if additional_actions:
+            self.system_message = {"role": "system", "content": SETTING_DESCRIPTION + additional_actions + "\nYOUR TASK IS: " + instruction}
+        else:
+            self.system_message = {"role": "system", "content": SETTING_DESCRIPTION + "\nYOUR TASK IS: " + instruction}
         self.instruction = instruction
         self.prompts = []
         self.responses = []
@@ -46,10 +49,10 @@ class LearningAgent(Agent):
                     break
             if observation:
                 if action_failed:
-                    complete_instruction = "The previous action you did achieved nothing. "
+                    complete_instruction = "The previous action you attempted failed. "
                 else:
                     complete_instruction = ""
-                complete_instruction += observation + "Reminder that your task is, " + self.instruction + " " + INQUIRY
+                complete_instruction += observation + INQUIRY
                 messages.append({"role": "user", "content": complete_instruction})
             else:
                 self.responses.pop()
@@ -71,12 +74,10 @@ class LearningAgent(Agent):
         content_length = 0
         for message in messages:
             content_length += len(self.tokenizer.encode(message["content"]))
-        while content_length > constants.MAX_MSG_TOKENS:
+        if content_length > constants.MAX_MSG_TOKENS:
             messages = messages[:1] + messages[3:]  # keep system message, throw out the oldest user/assistant pair
-            content_length = 0
-            for message in messages:
-                token_count = len(self.tokenizer.encode(message["content"]))
-                content_length += token_count
+            self.prompts = self.prompts[1:]
+            self.responses = self.responses[1:]
         return messages
     
     def display_history(self):

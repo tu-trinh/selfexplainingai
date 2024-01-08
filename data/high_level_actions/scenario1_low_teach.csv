@@ -1,0 +1,3 @@
+scenario,env_seed,inst_type,instruction,succeeded,steps_to_succeed,total_interactions
+1,1,low-teach,"Go to the goal. In order to complete this task, do the following exactly: move forward until you see only walls, then turn right. Keep moving forward and you will see the goal. Go to it to complete your task.",False,14,14
+1,2,low-teach,"Go to the goal. In order to complete this task, do the following exactly: move forward until you see only walls, then turn right. Keep moving forward and you will see the goal. Go to it to complete your task.",False,14,14

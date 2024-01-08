@@ -1,0 +1,1042 @@
+HAD TO REMOVE SEED FROM KWARGS AND USE ENV.SEED() METHOD INSTEAD
+MADE CHANGE IN /Users/tutrinh/Work/CHAI/Grounding_LLMs_with_online_RL/babyai-text/babyai/levels/levelgen.py
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like room. At each step, you may choose to execute one of the following actions:
+1. Turn left. For example, if you are in cell (0, 0) and facing north, turning left would have you in the same cell but facing west.
+2. Turn right. For example, if you are in cell (0, 0) and facing north, turning right would have you in the same cell but facing east.
+3. Move forward. For example, if you are in cell (0, 0) and facing north, moving forward would put you in (0, 1).
+4. Pick up an object. The object must be in a cell cardinally adjacent to you and you must be directly facing it. For example, if you are in cell (0, 0) and facing east, and there is a ball at (1, 0), you can pick up the ball and will be able to travel with it until you put it down.
+5. Drop an object. There must be space directly in front of you to drop it. For example, if you are in cell (0, 0), facing north, and holding a key, and there is nothing at (0, 1), you can put the key down on (0, 1).
+6. Unlock, open, or close a door. The door must be in a cell cardinally adjacent to you and you must be directly facing it. If it is locked, you must be holding a key of the same color as the door. For example, if you are in cell (0, 0), facing north, and holding a green key, and there is a green door at (0, 1), you can use the key to unlock the door, after which the door will also open.
+YOUR TASK IS: Go to the yellow box. In order to complete this task, you should do the following: explore the room until you see a closed green door. Head towards it and open it to enter another room. Then, explore this room until you find a grey key. Pick up this key. Further explore this room until you see a closed red door. Open it to enter another room. Explore this room until you find a closed green door. Head towards it and open it to enter another room. Now explore this room until you see a closed purple door. Open it to enter another room. Explore this one until you see a locked grey door. Use the grey key you picked up earlier to unlock this door. Enter the final room. Explore it until you see a yellow box. Head towards it to complete the task.
+
+Gingerbread Man was told: You see a wall 1 step left. You see a grey ball 2 steps forward. You see a closed blue door 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to go towards the closed blue door.
+
+
+Gingerbread Man was told: You see a wall 1 step left. You see a grey ball 2 steps forward. You see a closed blue door 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 1 step left. You see a grey ball 2 steps forward. You see a closed blue door 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the grey ball.
+
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a grey ball 2 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2 (turn right) to face towards the grey ball.
+
+
+Gingerbread Man was told: You see a wall 1 step left. You see a grey ball 2 steps forward. You see a closed blue door 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 4 (pick up) to interact with the grey ball.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 2 steps forward. You see a wall 1 step left. You see a closed blue door 1 step right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 2 steps forward. You see a wall 1 step left. You see a closed blue door 1 step right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the closed blue door.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 1 step forward. You see a wall 2 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 1 step forward. You see a wall 2 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2 (turn right) to face towards the wall 1 step forward.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 2 steps forward. You see a wall 1 step left. You see a closed blue door 1 step right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to approach the closed blue door.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 1 step forward. You see a wall 1 step left. You see a closed blue door 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6 (unlock, open, or close a door) to interact with the closed blue door.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 2 steps left. You see a closed purple door 2 steps left and 2 steps forward. You see a open blue door 1 step forward. You see a purple key 2 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 4 (pick up) to interact with the purple key.
+
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You carry a grey ball. You see a wall 2 steps right. You see a closed blue door 1 step left and 4 steps forward. You see a purple key 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to approach the closed blue door.
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You carry a grey ball. You see a wall 2 steps right. You see a closed blue door 1 step left and 4 steps forward. You see a purple key 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the closed blue door.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 5 steps forward. You see a wall 3 steps left. You see a grey box 1 step left and 4 steps forward. You see a purple key 1 step right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to approach the grey box.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 4 steps forward. You see a wall 3 steps left. You see a grey box 1 step left and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 5 (drop) to interact with the grey ball and drop it.
+
+
+Gingerbread Man was told: You see a wall 3 steps left. You see a grey box 1 step left and 3 steps forward. You see a grey ball 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 4 (pick up) to interact with the grey ball.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 4 steps forward. You see a wall 3 steps left. You see a grey box 1 step left and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 4 steps forward. You see a wall 3 steps left. You see a grey box 1 step left and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2 (turn right) to face towards the grey box.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 3 steps right. You see a closed blue door 4 steps forward. You see a purple key 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to approach the closed blue door.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a closed blue door 3 steps forward. You see a purple key 1 step right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6 (unlock, open, or close a door) to interact with the closed blue door.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 3 steps right. You see a purple box 3 steps left and 5 steps forward. You see a open blue door 1 step forward. You see a purple key 1 step right and 6 steps forward. You see a closed grey door 3 steps right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to approach the closed grey door.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 1 step left. You see a wall 1 step right. You see a purple box 3 steps left and 4 steps forward. You see a purple key 1 step right and 5 steps forward. You see a closed grey door 3 steps right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the closed grey door.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man has failed to complete the task. This took 26 interactions.
+
+HAD TO REMOVE SEED FROM KWARGS AND USE ENV.SEED() METHOD INSTEAD
+MADE CHANGE IN /Users/tutrinh/Work/CHAI/Grounding_LLMs_with_online_RL/babyai-text/babyai/levels/levelgen.py
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like room. At each step, you may choose to execute one of the following actions:
+1. Turn left. For example, if you are in cell (0, 0) and facing north, turning left would have you in the same cell but facing west.
+2. Turn right. For example, if you are in cell (0, 0) and facing north, turning right would have you in the same cell but facing east.
+3. Move forward. For example, if you are in cell (0, 0) and facing north, moving forward would put you in (0, 1).
+4. Pick up an object. The object must be in a cell cardinally adjacent to you and you must be directly facing it. For example, if you are in cell (0, 0) and facing east, and there is a ball at (1, 0), you can pick up the ball and will be able to travel with it until you put it down.
+5. Drop an object. There must be space directly in front of you to drop it. For example, if you are in cell (0, 0), facing north, and holding a key, and there is nothing at (0, 1), you can put the key down on (0, 1).
+6. Unlock, open, or close a door. The door must be in a cell cardinally adjacent to you and you must be directly facing it. If it is locked, you must be holding a key of the same color as the door. For example, if you are in cell (0, 0), facing north, and holding a green key, and there is a green door at (0, 1), you can use the key to unlock the door, after which the door will also open.
+YOUR TASK IS: Go to a purple key.
+In order to complete this task, you should explore the room until you see a blue door. Head through this door to reach a purple key.
+
+Gingerbread Man was told: You see a wall 4 steps forward. You see a wall 1 step right. You see a grey box 1 step left and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Turn right (2)
+
+Explanation: Turning right will allow me to face towards the grey box, which is 1 step to the right and 3 steps forward.
+
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a wall 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Turn left (1)
+
+Explanation: Turning left will allow me to face towards the grey box, which is 1 step to the left and 3 steps forward.
+
+
+Gingerbread Man was told: You see a wall 4 steps forward. You see a wall 1 step right. You see a grey box 1 step left and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Move forward (3)
+
+Explanation: Moving forward will allow me to reach the grey box, which is 3 steps forward from my current position.
+
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a wall 1 step right. You see a grey box 1 step left and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Turn left (1)
+
+Explanation: Turning left will allow me to face towards the grey box, which is 1 step to the left and 2 steps forward.
+
+
+Gingerbread Man was told: You see a wall 6 steps forward. You see a wall 3 steps right. You see a green ball 2 steps left and 2 steps forward. You see a closed blue door 1 step left and 6 steps forward. You see a grey box 2 steps right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Turn left (1)
+
+Explanation: Turning left will allow me to face towards the blue door, which is 1 step to the left and 6 steps forward.
+
+
+Gingerbread Man was told: You see a wall 4 steps forward. You see a wall 1 step left. You see a green ball 2 steps right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Turn right (2)
+
+Explanation: Turning right will allow me to face towards the green ball, which is 2 steps to the right and 2 steps forward.
+
+
+Gingerbread Man was told: You see a wall 6 steps forward. You see a wall 3 steps right. You see a green ball 2 steps left and 2 steps forward. You see a closed blue door 1 step left and 6 steps forward. You see a grey box 2 steps right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Move forward (3)
+
+Explanation: Moving forward will allow me to reach the closed blue door, which is 6 steps forward from my current position.
+
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a wall 3 steps right. You see a closed blue door 1 step left and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Turn left (1)
+
+Explanation: Turning left will allow me to face towards the closed blue door, which is 1 step to the left and 3 steps forward.
+
+
+Gingerbread Man was told: You see a wall 4 steps forward. You see a wall 3 steps right. You see a green ball 1 step left and 2 steps forward. You see a closed purple door 2 steps right and 4 steps forward. You see a closed blue door 3 steps right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Turn right (2)
+
+Explanation: Turning right will allow me to face towards the closed purple door, which is 2 steps to the right and 4 steps forward.
+
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a wall 3 steps right. You see a closed blue door 1 step left and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a wall 3 steps right. You see a closed blue door 1 step left and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Turn left (1)
+
+Explanation: Turning left will allow me to face towards the closed blue door, which is 1 step to the left and 3 steps forward.
+
+
+Gingerbread Man was told: You see a wall 4 steps forward. You see a wall 3 steps right. You see a green ball 1 step left and 2 steps forward. You see a closed purple door 2 steps right and 4 steps forward. You see a closed blue door 3 steps right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Turn right (2)
+
+Explanation: Turning right will allow me to face towards the closed purple door, which is 2 steps to the right and 4 steps forward.
+
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a wall 3 steps right. You see a closed blue door 1 step left and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Turn left (1)
+
+Explanation: Turning left will allow me to face towards the closed blue door, which is 1 step to the left and 3 steps forward.
+
+
+Gingerbread Man was told: You see a wall 4 steps forward. You see a wall 3 steps right. You see a green ball 1 step left and 2 steps forward. You see a closed purple door 2 steps right and 4 steps forward. You see a closed blue door 3 steps right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Move forward (3)
+
+Explanation: Moving forward will allow me to reach the closed purple door, which is 4 steps forward from my current position.
+
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a green ball 1 step left and 1 step forward. You see a closed purple door 2 steps right and 3 steps forward. You see a closed blue door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Turn right (2)
+
+Explanation: Turning right will allow me to face towards the closed blue door, which is 3 steps to the right.
+
+
+Gingerbread Man was told: You see a wall 3 steps left. You see a closed purple door 3 steps left and 2 steps forward. You see a closed blue door 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Move forward (3)
+
+Explanation: Moving forward will allow me to reach the closed blue door, which is 3 steps forward from my current position.
+
+
+Gingerbread Man was told: You see a closed purple door 3 steps left. You see a closed blue door 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Move forward (3)
+
+Explanation: Moving forward will allow me to reach the closed blue door, which is 1 step forward from my current position.
+
+Gingerbread Man was told: You see a closed purple door 3 steps left. You see a closed blue door 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I am stumped.
+
+Gingerbread Man was told: You see a closed purple door 3 steps left. You see a closed blue door 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Turn left (1)
+
+Explanation: Turning left will allow me to face towards the closed purple door, which is 3 steps to the left.
+
+
+Gingerbread Man was told: You see a green ball 3 steps left and 1 step forward. You see a closed purple door 3 steps forward. You see a closed blue door 1 step right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Move forward (3)
+
+Explanation: Moving forward will allow me to reach the closed purple door, which is 3 steps forward from my current position.
+
+
+Gingerbread Man was told: You see a wall 1 step right. You see a green ball 3 steps left. You see a closed purple door 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I am stumped.
+
+Gingerbread Man was told: You see a wall 1 step right. You see a green ball 3 steps left. You see a closed purple door 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Turn left (1)
+
+Explanation: Turning left will allow me to face towards the green ball, which is 3 steps to the left.
+
+
+Gingerbread Man was told: You see a green ball 3 steps forward. You see a closed purple door 2 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will take the following action:
+
+Action: Move forward (3)
+
+Explanation: Moving forward will allow me to reach the closed purple door, which is 2 steps to the right from my current position.
+
+
+Gingerbread Man has failed to complete the task. This took 23 interactions.
+
+HAD TO REMOVE SEED FROM KWARGS AND USE ENV.SEED() METHOD INSTEAD
+MADE CHANGE IN /Users/tutrinh/Work/CHAI/Grounding_LLMs_with_online_RL/babyai-text/babyai/levels/levelgen.py
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like room. At each step, you may choose to execute one of the following actions:
+1. Turn left. For example, if you are in cell (0, 0) and facing north, turning left would have you in the same cell but facing west.
+2. Turn right. For example, if you are in cell (0, 0) and facing north, turning right would have you in the same cell but facing east.
+3. Move forward. For example, if you are in cell (0, 0) and facing north, moving forward would put you in (0, 1).
+4. Pick up an object. The object must be in a cell cardinally adjacent to you and you must be directly facing it. For example, if you are in cell (0, 0) and facing east, and there is a ball at (1, 0), you can pick up the ball and will be able to travel with it until you put it down.
+5. Drop an object. There must be space directly in front of you to drop it. For example, if you are in cell (0, 0), facing north, and holding a key, and there is nothing at (0, 1), you can put the key down on (0, 1).
+6. Unlock, open, or close a door. The door must be in a cell cardinally adjacent to you and you must be directly facing it. If it is locked, you must be holding a key of the same color as the door. For example, if you are in cell (0, 0), facing north, and holding a green key, and there is a green door at (0, 1), you can use the key to unlock the door, after which the door will also open.
+YOUR TASK IS: Go to the blue ball.
+In order to complete this task, you must explore the room until you see a grey door. Head through it and explore that room until you see another grey door. Head through it, then find and pick up a blue key. Then find and go through a green door. Explore this room until you find a red door. Head through it. Explore this new room until you find a blue door. Unlock it using the blue key you picked up earlier. In this room, explore around you until you see the blue ball and head towards it.
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a wall 2 steps right. You see a purple box 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to go 3 steps forward.
+
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a wall 2 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a wall 2 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the left.
+
+
+Gingerbread Man was told: You see a wall 5 steps forward. You see a wall 1 step right. You see a closed grey door 2 steps left and 5 steps forward. You see a yellow box 1 step left and 4 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to go 5 steps forward.
+
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a wall 1 step right. You see a closed grey door 2 steps left and 1 step forward. You see a yellow box 1 step left. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the left.
+
+
+Gingerbread Man was told: You see a wall 1 step right. You see a closed yellow door 6 steps forward. You see a yellow box 1 step forward. You see a closed grey door 1 step right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to go 6 steps forward.
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You see a wall 1 step right. You see a closed yellow door 6 steps forward. You see a yellow box 1 step forward. You see a closed grey door 1 step right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 1 step right. You see a closed yellow door 6 steps forward. You see a yellow box 1 step forward. You see a closed grey door 1 step right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the left.
+
+
+Gingerbread Man was told: You see a wall 6 steps forward. You see a wall 1 step left. You see a purple box 1 step right and 5 steps forward. You see a yellow box 1 step right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2 (turn right) to face towards the right.
+
+
+Gingerbread Man was told: You see a wall 1 step right. You see a closed yellow door 6 steps forward. You see a yellow box 1 step forward. You see a closed grey door 1 step right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6 (unlock, open, or close a door) to interact with the closed yellow door.
+
+
+
+Gingerbread Man was told: You see a wall 1 step right. You see a red box 2 steps left and 4 steps forward. You see a yellow ball 2 steps left and 3 steps forward. You see a open yellow door 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 4 (pick up) to pick up the yellow ball.
+
+
+Gingerbread Man was told: You carry a yellow ball. You see a wall 5 steps forward. You see a wall 2 steps left. You see a closed green door 1 step left and 5 steps forward. You see a red box 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the left.
+
+
+Gingerbread Man was told: You carry a yellow ball. You see a wall 2 steps forward. You see a wall 2 steps left. You see a closed grey door 2 steps left and 6 steps forward. You see a open yellow door 1 step left and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to go 2 steps forward.
+
+
+Gingerbread Man was told: You carry a yellow ball. You see a wall 1 step forward. You see a wall 2 steps left. You see a closed grey door 2 steps left and 5 steps forward. You see a yellow box 1 step left and 6 steps forward. You see a open yellow door 1 step left and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to go 1 step forward.
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You carry a yellow ball. You see a wall 1 step forward. You see a wall 2 steps left. You see a closed grey door 2 steps left and 5 steps forward. You see a yellow box 1 step left and 6 steps forward. You see a open yellow door 1 step left and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a yellow ball. You see a wall 1 step forward. You see a wall 2 steps left. You see a closed grey door 2 steps left and 5 steps forward. You see a yellow box 1 step left and 6 steps forward. You see a open yellow door 1 step left and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6 (unlock, open, or close a door) to interact with the open yellow door.
+
+
+Gingerbread Man was told: You carry a yellow ball. You see a wall 1 step left. You see a closed yellow door 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6 (unlock, open, or close a door) to interact with the closed yellow door.
+
+
+Gingerbread Man was told: You carry a yellow ball. You see a wall 1 step left. You see a closed grey door 1 step left and 5 steps forward. You see a yellow box 6 steps forward. You see a open yellow door 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to go 1 step forward.
+
+
+Gingerbread Man was told: You carry a yellow ball. You see a wall 1 step left. You see a wall 1 step right. You see a closed grey door 1 step left and 4 steps forward. You see a yellow box 5 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to go 4 steps forward.
+
+
+Gingerbread Man was told: You carry a yellow ball. You see a closed grey door 1 step left. You see a yellow box 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 4 (pick up) to pick up the yellow box.
+
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You carry a yellow ball. You see a closed grey door 1 step left. You see a yellow box 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a yellow ball. You see a closed grey door 1 step left. You see a yellow box 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6 (unlock, open, or close a door) to interact with the closed grey door.
+
+
+Gingerbread Man was told: You carry a yellow ball. You see a purple box 2 steps left and 6 steps forward. You see a open grey door 1 step forward. You see a yellow box 1 step right. You see a blue box 2 steps right and 2 steps forward. You see a closed grey door 3 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to go 1 step forward.
+
+
+Gingerbread Man was told: You carry a yellow ball. You see a wall 1 step left. You see a wall 1 step right. You see a purple box 2 steps left and 5 steps forward. You see a blue box 2 steps right and 1 step forward. You see a closed grey door 3 steps right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to go 2 steps forward.
+
+
+Gingerbread Man was told: You carry a yellow ball. You see a wall 5 steps forward. You see a purple box 2 steps left and 3 steps forward. You see a closed grey door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the left.
+
+
+Gingerbread Man was told: You carry a yellow ball. You see a wall 4 steps forward. You see a open yellow door 3 steps left and 4 steps forward. You see a open grey door 2 steps left. You see a closed purple door 1 step left and 4 steps forward. You see a purple box 3 steps right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6 (unlock, open, or close a door) to interact with the closed purple door.
+
+
+Gingerbread Man was told: You carry a yellow ball. You see a wall 1 step left. You see a open purple door 1 step forward. You see a yellow key 1 step right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 4 (pick up) to pick up the yellow key.
+
+
+Gingerbread Man has failed to complete the task. This took 28 interactions.
+
+HAD TO REMOVE SEED FROM KWARGS AND USE ENV.SEED() METHOD INSTEAD
+MADE CHANGE IN /Users/tutrinh/Work/CHAI/Grounding_LLMs_with_online_RL/babyai-text/babyai/levels/levelgen.py
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like room. At each step, you may choose to execute one of the following actions:
+1. Turn left. For example, if you are in cell (0, 0) and facing north, turning left would have you in the same cell but facing west.
+2. Turn right. For example, if you are in cell (0, 0) and facing north, turning right would have you in the same cell but facing east.
+3. Move forward. For example, if you are in cell (0, 0) and facing north, moving forward would put you in (0, 1).
+4. Pick up an object. The object must be in a cell cardinally adjacent to you and you must be directly facing it. For example, if you are in cell (0, 0) and facing east, and there is a ball at (1, 0), you can pick up the ball and will be able to travel with it until you put it down.
+5. Drop an object. There must be space directly in front of you to drop it. For example, if you are in cell (0, 0), facing north, and holding a key, and there is nothing at (0, 1), you can put the key down on (0, 1).
+6. Unlock, open, or close a door. The door must be in a cell cardinally adjacent to you and you must be directly facing it. If it is locked, you must be holding a key of the same color as the door. For example, if you are in cell (0, 0), facing north, and holding a green key, and there is a green door at (0, 1), you can use the key to unlock the door, after which the door will also open.
+YOUR TASK IS: Go to a red box.
+In order to complete this task, you should do the following: starting in your current position, explore the room you're in until you find a yellow door. Open that door and enter another room. Explore this room until you see a red box. Head towards it to complete your task.
+
+Gingerbread Man was told: You see a wall 6 steps forward. You see a wall 1 step right. You see a purple box 3 steps left and 2 steps forward. You see a green ball 1 step left. You see a closed blue door 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 3 (Move forward)
+
+
+Gingerbread Man was told: You see a wall 5 steps forward. You see a purple box 3 steps left and 1 step forward. You see a closed blue door 1 step right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 1 (Turn left)
+
+
+Gingerbread Man was told: You see a wall 6 steps forward. You see a wall 2 steps left. You see a closed yellow door 2 steps left and 5 steps forward. You see a green ball 1 step left and 1 step forward. You see a purple box 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 6 (Unlock, open, or close a door)
+Object: Yellow door
+
+
+Gingerbread Man was told: You see a wall 1 step right. You see a red box 3 steps left and 3 steps forward. You see a green key 3 steps forward. You see a open yellow door 1 step forward. You see a closed blue door 1 step right and 4 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 4 (Pick up)
+Object: Green key
+
+
+Gingerbread Man was told: You carry a green key. You see a wall 6 steps forward. You see a wall 1 step right. You see a red box 3 steps left and 1 step forward. You see a closed blue door 1 step right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 1 (Turn left)
+
+
+Gingerbread Man was told: You carry a green key. You see a wall 6 steps forward. You see a closed blue door 3 steps left and 6 steps forward. You see a green ball 2 steps left and 4 steps forward. You see a open yellow door 1 step left. You see a red box 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 3 (Move forward)
+
+
+Gingerbread Man was told: You carry a green key. You see a wall 5 steps forward. You see a wall 1 step left. You see a red box 1 step right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a green key. You see a wall 5 steps forward. You see a wall 1 step left. You see a red box 1 step right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 1 (Turn left)
+
+
+Gingerbread Man was told: You carry a green key. You see a wall 1 step forward. You see a wall 2 steps left. You see a open yellow door 1 step left and 1 step forward. You see a purple box 1 step right and 4 steps forward. You see a green ball 3 steps right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 3 (Move forward)
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You carry a green key. You see a wall 1 step forward. You see a wall 2 steps left. You see a open yellow door 1 step left and 1 step forward. You see a purple box 1 step right and 4 steps forward. You see a green ball 3 steps right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Apologies for the confusion. Based on the given information, I will take the following action:
+
+Action: 6 (Unlock, open, or close a door)
+Object: Yellow door
+
+
+Gingerbread Man was told: You carry a green key. You see a wall 1 step left. You see a closed yellow door 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 6 (Unlock, open, or close a door)
+Object: Yellow door
+
+
+Gingerbread Man was told: You carry a green key. You see a wall 1 step left. You see a open yellow door 1 step forward. You see a purple box 2 steps right and 4 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 3 (Move forward)
+
+
+Gingerbread Man was told: You carry a green key. You see a wall 1 step left. You see a wall 1 step right. You see a closed grey door 1 step left and 6 steps forward. You see a purple box 2 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 1 (Turn left)
+
+
+Gingerbread Man was told: You carry a green key. You see a wall 1 step forward. You see a closed blue door 3 steps left and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 1 (Turn left)
+
+
+Gingerbread Man was told: You carry a green key. You see a wall 1 step left. You see a wall 1 step right. You see a red box 3 steps left and 2 steps forward. You see a closed blue door 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 1 (Turn left)
+
+
+Gingerbread Man was told: You carry a green key. You see a wall 1 step forward. You see a purple box 3 steps left and 2 steps forward. You see a closed blue door 2 steps left and 6 steps forward. You see a green ball 1 step left and 4 steps forward. You see a red box 2 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 6 (Unlock, open, or close a door)
+Object: Blue door
+
+
+Gingerbread Man was told: You carry a green key. You see a purple ball 1 step left and 2 steps forward. You see a red key 6 steps forward. You see a open blue door 1 step forward. You see a closed grey door 3 steps right and 2 steps forward. You see a open yellow door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 4 (Pick up)
+Object: Red key
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You carry a green key. You see a purple ball 1 step left and 2 steps forward. You see a red key 6 steps forward. You see a open blue door 1 step forward. You see a closed grey door 3 steps right and 2 steps forward. You see a open yellow door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Apologies for the confusion. Based on the given information, I will take the following action:
+
+Action: 3 (Move forward)
+
+Gingerbread Man was told: You carry a green key. You see a purple ball 1 step left and 2 steps forward. You see a red key 6 steps forward. You see a open blue door 1 step forward. You see a closed grey door 3 steps right and 2 steps forward. You see a open yellow door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 6 (Unlock, open, or close a door)
+Object: Grey door
+
+
+Gingerbread Man was told: You carry a green key. You see a wall 1 step left. You see a wall 1 step right. You see a purple key 2 steps left and 6 steps forward. You see a purple ball 1 step left and 1 step forward. You see a red key 5 steps forward. You see a closed grey door 3 steps right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 4 (Pick up)
+Object: Purple key
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You carry a green key. You see a wall 1 step left. You see a wall 1 step right. You see a purple key 2 steps left and 6 steps forward. You see a purple ball 1 step left and 1 step forward. You see a red key 5 steps forward. You see a closed grey door 3 steps right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Apologies for the confusion. Based on the given information, I will take the following action:
+
+Action: 3 (Move forward)
+
+
+Gingerbread Man was told: You carry a green key. You see a purple key 2 steps left and 5 steps forward. You see a purple ball 1 step left. You see a red key 4 steps forward. You see a closed grey door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 4 (Pick up)
+Object: Purple key
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You carry a green key. You see a purple key 2 steps left and 5 steps forward. You see a purple ball 1 step left. You see a red key 4 steps forward. You see a closed grey door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Apologies for the confusion. Based on the given information, I will take the following action:
+
+Action: 3 (Move forward)
+
+
+Gingerbread Man was told: You carry a green key. You see a wall 3 steps right. You see a purple key 2 steps left and 4 steps forward. You see a red key 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I am stumped.
+
+Gingerbread Man was told: You carry a green key. You see a wall 3 steps right. You see a purple key 2 steps left and 4 steps forward. You see a red key 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 2 (Turn right)
+
+
+Gingerbread Man was told: You carry a green key. You see a wall 3 steps forward. You see a red key 3 steps left. You see a closed grey door 1 step right and 3 steps forward. You see a open blue door 2 steps right. You see a open yellow door 3 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action
+
+Gingerbread Man was told: You carry a green key. You see a wall 3 steps forward. You see a red key 3 steps left. You see a closed grey door 1 step right and 3 steps forward. You see a open blue door 2 steps right. You see a open yellow door 3 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I am stumped.
+
+Gingerbread Man was told: You carry a green key. You see a wall 3 steps forward. You see a red key 3 steps left. You see a closed grey door 1 step right and 3 steps forward. You see a open blue door 2 steps right. You see a open yellow door 3 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action:
+
+Gingerbread Man was told: You carry a green key. You see a wall 3 steps forward. You see a red key 3 steps left. You see a closed grey door 1 step right and 3 steps forward. You see a open blue door 2 steps right. You see a open yellow door 3 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information, I will take the following action:
+
+Action: 6 (Unlock, open, or close a
+
+
+Gingerbread Man was told: You carry a green key. You see a closed grey door 3 steps left. You see a closed blue door 1 step forward. You see a purple ball 1 step right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the given information,
+
+Gingerbread Man has failed to complete the task. This took 30 interactions.
+
+HAD TO REMOVE SEED FROM KWARGS AND USE ENV.SEED() METHOD INSTEAD
+MADE CHANGE IN /Users/tutrinh/Work/CHAI/Grounding_LLMs_with_online_RL/babyai-text/babyai/levels/levelgen.py
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like room. At each step, you may choose to execute one of the following actions:
+1. Turn left. For example, if you are in cell (0, 0) and facing north, turning left would have you in the same cell but facing west.
+2. Turn right. For example, if you are in cell (0, 0) and facing north, turning right would have you in the same cell but facing east.
+3. Move forward. For example, if you are in cell (0, 0) and facing north, moving forward would put you in (0, 1).
+4. Pick up an object. The object must be in a cell cardinally adjacent to you and you must be directly facing it. For example, if you are in cell (0, 0) and facing east, and there is a ball at (1, 0), you can pick up the ball and will be able to travel with it until you put it down.
+5. Drop an object. There must be space directly in front of you to drop it. For example, if you are in cell (0, 0), facing north, and holding a key, and there is nothing at (0, 1), you can put the key down on (0, 1).
+6. Unlock, open, or close a door. The door must be in a cell cardinally adjacent to you and you must be directly facing it. If it is locked, you must be holding a key of the same color as the door. For example, if you are in cell (0, 0), facing north, and holding a green key, and there is a green door at (0, 1), you can use the key to unlock the door, after which the door will also open.
+YOUR TASK IS: Go to a red key.
+In order to complete this task, you must follow these instructions carefully: explore the room until you see the yellow door that is two steps behind a grey ball. Head through this yellow door into a room with a blue key. Find this key and pick it up. Then go back through the yellow door and explore this room until you find a purple door. Head through it and go straight to the blue door. Use the blue key to unlock the blue door. Head through this door. Explore this room until you see a red key. Head towards it to complete your task.
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a wall 1 step left. You see a closed yellow door 1 step left and 2 steps forward. You see a closed yellow door 1 step right and 3 steps forward. You see a grey ball 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to go 1 step forward.
+
+
+Gingerbread Man was told: You see a wall 2 steps forward. You see a wall 1 step left. You see a closed yellow door 1 step left and 1 step forward. You see a closed yellow door 1 step right and 2 steps forward. You see a grey ball 1 step right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to go 1 step forward.
+
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a closed yellow door 1 step left. You see a closed yellow door 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a closed yellow door 1 step left. You see a closed yellow door 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the closed yellow door on the left.
+
+
+Gingerbread Man was told: You see a wall 1 step right. You see a closed yellow door 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to go 1 step forward towards the closed yellow door.
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You see a wall 1 step right. You see a closed yellow door 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 1 step right. You see a closed yellow door 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2 (turn right) to face towards the closed yellow door.
+
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a closed yellow door 1 step left. You see a closed yellow door 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 5 (drop) to drop the object I am currently holding.
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You see a wall 1 step forward. You see a closed yellow door 1 step left. You see a closed yellow door 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a closed yellow door 1 step left. You see a closed yellow door 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the closed yellow door on the left.
+
+
+Gingerbread Man was told: You see a wall 1 step right. You see a closed yellow door 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to go 1 step forward towards the closed yellow door.
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You see a wall 1 step right. You see a closed yellow door 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 1 step right. You see a closed yellow door 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2 (turn right) to face towards the closed yellow door.
+
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a closed yellow door 1 step left. You see a closed yellow door 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 5 (drop) to drop the object I am currently holding.
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You see a wall 1 step forward. You see a closed yellow door 1 step left. You see a closed yellow door 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a closed yellow door 1 step left. You see a closed yellow door 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the closed yellow door on the left.
+
+Gingerbread Man has failed to complete the task. This took 16 interactions.
+
+HAD TO REMOVE SEED FROM KWARGS AND USE ENV.SEED() METHOD INSTEAD
+MADE CHANGE IN /Users/tutrinh/Work/CHAI/Grounding_LLMs_with_online_RL/babyai-text/babyai/levels/levelgen.py
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like room. At each step, you may choose to execute one of the following actions:
+1. Turn left. For example, if you are in cell (0, 0) and facing north, turning left would have you in the same cell but facing west.
+2. Turn right. For example, if you are in cell (0, 0) and facing north, turning right would have you in the same cell but facing east.
+3. Move forward. For example, if you are in cell (0, 0) and facing north, moving forward would put you in (0, 1).
+4. Pick up an object. The object must be in a cell cardinally adjacent to you and you must be directly facing it. For example, if you are in cell (0, 0) and facing east, and there is a ball at (1, 0), you can pick up the ball and will be able to travel with it until you put it down.
+5. Drop an object. There must be space directly in front of you to drop it. For example, if you are in cell (0, 0), facing north, and holding a key, and there is nothing at (0, 1), you can put the key down on (0, 1).
+6. Unlock, open, or close a door. The door must be in a cell cardinally adjacent to you and you must be directly facing it. If it is locked, you must be holding a key of the same color as the door. For example, if you are in cell (0, 0), facing north, and holding a green key, and there is a green door at (0, 1), you can use the key to unlock the door, after which the door will also open.
+YOUR TASK IS: Go a green ball.
+In order to complete this task, please carefully adhere to the following instructions: Explore your current room until you find a green door. Head through that door into a room that has a yellow key. Find this key and pick it up. Then explore this room until you see a locked yellow door. Use the yellow key to unlock this door. Then head through this door into a room with a green ball. Explore the room until you reach the ball, completing your task.
+
+Gingerbread Man was told: You see a wall 2 steps forward. You see a wall 1 step right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 2 steps forward. You see a wall 1 step right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will turn left. (Action 1: Turn left)
+
+
+Gingerbread Man was told: You see a wall 2 steps right. You see a blue ball 1 step left and 2 steps forward. You see a grey box 1 step left. You see a closed green door 6 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will move forward. (Action 3: Move forward)
+
+
+Gingerbread Man was told: You see a wall 2 steps right. You see a closed green door 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 2 steps right. You see a closed green door 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will turn left. (Action 1: Turn left)
+
+
+Gingerbread Man was told: You see a wall 5 steps forward. You see a grey box 3 steps left and 1 step forward. You see a closed green door 2 steps left and 5 steps forward. You see a blue ball 1 step left and 1 step forward. You see a closed green door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will turn right. (Action 2: Turn right)
+
+
+Gingerbread Man was told: You see a wall 2 steps right. You see a closed green door 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will turn left. (Action 1: Turn left)
+
+
+Gingerbread Man was told: You see a wall 5 steps forward. You see a grey box 3 steps left and 1 step forward. You see a closed green door 2 steps left and 5 steps forward. You see a blue ball 1 step left and 1 step forward. You see a closed green door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will move forward. (Action 3: Move forward)
+
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a wall 3 steps right. You see a closed green door 2 steps left and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will turn left. (Action 1: Turn left)
+
+
+Gingerbread Man was told: You see a wall 4 steps forward. You see a wall 3 steps right. You see a grey box 1 step left and 3 steps forward. You see a blue ball 1 step left and 1 step forward. You see a closed green door 3 steps right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will turn right. (Action 2: Turn right)
+
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a wall 3 steps right. You see a closed green door 2 steps left and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will turn left. (Action 1: Turn left)
+
+
+Gingerbread Man was told: You see a wall 4 steps forward. You see a wall 3 steps right. You see a grey box 1 step left and 3 steps forward. You see a blue ball 1 step left and 1 step forward. You see a closed green door 3 steps right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will move forward. (Action 3: Move forward)
+
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a wall 3 steps right. You see a grey box 1 step left and 2 steps forward. You see a blue ball 1 step left. You see a closed green door 3 steps right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will turn left. (Action 1: Turn left)
+
+
+Gingerbread Man was told: You see a wall 3 steps right. You see a blue ball 1 step forward. You see a grey box 2 steps right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will pick up the blue ball. (Action 4: Pick up the blue ball)
+
+
+Gingerbread Man was told: You carry a blue ball. You see a wall 4 steps forward. You see a wall 3 steps right. You see a grey box 2 steps right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a blue ball. You see a wall 4 steps forward. You see a wall 3 steps right. You see a grey box 2 steps right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will turn around. (Action 1: Turn left, Action 1: Turn left)
+
+
+Gingerbread Man was told: You carry a blue ball. You see a wall 3 steps forward. You see a wall 3 steps left. You see a closed green door 1 step left and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will turn right. (Action 2: Turn right)
+
+
+Gingerbread Man was told: You carry a blue ball. You see a wall 4 steps forward. You see a wall 3 steps left. You see a closed green door 2 steps right and 4 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will turn left. (Action 1: Turn left)
+
+
+Gingerbread Man was told: You carry a blue ball. You see a wall 3 steps forward. You see a wall 3 steps left. You see a closed green door 1 step left and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will turn right. (Action 2: Turn right)
+
+
+Gingerbread Man was told: You carry a blue ball. You see a wall 4 steps forward. You see a wall 3 steps left. You see a closed green door 2 steps right and 4 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will turn left. (Action 1: Turn left)
+
+
+Gingerbread Man has failed to complete the task. This took 20 interactions.
+
+HAD TO REMOVE SEED FROM KWARGS AND USE ENV.SEED() METHOD INSTEAD
+MADE CHANGE IN /Users/tutrinh/Work/CHAI/Grounding_LLMs_with_online_RL/babyai-text/babyai/levels/levelgen.py
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like room. At each step, you may choose to execute one of the following actions:
+1. Turn left. For example, if you are in cell (0, 0) and facing north, turning left would have you in the same cell but facing west.
+2. Turn right. For example, if you are in cell (0, 0) and facing north, turning right would have you in the same cell but facing east.
+3. Move forward. For example, if you are in cell (0, 0) and facing north, moving forward would put you in (0, 1).
+4. Pick up an object. The object must be in a cell cardinally adjacent to you and you must be directly facing it. For example, if you are in cell (0, 0) and facing east, and there is a ball at (1, 0), you can pick up the ball and will be able to travel with it until you put it down.
+5. Drop an object. There must be space directly in front of you to drop it. For example, if you are in cell (0, 0), facing north, and holding a key, and there is nothing at (0, 1), you can put the key down on (0, 1).
+6. Unlock, open, or close a door. The door must be in a cell cardinally adjacent to you and you must be directly facing it. If it is locked, you must be holding a key of the same color as the door. For example, if you are in cell (0, 0), facing north, and holding a green key, and there is a green door at (0, 1), you can use the key to unlock the door, after which the door will also open.
+YOUR TASK IS: Go to the blue ball.
+In order to complete this task, please follow the following instructions: Explore your current room until you see a yellow door. Head through this door into another room. In this room, explore it until you see a yellow key. Pick up this key. Keep exploring the room until you see a green door. Head through this green door into another room. Explore this new room until you see a blue key, then pick it up. Then go back through the green door and yellow door until you're back into the room you started in. Explore this room until you see a locked blue door. Use the blue key to unlock the blue door. Head through and explore the new room until you see a blue ball. Go towards this ball to complete your task.
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a wall 2 steps left. You see a grey ball 2 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a wall 2 steps left. You see a grey ball 2 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 4 to pick up the grey ball.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 4 steps forward. You see a wall 1 step left. You see a purple key 3 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 4 steps forward. You see a wall 1 step left. You see a purple key 3 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2 to turn right.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 3 steps right. You see a purple key 3 steps left and 3 steps forward. You see a locked blue door 6 steps forward. You see a closed yellow door 3 steps right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 to move forward.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 3 steps right. You see a purple key 3 steps left and 2 steps forward. You see a locked blue door 5 steps forward. You see a closed yellow door 3 steps right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6 to unlock the yellow door.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 3 steps right. You see a open yellow door 1 step forward. You see a yellow key 1 step right and 4 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 4 to pick up the yellow key.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a yellow key 1 step forward. You see a open yellow door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 to move forward.
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You carry a grey ball. You see a yellow key 1 step forward. You see a open yellow door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a grey ball. You see a yellow key 1 step forward. You see a open yellow door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I apologize for the confusion. I will choose action 2 to turn right.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a yellow key 1 step left. You see a open yellow door 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 to move forward.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 3 steps left. You see a open yellow door 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2 to turn right.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a open yellow door 2 steps left. You see a closed purple door 4 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 to move forward.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 2 steps left. You see a closed purple door 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 2 steps left. You see a closed purple door 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 to turn left.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 2 steps forward. You see a open yellow door 1 step left and 2 steps forward. You see a locked blue door 3 steps right and 5 steps forward. You see a closed purple door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6 to unlock the blue door.
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You carry a grey ball. You see a wall 2 steps forward. You see a open yellow door 1 step left and 2 steps forward. You see a locked blue door 3 steps right and 5 steps forward. You see a closed purple door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I apologize for the confusion. I will choose action 1 to turn left.
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 2 steps forward. You see a open yellow door 1 step left and 2 steps forward. You see a locked blue door 3 steps right and 5 steps forward. You see a closed purple door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2 to turn right.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 2 steps left. You see a closed purple door 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 2 steps left. You see a closed purple door 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 to turn left.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 2 steps forward. You see a open yellow door 1 step left and 2 steps forward. You see a locked blue door 3 steps right and 5 steps forward. You see a closed purple door 3 steps right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 to move forward.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 1 step forward. You see a wall 3 steps right. You see a open yellow door 1 step left and 1 step forward. You see a locked blue door 3 steps right and 4 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2 to turn right.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 3 steps forward. You see a wall 1 step left. You see a closed purple door 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 3 steps forward. You see a wall 1 step left. You see a closed purple door 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 to turn left.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 1 step forward. You see a wall 3 steps right. You see a open yellow door 1 step left and 1 step forward. You see a locked blue door 3 steps right and 4 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 to move forward.
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You carry a grey ball. You see a wall 1 step forward. You see a wall 3 steps right. You see a open yellow door 1 step left and 1 step forward. You see a locked blue door 3 steps right and 4 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I apologize for the confusion. I will choose action 2 to turn right.
+
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 3 steps forward. You see a wall 1 step left. You see a closed purple door 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You carry a grey ball. You see a wall 3 steps forward. You see a wall 1 step left. You see a closed purple door 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I apologize for the confusion. I will choose action 1 to turn left.
+
+Gingerbread Man has failed to complete the task. This took 28 interactions.
+
+HAD TO REMOVE SEED FROM KWARGS AND USE ENV.SEED() METHOD INSTEAD
+MADE CHANGE IN /Users/tutrinh/Work/CHAI/Grounding_LLMs_with_online_RL/babyai-text/babyai/levels/levelgen.py
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like room. At each step, you may choose to execute one of the following actions:
+1. Turn left. For example, if you are in cell (0, 0) and facing north, turning left would have you in the same cell but facing west.
+2. Turn right. For example, if you are in cell (0, 0) and facing north, turning right would have you in the same cell but facing east.
+3. Move forward. For example, if you are in cell (0, 0) and facing north, moving forward would put you in (0, 1).
+4. Pick up an object. The object must be in a cell cardinally adjacent to you and you must be directly facing it. For example, if you are in cell (0, 0) and facing east, and there is a ball at (1, 0), you can pick up the ball and will be able to travel with it until you put it down.
+5. Drop an object. There must be space directly in front of you to drop it. For example, if you are in cell (0, 0), facing north, and holding a key, and there is nothing at (0, 1), you can put the key down on (0, 1).
+6. Unlock, open, or close a door. The door must be in a cell cardinally adjacent to you and you must be directly facing it. If it is locked, you must be holding a key of the same color as the door. For example, if you are in cell (0, 0), facing north, and holding a green key, and there is a green door at (0, 1), you can use the key to unlock the door, after which the door will also open.
+YOUR TASK IS: Go to a grey ball.
+In order to complete this task, please carefully adhere to the following instructions: Explore your current room until you see a green door. Head through this door into the next room. Explore this room until you see a grey door. Head through this door into another room. Explore this room until you see a purple door. Head through that door into yet another room. Explore this room until you see a grey ball. Head towards it to complete your task.
+
+Gingerbread Man was told: You see a wall 5 steps forward. You see a closed green door 3 steps left and 5 steps forward. You see a purple key 3 steps left and 2 steps forward. You see a red box 1 step left and 1 step forward. You see a closed yellow door 1 step right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: The next action I will take is to turn left. (Action 1)
+
+
+Gingerbread Man was told: You see a wall 6 steps forward. You see a wall 2 steps left. You see a closed red door 1 step right and 6 steps forward. You see a red box 1 step right and 1 step forward. You see a purple key 2 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 6 steps forward. You see a wall 2 steps left. You see a closed red door 1 step right and 6 steps forward. You see a red box 1 step right and 1 step forward. You see a purple key 2 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: The next action I will take is to turn right. (Action 2)
+
+
+Gingerbread Man was told: You see a wall 5 steps forward. You see a closed green door 3 steps left and 5 steps forward. You see a purple key 3 steps left and 2 steps forward. You see a red box 1 step left and 1 step forward. You see a closed yellow door 1 step right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: The next action I will take is to move forward. (Action 3)
+
+
+Gingerbread Man was told: You see a wall 4 steps forward. You see a wall 1 step right. You see a closed green door 3 steps left and 4 steps forward. You see a purple key 3 steps left and 1 step forward. You see a red box 1 step left. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: The next action I will take is to turn left. (Action 1)
+
+
+Gingerbread Man was told: You see a wall 3 steps left. You see a closed red door 6 steps forward. You see a red box 1 step forward. You see a purple key 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: The next action I will take is to move forward. (Action 3)
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You see a wall 3 steps left. You see a closed red door 6 steps forward. You see a red box 1 step forward. You see a purple key 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 3 steps left. You see a closed red door 6 steps forward. You see a red box 1 step forward. You see a purple key 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: The next action I will take is to turn right. (Action 2)
+
+
+Gingerbread Man was told: You see a wall 4 steps forward. You see a wall 1 step right. You see a closed green door 3 steps left and 4 steps forward. You see a purple key 3 steps left and 1 step forward. You see a red box 1 step left. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: The next action I will take is to turn left. (Action 1)
+
+
+Gingerbread Man was told: You see a wall 3 steps left. You see a closed red door 6 steps forward. You see a red box 1 step forward. You see a purple key 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: The next action I will take is to move forward. (Action 3)
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You see a wall 3 steps left. You see a closed red door 6 steps forward. You see a red box 1 step forward. You see a purple key 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 3 steps left. You see a closed red door 6 steps forward. You see a red box 1 step forward. You see a purple key 1 step right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: The next action I will take is to turn right. (Action 2)
+
+
+Gingerbread Man was told: You see a wall 4 steps forward. You see a wall 1 step right. You see a closed green door 3 steps left and 4 steps forward. You see a purple key 3 steps left and 1 step forward. You see a red box 1 step left. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: The next action I will take is to turn left. (Action 1)
+
+Gingerbread Man has failed to complete the task. This took 13 interactions.
+
+HAD TO REMOVE SEED FROM KWARGS AND USE ENV.SEED() METHOD INSTEAD
+MADE CHANGE IN /Users/tutrinh/Work/CHAI/Grounding_LLMs_with_online_RL/babyai-text/babyai/levels/levelgen.py
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like room. At each step, you may choose to execute one of the following actions:
+1. Turn left. For example, if you are in cell (0, 0) and facing north, turning left would have you in the same cell but facing west.
+2. Turn right. For example, if you are in cell (0, 0) and facing north, turning right would have you in the same cell but facing east.
+3. Move forward. For example, if you are in cell (0, 0) and facing north, moving forward would put you in (0, 1).
+4. Pick up an object. The object must be in a cell cardinally adjacent to you and you must be directly facing it. For example, if you are in cell (0, 0) and facing east, and there is a ball at (1, 0), you can pick up the ball and will be able to travel with it until you put it down.
+5. Drop an object. There must be space directly in front of you to drop it. For example, if you are in cell (0, 0), facing north, and holding a key, and there is nothing at (0, 1), you can put the key down on (0, 1).
+6. Unlock, open, or close a door. The door must be in a cell cardinally adjacent to you and you must be directly facing it. If it is locked, you must be holding a key of the same color as the door. For example, if you are in cell (0, 0), facing north, and holding a green key, and there is a green door at (0, 1), you can use the key to unlock the door, after which the door will also open.
+YOUR TASK IS: Go to a purple box.
+In order to complete this task, explore your current room. There is a purple box in this room. Find it and head towards it to complete your task.
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a wall 3 steps right. You see a yellow box 1 step left. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will turn left (action 1) to face the yellow box.
+
+
+Gingerbread Man was told: You see a wall 3 steps right. You see a purple box 3 steps left and 1 step forward. You see a closed grey door 4 steps forward. You see a yellow box 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will move forward (action 3) to reach the yellow box.
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You see a wall 3 steps right. You see a purple box 3 steps left and 1 step forward. You see a closed grey door 4 steps forward. You see a yellow box 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Apologies for the confusion. In this case, I will turn left (action 1) to face the purple box.
+
+
+Gingerbread Man was told: You see a wall 4 steps forward. You see a wall 3 steps left. You see a purple box 1 step right and 3 steps forward. You see a yellow box 1 step right. You see a closed purple door 3 steps right and 4 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will move forward (action 3) to reach the purple box.
+
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a wall 3 steps left. You see a purple box 1 step right and 2 steps forward. You see a closed purple door 3 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will turn right (action 2) to face the closed purple door.
+
+
+Gingerbread Man was told: You see a wall 4 steps forward. You see a wall 3 steps left. You see a closed purple door 3 steps left and 3 steps forward. You see a purple box 2 steps left and 1 step forward. You see a closed grey door 1 step right and 4 steps forward. You see a yellow box 1 step right and 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will turn left (action 1) to face the closed purple door.
+
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a wall 3 steps left. You see a purple box 1 step right and 2 steps forward. You see a closed purple door 3 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 3 steps forward. You see a wall 3 steps left. You see a purple box 1 step right and 2 steps forward. You see a closed purple door 3 steps right and 3 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Apologies for the confusion earlier. Based on the updated information, I will move forward (action 3) to reach the purple box.
+
+Gingerbread Man has succeeded! This round took 8 interactions.
+
+HAD TO REMOVE SEED FROM KWARGS AND USE ENV.SEED() METHOD INSTEAD
+MADE CHANGE IN /Users/tutrinh/Work/CHAI/Grounding_LLMs_with_online_RL/babyai-text/babyai/levels/levelgen.py
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like room. At each step, you may choose to execute one of the following actions:
+1. Turn left. For example, if you are in cell (0, 0) and facing north, turning left would have you in the same cell but facing west.
+2. Turn right. For example, if you are in cell (0, 0) and facing north, turning right would have you in the same cell but facing east.
+3. Move forward. For example, if you are in cell (0, 0) and facing north, moving forward would put you in (0, 1).
+4. Pick up an object. The object must be in a cell cardinally adjacent to you and you must be directly facing it. For example, if you are in cell (0, 0) and facing east, and there is a ball at (1, 0), you can pick up the ball and will be able to travel with it until you put it down.
+5. Drop an object. There must be space directly in front of you to drop it. For example, if you are in cell (0, 0), facing north, and holding a key, and there is nothing at (0, 1), you can put the key down on (0, 1).
+6. Unlock, open, or close a door. The door must be in a cell cardinally adjacent to you and you must be directly facing it. If it is locked, you must be holding a key of the same color as the door. For example, if you are in cell (0, 0), facing north, and holding a green key, and there is a green door at (0, 1), you can use the key to unlock the door, after which the door will also open.
+YOUR TASK IS: Go to a green key.
+In order to complete this task, do the following steps exactly: explore your current room until you see a red door. Enter this door into a new room. Explore this new room until you see a blue door. Enter this door into yet another room. Explore this room until you see a green key; head towards it to achieve your goal.
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a wall 2 steps left. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the wall 2 steps left.
+
+
+Gingerbread Man was told: You see a wall 2 steps forward. You see a wall 1 step right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2 (turn right) to face towards the wall 1 step right.
+
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a wall 2 steps left. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a wall 2 steps left. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to explore the room further.
+
+Gingerbread Man was told to retry: The previous action you did achieved nothing. You see a wall 1 step forward. You see a wall 2 steps left. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a wall 2 steps left. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I apologize for the confusion. I will choose action 1 (turn left) to face towards the wall 2 steps left.
+
+
+Gingerbread Man was told: You see a wall 2 steps forward. You see a wall 1 step right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to explore the room further.
+
+
+Gingerbread Man was told: You see a wall 1 step forward. You see a wall 1 step right. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the wall 1 step right.
+
+
+Gingerbread Man was told: You see a wall 6 steps forward. You see a wall 1 step right. You see a red box 1 step left and 5 steps forward. You see a closed red door 1 step right and 4 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3 (move forward) to approach the closed red door.
+
+
+Gingerbread Man was told: You see a wall 2 steps left. You see a closed red door 1 step forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6 (unlock, open, or close a door) to interact with the closed red door.
+
+
+Gingerbread Man was told: You see a wall 2 steps left. You see a closed blue door 2 steps left and 4 steps forward. You see a yellow key 3 steps forward. You see a open red door 1 step forward. You see a yellow ball 1 step right and 4 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 4 (pick up) to interact with the yellow key.
+
+
+Gingerbread Man was told: You carry a yellow key. You see a wall 6 steps forward. You see a wall 2 steps left. You see a closed blue door 2 steps left and 2 steps forward. You see a yellow ball 1 step right and 2 steps forward. You see a closed yellow door 3 steps right and 6 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1 (turn left) to face towards the closed blue door.
+
+
+Gingerbread Man was told: You carry a yellow key. You see a wall 2 steps forward. You see a red box 3 steps left and 1 step forward. You see a open red door 1 step left. You see a closed blue door 2 steps right and 2 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6 (unlock, open, or close a door) to interact with the closed blue door.
+
+
+Gingerbread Man was told: You carry a yellow key. You see a wall 3 steps left. You see a locked red door 3 steps left and 6 steps forward. You see a green key 2 steps left and 2 steps forward. You see a open blue door 1 step forward. You see a blue box 2 steps right and 6 steps forward. What is the next action you take in order to complete your given task? Please tell me the number corresponding to your chosen action. If you choose 4 (pick up) or 5 (drop), please also tell me the object you'll be interacting with. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 4 (pick up) to interact with the green key.
+
+Gingerbread Man has succeeded! This round took 14 interactions.
+

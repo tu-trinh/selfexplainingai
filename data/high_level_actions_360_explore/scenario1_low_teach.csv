@@ -1,0 +1,8 @@
+scenario,env_seed,inst_type,instruction,succeeded,steps_to_succeed,total_interactions
+1,1,low-teach,"Get to the goal.\nIn order to achieve this task, do the following exactly: move forward as much as you can until you hit a wall. Then, turn right and continue moving forward until you reach the goal.",True,16,16
+1,2,low-teach,"Get to the goal.\nIn order to achieve this task, do the following exactly: move forward as much as you can until you hit a wall. Then, turn right and continue moving forward until you reach the goal.",False,14,14
+1,3,low-teach,"Get to the goal.\nIn order to achieve this task, do the following exactly: move forward as much as you can until you hit a wall. Then, turn right and continue moving forward until you reach the goal.",False,23,23
+1,4,low-teach,"Get to the goal.\nIn order to achieve this task, do the following exactly: move forward as much as you can until you hit a wall. Then, turn right and continue moving forward until you reach the goal.",False,24,24
+1,5,low-teach,"Get to the goal.\nIn order to achieve this task, do the following exactly: move forward as much as you can until you hit a wall. Then, turn right and continue moving forward until you reach the goal.",False,13,13
+1,6,low-teach,"Get to the goal.\nIn order to achieve this task, do the following exactly: move forward as much as you can until you hit a wall. Then, turn right and continue moving forward until you reach the goal.",False,24,24
+1,7,low-teach,"Get to the goal.\nIn order to achieve this task, do the following exactly: move forward as much as you can until you hit a wall. Then, turn right and continue moving forward until you reach the goal.",False,24,24

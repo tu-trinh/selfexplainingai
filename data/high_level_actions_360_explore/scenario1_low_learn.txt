@@ -1,0 +1,691 @@
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like environment. At each step, you may choose to do one of the following actions:
+1. Explore what is around you.
+2. Go to the cell in front.
+3. Go to the cell to the left.
+4. Go to the cell to the right.
+5. Go to the cell behind you.
+6. Go to key (only if you have seen one).
+7. Go to door (only if you have seen one).
+8. Go to goal (only if you have seen one).
+9. Pick up key (only if you have seen one).
+10. Open door (only if you have seen one).
+YOUR TASK IS: Go to the goal.
+In order to achieve this task, do exactly the following steps: starting from your current position, turn left twice to turn around. Then go to the key and pick it up. Then go forward three steps to the door. Open the door. Then go forward seven steps then right two steps to reach the goal.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3: Go to the cell to the left.
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1: Explore what is around me.
+
+Gingerbread Man was told: From your exploration, you know that you are facing east. Around you, you see the following:  a grey wall 1 cell left and 1 cell in front, a grey wall 1 cell left, a grey wall 1 cell in front, a grey wall 1 cell right and 1 cell in front, a grey wall 1 cell right, a grey wall 1 cell right and 4 cells behind, a grey wall 1 cell right and 3 cells behind, a grey wall 1 cell right and 2 cells behind, a grey wall 1 cell right and 1 cell behind, a blue key 2 cells behind, a grey wall 1 cell left and 4 cells behind, a grey wall 1 cell left and 3 cells behind, a grey wall 1 cell left and 2 cells behind, and a grey wall 1 cell left and 1 cell behind. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 5: Go to the cell behind you.
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a blue key 1, a locked blue door 1, a grey wall 6, a grey wall 7, a grey wall 8, and a grey wall 9. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a blue key 1, a locked blue door 1, a grey wall 6, a grey wall 7, a grey wall 8, and a grey wall 9. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3: Go to the cell to the left.
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a blue key 1, a locked blue door 1, a grey wall 6, a grey wall 7, a grey wall 8, and a grey wall 9. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 5: Go to the cell behind you.
+
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6: Go to key (only if you have seen one).
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a blue key 1, a locked blue door 1, a grey wall 6, a grey wall 7, a grey wall 8, and a grey wall 9. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 9: Pick up key (only if you have seen one).
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a locked blue door 1, a grey wall 6, a grey wall 7, a grey wall 8, and a grey wall 9. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a locked blue door 1, a grey wall 7, a grey wall 8, and a grey wall 9. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 10: Open door (only if you have seen one).
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, an open blue door 1, a grey wall 3, and a grey wall 4. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1 and a grey wall 2. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle.  Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a green goal 1. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a green goal 1. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 8: Go to goal (only if you have seen one).
+
+
+Gingerbread Man has succeeded! This round took 19 interactions.
+
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like environment. At each step, you may choose to do one of the following actions:
+1. Explore what is around you.
+2. Go to the cell in front.
+3. Go to the cell to the left.
+4. Go to the cell to the right.
+5. Go to the cell behind you.
+6. Go to key (only if you have seen one).
+7. Go to door (only if you have seen one).
+8. Go to goal (only if you have seen one).
+9. Pick up key (only if you have seen one).
+10. Open door (only if you have seen one).
+YOUR TASK IS: Go to the goal.
+In order to achieve this task, do exactly the following steps: turn right and pick up the blue key. Then turn left twice to turn around and go to the blue door. Use the blue key to unlock the blue door. Then go through the blue door and reach the goal
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a blue key 1, and a grey wall 6. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 2
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a blue key 1, and a grey wall 6. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 1
+
+Gingerbread Man was told: From your exploration, you know that you are facing north. Around you, you see the following:  a grey wall 2 cells left and 1 cell in front, a grey wall 2 cells left, a grey wall 1 cell left and 1 cell in front, a grey wall 1 cell in front, a grey wall 1 cell right and 1 cell in front, a blue key 1 cell right, a grey wall 2 cells right and 1 cell in front, a grey wall 2 cells right and 1 cell behind, a grey wall 1 cell right and 1 cell behind, a grey wall 1 cell behind, a locked blue door 1 cell left and 1 cell behind, and a grey wall 2 cells left and 1 cell behind. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 6
+
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, a grey wall 8, a grey wall 9, a grey wall 10, and a grey wall 11. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 9
+
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, a grey wall 8, a grey wall 9, a grey wall 10, and a grey wall 11. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 5
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a locked blue door 1, a grey wall 2, a grey wall 3, and a grey wall 4. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 10
+
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a green goal 1, an open blue door 1, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 8
+
+
+Gingerbread Man has succeeded! This round took 7 interactions.
+
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like environment. At each step, you may choose to do one of the following actions:
+1. Explore what is around you.
+2. Go to the cell in front.
+3. Go to the cell to the left.
+4. Go to the cell to the right.
+5. Go to the cell behind you.
+6. Go to key (only if you have seen one).
+7. Go to door (only if you have seen one).
+8. Go to goal (only if you have seen one).
+9. Pick up key (only if you have seen one).
+10. Open door (only if you have seen one).
+YOUR TASK IS: Go to the goal.
+In order to achieve this task, blindly follow these steps, ignoring what you see around you: Turn left and go pick up the blue key. Then turn around and go to the blue door. Use the blue key to unlock and open the blue door. Finally, go through this door and keep moving forward until you reach the goal.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a blue key 1, a grey wall 2, a grey wall 3, a grey wall 4, and a locked blue door 1. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 3
+
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, a grey wall 8, a grey wall 9, and a grey wall 10. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 1
+
+Gingerbread Man was told: From your exploration, you know that you are facing south. Around you, you see the following:  a grey wall 1 cell left and 3 cells in front, a grey wall 1 cell left and 2 cells in front, a grey wall 1 cell left and 1 cell in front, a grey wall 1 cell left, a grey wall 3 cells in front, a grey wall 1 cell right and 3 cells in front, a blue key 1 cell right and 1 cell in front, a grey wall 2 cells right and 3 cells in front, a grey wall 2 cells right and 2 cells in front, a grey wall 2 cells right and 1 cell in front, a grey wall 2 cells right, a grey wall 2 cells right and 4 cells behind, a locked blue door 2 cells right and 3 cells behind, a grey wall 2 cells right and 2 cells behind, a grey wall 2 cells right and 1 cell behind, a grey wall 1 cell left and 4 cells behind, a grey wall 1 cell left and 3 cells behind, a grey wall 1 cell left and 2 cells behind, and a grey wall 1 cell left and 1 cell behind. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 2
+
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a blue key 1, a grey wall 6, a grey wall 7, and a grey wall 8. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 9
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 6
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 5
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 7
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 10
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man has failed to complete the task. This took 16 interactions.
+
+
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like environment. At each step, you may choose to do one of the following actions:
+1. Explore what is around you.
+2. Go to the cell in front.
+3. Go to the cell to the left.
+4. Go to the cell to the right.
+5. Go to the cell behind you.
+6. Go to key (only if you have seen one).
+7. Go to door (only if you have seen one).
+8. Go to goal (only if you have seen one).
+9. Pick up key (only if you have seen one).
+10. Open door (only if you have seen one).
+YOUR TASK IS: Go to the goal.
+In order to achieve this task, it is imperative that you follow these instructions exactly: Pick up the blue key on your left. Keep turning in the same spot until you see a blue door. Use the blue key to unlock this blue door. Go through this door. Move forward four steps and go right four steps to reach the goal.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a blue key 1, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 2
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a blue key 1, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 1
+
+Gingerbread Man was told: From your exploration, you know that you are facing west. Around you, you see the following:  a grey wall 2 cells left and 1 cell in front, a grey wall 1 cell left and 1 cell in front, a blue key 1 cell left, a grey wall 1 cell in front, a grey wall 1 cell right and 1 cell in front, a grey wall 2 cells right and 1 cell in front, a grey wall 2 cells right, a grey wall 2 cells right and 1 cell behind, a grey wall 1 cell right and 1 cell behind, a locked blue door 1 cell behind, a grey wall 1 cell left and 1 cell behind, and a grey wall 2 cells left and 1 cell behind. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 9
+
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a locked blue door 1, a grey wall 5, a grey wall 6, a grey wall 7, a grey wall 8, and a grey wall 9. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 10
+
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, an open blue door 1, a grey wall 7, and a grey wall 8. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 2
+
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 6
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 7
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man has failed to complete the task. This took 12 interactions.
+
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like environment. At each step, you may choose to do one of the following actions:
+1. Explore what is around you.
+2. Go to the cell in front.
+3. Go to the cell to the left.
+4. Go to the cell to the right.
+5. Go to the cell behind you.
+6. Go to key (only if you have seen one).
+7. Go to door (only if you have seen one).
+8. Go to goal (only if you have seen one).
+9. Pick up key (only if you have seen one).
+10. Open door (only if you have seen one).
+YOUR TASK IS: Go to the goal.
+In order to achieve this task, it is imperative that you follow these instructions exactly: Go to the blue key. Pick up the blue key. Turn back around and go to the blue door. Open the blue door using the blue key. Go through this door. Go to the goal that is three steps in front and three steps to the right.
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a blue key 1. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 2
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, and a grey wall 8. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 1
+
+Gingerbread Man was told: From your exploration, you know that you are facing north. Around you, you see the following:  a grey wall 1 cell left and 4 cells in front, a grey wall 1 cell left and 3 cells in front, a grey wall 1 cell left and 2 cells in front, a grey wall 1 cell left and 1 cell in front, a grey wall 1 cell left, a grey wall 4 cells in front, a blue key 2 cells in front, a grey wall 1 cell right and 4 cells in front, a grey wall 2 cells right and 4 cells in front, a grey wall 1 cell left and 4 cells behind, a grey wall 1 cell left and 3 cells behind, a grey wall 1 cell left and 2 cells behind, and a grey wall 1 cell left and 1 cell behind. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 1
+
+Gingerbread Man was told: From your exploration, you know that you are facing north. Around you, you see the following:  a grey wall 1 cell left and 4 cells in front, a grey wall 1 cell left and 3 cells in front, a grey wall 1 cell left and 2 cells in front, a grey wall 1 cell left and 1 cell in front, a grey wall 1 cell left, a grey wall 4 cells in front, a blue key 2 cells in front, a grey wall 1 cell right and 4 cells in front, a grey wall 2 cells right and 4 cells in front, a grey wall 1 cell left and 4 cells behind, a grey wall 1 cell left and 3 cells behind, a grey wall 1 cell left and 2 cells behind, and a grey wall 1 cell left and 1 cell behind. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 9
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 5
+
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 6
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: 7
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man has failed to complete the task. This took 11 interactions.
+
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like environment. At each step, you may choose to do one of the following actions:
+1. Explore what is around you.
+2. Go to the cell in front.
+3. Go to the cell to the left.
+4. Go to the cell to the right.
+5. Go to the cell behind you.
+6. Go to key (only if you have seen one).
+7. Go to door (only if you have seen one).
+8. Go to goal (only if you have seen one).
+9. Pick up key (only if you have seen one).
+10. Open door (only if you have seen one).
+YOUR TASK IS: Go to the goal.
+In order to achieve this task, it is imperative that you follow these instructions exactly: Turn around so that you have a new field of vision. There will be a blue key in this new field of vision. Go to it and pick it up. There will now be a blue door in your field of vision. Go to it and open it using the blue key. Go through the door and go left to get a new field of vision. You will the goal. Go to it to complete your task.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. What is the next action you take? Give the number corresponding to your chosen action. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man has failed to complete the task. This took 3 interactions.
+
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like environment. At each step, you may choose to do one of the following actions:
+1. Explore what is around you.
+2. Go to the cell in front.
+3. Go to the cell to the left.
+4. Go to the cell to the right.
+5. Go to the cell behind you.
+6. Go to key (only if you have seen one).
+7. Go to door (only if you have seen one).
+8. Go to goal (only if you have seen one).
+9. Pick up key (only if you have seen one).
+10. Open door (only if you have seen one).
+YOUR TASK IS: Go to the goal.
+In order to achieve this task, it is imperative that you follow these instructions exactly: Pick up the blue key right in front of you. Move forward three steps and right two steps and you will see a blue door. Open this blue door using this blue key. Go through the blue door and you will see a green goal. Go to this goal to complete your task.
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a blue key 1. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will pick up the key in front of me.
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will move forward three steps.
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will move forward three steps.
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will move to the cell on my right.
+
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will move to the cell on my right.
+
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will move forward three steps.
+
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, and a grey wall 8. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, and a grey wall 8. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will move to the cell on my left.
+
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a locked blue door 1, a grey wall 2, a grey wall 3, and a grey wall 4. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will go to the cell in front.
+
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a locked blue door 1, a grey wall 2, a grey wall 3, and a grey wall 4. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will go to the cell in front.
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a locked blue door 1, a grey wall 2, a grey wall 3, and a grey wall 4. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will go to the cell on my left.
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a locked blue door 1. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will go to the cell in front.
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will go to the cell in front.
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, and a grey wall 8. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, and a grey wall 8. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will move to the cell behind me.
+
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a locked blue door 1, and a grey wall 4. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will go to the cell in front.
+
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a locked blue door 1, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will go to the cell on my left.
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a locked blue door 1, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a locked blue door 1, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will go to the cell on my right.
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will move forward three steps.
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will move to the cell on my left.
+
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, and a grey wall 8. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, and a grey wall 8. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will move to the cell on my right.
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will move forward three steps.
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man has failed to complete the task. This took 28 interactions.
+
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like environment. At each step, you may choose to do one of the following actions:
+1. Explore what is around you.
+2. Go to the cell in front.
+3. Go to the cell to the left.
+4. Go to the cell to the right.
+5. Go to the cell behind you.
+6. Go to key (only if you have seen one).
+7. Go to door (only if you have seen one).
+8. Go to goal (only if you have seen one).
+9. Pick up key (only if you have seen one).
+10. Open door (only if you have seen one).
+YOUR TASK IS: Go to the goal.
+In order to achieve this task, it is imperative that you follow these instructions exactly: Turn right and move forward until you see a blue key. Go to this key and pick it up. Turn around and you will see a blue door. Go to this door and open it with the blue key. Then go through the door and move forward two steps and you will see a green goal. Go to this goal to complete your task.
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 4: Go to the cell to the right.
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a blue key 1, a grey wall 6, a grey wall 7, a grey wall 8, a locked blue door 1, and a grey wall 9. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, a grey wall 8, a grey wall 9, a grey wall 10, a grey wall 11, and a locked blue door 1. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a blue key 1, a grey wall 6, a grey wall 7, a grey wall 8, a grey wall 9, and a grey wall 10. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a blue key 1, a grey wall 5, a grey wall 6, a grey wall 7, and a grey wall 8. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a blue key 1, a grey wall 4, a grey wall 5, and a grey wall 6. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 9: Pick up key.
+
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 5: Go to the cell behind you.
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I apologize for the confusion. In this case, I will choose action 1: Explore what is around me.
+
+Gingerbread Man was told: From your exploration, you know that you are facing south. Around you, you see the following:  a grey wall 2 cells left and 2 cells in front, a grey wall 1 cell left and 2 cells in front, a grey wall 2 cells in front, a grey wall 1 cell right and 2 cells in front, a grey wall 1 cell right and 1 cell in front, a grey wall 1 cell right, a grey wall 1 cell right and 1 cell behind, a grey wall 1 cell behind, a grey wall 1 cell left and 1 cell behind, and a grey wall 2 cells left and 1 cell behind. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will choose action 3: Go to the cell to the left.
+
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a locked blue door 1, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, a grey wall 8, and a grey wall 9. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6: Go to key.
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a locked blue door 1, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, a grey wall 8, and a grey wall 9. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a locked blue door 1, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, a grey wall 8, and a grey wall 9. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I apologize for the confusion. In this case, I will choose action 5: Go to the cell behind you.
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I apologize for the confusion. In this case, I will choose action 1: Explore what is around me.
+
+Gingerbread Man was told: From your exploration, you know that you are facing west. Around you, you see the following:  a grey wall 2 cells left and 1 cell in front, a grey wall 2 cells left, a grey wall 1 cell left and 1 cell in front, a grey wall 1 cell in front, a grey wall 1 cell right and 1 cell in front, a grey wall 1 cell right, a grey wall 1 cell right and 4 cells behind, a locked blue door 1 cell right and 3 cells behind, a grey wall 1 cell right and 2 cells behind, a grey wall 1 cell right and 1 cell behind, a grey wall 2 cells left and 4 cells behind, a grey wall 2 cells left and 3 cells behind, a grey wall 2 cells left and 2 cells behind, and a grey wall 2 cells left and 1 cell behind. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: Based on the information provided, I will choose action 7: Go to door (only if you have seen one).
+
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a locked blue door 1, a grey wall 3, and a grey wall 4. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 10: Open door (only if you have seen one).
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, an open blue door 1, a grey wall 3, and a grey wall 4. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a green goal 1, and a grey wall 2. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a green goal 1. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a green goal 1, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 8: Go to goal (only if you have seen one).
+
+Gingerbread Man has succeeded! This round took 22 interactions.
+
+
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like environment. At each step, you may choose to do one of the following actions:
+1. Explore what is around you.
+2. Go to the cell in front.
+3. Go to the cell to the left.
+4. Go to the cell to the right.
+5. Go to the cell behind you.
+6. Go to key (only if you have seen one).
+7. Go to door (only if you have seen one).
+8. Go to goal (only if you have seen one).
+9. Pick up key (only if you have seen one).
+10. Open door (only if you have seen one).
+YOUR TASK IS: Get to the goal.
+In order to achieve this task, do the following steps exactly and in order: starting from your current position, move forward three steps and then move left one step. Pick up the blue key that will be in front of you. Then turn left and move six steps forward. Then turn right and move one step forward, where you will see a blue door. Open this door with the key. Head through the door, going four steps forward, then turn right and go two steps forward to reach the goal.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a blue key 1, a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1: Explore what is around me.
+
+Gingerbread Man was told: From your exploration, you know that you are facing west. Around you, you see the following:  a blue key 2 cells left and 3 cells in front, a grey wall 1 cell right and 4 cells in front, a grey wall 1 cell right and 3 cells in front, a grey wall 1 cell right and 2 cells in front, a grey wall 1 cell right and 1 cell in front, a grey wall 1 cell right, a grey wall 1 cell right and 4 cells behind, a grey wall 1 cell right and 3 cells behind, a grey wall 1 cell right and 2 cells behind, and a grey wall 1 cell right and 1 cell behind. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a blue key 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, and a grey wall 8. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a blue key 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a blue key 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, and a grey wall 6. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 9: Pick up key.
+
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, and a grey wall 7. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3: Go to the cell to the left.
+
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, a grey wall 8, a grey wall 9, and a grey wall 10. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, a grey wall 8, a grey wall 9, and a grey wall 10. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, a grey wall 8, a grey wall 9, and a grey wall 10. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man has failed to complete the task. This took 9 interactions.
+
+**********************************************************
+Gingerbread Man was told: You are an agent who is trying to complete a task in an unknown, grid-like environment. At each step, you may choose to do one of the following actions:
+1. Explore what is around you.
+2. Go to the cell in front.
+3. Go to the cell to the left.
+4. Go to the cell to the right.
+5. Go to the cell behind you.
+6. Go to key (only if you have seen one).
+7. Go to door (only if you have seen one).
+8. Go to goal (only if you have seen one).
+9. Pick up key (only if you have seen one).
+10. Open door (only if you have seen one).
+YOUR TASK IS: Get to the goal.
+In order to achieve this task, do the following steps exactly and in order: starting from your current position, you will see a blue key. Go to this key and pick it up. Then keep turning until you see a blue door. Go to it and open it using the blue key you picked up. Then head through the door and you will see the green goal. Go to it to achieve your task.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a blue key 1, a grey wall 6, a locked blue door 1, a grey wall 7, a grey wall 8, and a grey wall 9. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1: Explore what is around me.
+
+Gingerbread Man was told: From your exploration, you know that you are facing east. Around you, you see the following:  a grey wall 2 cells left and 4 cells in front, a grey wall 2 cells left and 3 cells in front, a grey wall 2 cells left and 2 cells in front, a grey wall 2 cells left and 1 cell in front, a grey wall 2 cells left, a blue key 1 cell left and 2 cells in front, a grey wall 1 cell right and 4 cells in front, a locked blue door 1 cell right and 3 cells in front, a grey wall 1 cell right and 2 cells in front, a grey wall 1 cell right and 1 cell in front, a grey wall 1 cell right, a grey wall 1 cell right and 2 cells behind, a grey wall 1 cell right and 1 cell behind, a grey wall 2 cells behind, a grey wall 1 cell left and 2 cells behind, a grey wall 2 cells left and 2 cells behind, and a grey wall 2 cells left and 1 cell behind. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6: Go to key (only if you have seen one).
+
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, a grey wall 8, a grey wall 9, a locked blue door 1, a grey wall 10, and a grey wall 11. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, a grey wall 8, a grey wall 9, a locked blue door 1, a grey wall 10, and a grey wall 11. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, a grey wall 8, a grey wall 9, a locked blue door 1, a grey wall 10, and a grey wall 11. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3: Go to the cell to the left.
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, a grey wall 8, a grey wall 9, a locked blue door 1, a grey wall 10, and a grey wall 11. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, a grey wall 8, a grey wall 9, a locked blue door 1, a grey wall 10, and a grey wall 11. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 5: Go to the cell behind you.
+
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, and a grey wall 8. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing west. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a grey wall 7, and a grey wall 8. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1: Explore what is around me.
+
+Gingerbread Man was told: From your exploration, you know that you are facing west. Around you, you see the following:  a grey wall 2 cells left and 2 cells in front, a grey wall 2 cells left and 1 cell in front, a grey wall 2 cells left, a grey wall 1 cell left and 2 cells in front, a grey wall 2 cells in front, a grey wall 1 cell right and 2 cells in front, a grey wall 1 cell right and 1 cell in front, a grey wall 1 cell right, a grey wall 1 cell right and 4 cells behind, a grey wall 1 cell right and 3 cells behind, a grey wall 1 cell right and 2 cells behind, a grey wall 1 cell right and 1 cell behind, a blue key 2 cells behind, a grey wall 2 cells left and 4 cells behind, a locked blue door 2 cells left and 3 cells behind, a grey wall 2 cells left and 2 cells behind, and a grey wall 2 cells left and 1 cell behind. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 5: Go to the cell behind you.
+
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, a grey wall 8, a grey wall 9, a locked blue door 1, a grey wall 10, and a grey wall 11. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6: Go to key (only if you have seen one).
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, a grey wall 8, a grey wall 9, a locked blue door 1, a grey wall 10, and a grey wall 11. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 2: Go to the cell in front.
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, a grey wall 8, a grey wall 9, a locked blue door 1, a grey wall 10, and a grey wall 11. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, a grey wall 8, a grey wall 9, a locked blue door 1, a grey wall 10, and a grey wall 11. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 3: Go to the cell to the left.
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, a grey wall 8, a grey wall 9, a locked blue door 1, a grey wall 10, and a grey wall 11. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing east. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, a grey wall 5, a grey wall 6, a blue key 1, a grey wall 7, a grey wall 8, a grey wall 9, a locked blue door 1, a grey wall 10, and a grey wall 11. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 4: Go to the cell to the right.
+
+
+Gingerbread Man was told: You are facing south. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a locked blue door 1, a grey wall 1, a grey wall 2, a grey wall 3, and a grey wall 4. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 1: Explore what is around me.
+
+Gingerbread Man was told: From your exploration, you know that you are facing south. Around you, you see the following:  a locked blue door 2 cells left and 1 cell in front, a grey wall 1 cell left and 1 cell in front, a grey wall 1 cell in front, a grey wall 1 cell right and 1 cell in front, a grey wall 2 cells right and 1 cell in front, a grey wall 2 cells right and 2 cells behind, a grey wall 1 cell right and 2 cells behind, a grey wall 2 cells behind, a grey wall 1 cell left and 2 cells behind, a blue key 1 cell left and 1 cell behind, and a grey wall 2 cells left and 2 cells behind. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 9: Pick up key (only if you have seen one).
+
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 6: Go to key (only if you have seen one).
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 7: Go to door (only if you have seen one).
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I will choose action 8: Go to goal (only if you have seen one).
+
+Gingerbread Man was told to retry: The previous action you attempted failed. You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man was told: You are facing north. Your field of vision is a 5x5 square in which you are located at the bottom middle. You see a grey wall 1, a grey wall 2, a grey wall 3, a grey wall 4, and a grey wall 5. Finally, you are carrying a blue key. What is the next action you take? Choose from the list you were given. If none of the actions seem feasible, say, 'I'm stumped.'
+Gingerbread Man says: I'm stumped.
+
+Gingerbread Man has failed to complete the task. This took 27 interactions.
+

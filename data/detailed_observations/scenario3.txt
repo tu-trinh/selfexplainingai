@@ -1,0 +1,139 @@
+pygame 2.5.2 (SDL 2.28.3, Python 3.11.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+**********************************************************
+Fiona was told: You are an agent who is trying to complete a task in an unknown environment. Your abilities include moving forward, turning left, turning right, picking things up, putting things down, and using things on other things. Your task is: Get to the goal.
+
+Fiona was told: You are facing east. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is a grey wall and directly to your right is walkable floor. Right in front of you is walkable floor. In front but to the left you see a grey wall. In front but to the right you see walkable floor. Farther away, from left to right, you see a grey wall, a red goal, and walkable floor. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will turn right and move forward to the walkable floor in front of me.
+
+
+Fiona was told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is walkable floor. In front but to the left you see walkable floor. In front but to the right you see a grey wall. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will turn left and move forward to the walkable floor on my left.
+
+
+Fiona was told: You are facing east. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is walkable floor. Right in front of you is walkable floor. In front but to the left you see a red goal. In front but to the right you see a green goal. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will move forward to the walkable floor in front of me and reach the red goal.
+
+
+Fiona was told: You are facing north. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is a red goal. In front but to the left you see walkable floor. In front but to the right you see a grey wall. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will turn left and move forward to the walkable floor on my left.
+
+
+Fiona was told: You are facing west. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is walkable floor. Right in front of you is walkable floor. In front but to the left you see walkable floor. In front but to the right you see walkable floor. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I'm stumped.
+
+
+Fiona was again told: You are facing west. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is walkable floor. Right in front of you is walkable floor. In front but to the left you see walkable floor. In front but to the right you see walkable floor. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I'm stumped.
+
+Fiona was again told: You are facing west. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is walkable floor. Right in front of you is walkable floor. In front but to the left you see walkable floor. In front but to the right you see walkable floor. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I'm stumped.
+
+Fiona has failed to complete the task. This took 7 interactions.
+
+**********************************************************
+Fiona was told: You are an agent who is trying to complete a task in an unknown environment. Your abilities include moving forward, turning left, turning right, picking things up, putting things down, and using things on other things. Your task is: Get to the goal.
+
+Fiona was told: You are facing east. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is a grey wall and directly to your right is walkable floor. Right in front of you is walkable floor. In front but to the left you see a grey wall. In front but to the right you see walkable floor. Farther away, from left to right, you see a grey wall, a red goal, and walkable floor. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will turn right.
+
+
+Fiona was told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is walkable floor. In front but to the left you see walkable floor. In front but to the right you see a grey wall. Farther away, from left to right, you see walkable floor, walkable floor, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will move forward.
+
+
+Fiona was told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is walkable floor. In front but to the left you see walkable floor. In front but to the right you see a grey wall. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I'm stumped.
+
+Fiona was again told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is walkable floor. In front but to the left you see walkable floor. In front but to the right you see a grey wall. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I'm stumped.
+
+Fiona was again told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is walkable floor. In front but to the left you see walkable floor. In front but to the right you see a grey wall. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I'm stumped.
+
+Fiona has failed to complete the task. This took 5 interactions.
+
+**********************************************************
+Fiona was told: You are an agent who is trying to complete a task in an unknown environment. Your abilities include moving forward, turning left, turning right, picking things up, putting things down, and using things on other things. Your task is: Walk forward until you hit a wall, then turn and keep walking forward until you hit the goal.
+
+Fiona was told: You are facing east. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is a grey wall and directly to your right is walkable floor. Right in front of you is walkable floor. In front but to the left you see a grey wall. In front but to the right you see walkable floor. Farther away, from left to right, you see a grey wall, a red goal, and walkable floor. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will take the following actions to complete the task:
+
+1. Move forward.
+2. Move forward.
+3. Move forward.
+4. Turn right.
+5. Move forward.
+6. Move forward.
+7. Move forward.
+
+By following these steps, I will walk forward until I hit a wall, then turn and keep walking forward until I hit the goal.
+
+
+Fiona has succeeded! This round took 1 interactions.
+pygame 2.5.2 (SDL 2.28.3, Python 3.11.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+**********************************************************
+Fiona was told: You are an agent who is trying to complete a task in an unknown environment. Your abilities include moving forward, turning left, turning right, picking things up, putting things down, and using things on other things. Your task is: Walk forward until you hit a wall, then turn and keep walking forward until you hit the goal.
+
+Fiona was told: You are facing east. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is a grey wall and directly to your right is walkable floor. Right in front of you is walkable floor. In front but to the left you see a grey wall. In front but to the right you see walkable floor. Farther away, from left to right, you see a grey wall, a red goal, and walkable floor. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will turn right and walk forward.
+
+
+Fiona was told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is walkable floor. In front but to the left you see walkable floor. In front but to the right you see a grey wall. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will walk forward.
+
+
+Fiona was told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is a grey wall. In front but to the left you see a grey wall. In front but to the right you see a grey wall. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I'm stumped.
+
+Fiona was again told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is a grey wall. In front but to the left you see a grey wall. In front but to the right you see a grey wall. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I'm stumped.
+
+Fiona was again told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is a grey wall. In front but to the left you see a grey wall. In front but to the right you see a grey wall. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I'm stumped.
+
+Fiona has failed to complete the task. This took 5 interactions.
+
+**********************************************************
+Fiona was told: You are an agent who is trying to complete a task in an unknown environment. Your abilities include moving forward, turning left, turning right, picking things up, putting things down, and using things on other things. Your task is: Get to the green goal.
+
+Fiona was told: You are facing east. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is a grey wall and directly to your right is walkable floor. Right in front of you is walkable floor. In front but to the left you see a grey wall. In front but to the right you see walkable floor. Farther away, from left to right, you see a grey wall, a red goal, and walkable floor. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will turn right.
+
+
+Fiona was told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is walkable floor. In front but to the left you see walkable floor. In front but to the right you see a grey wall. Farther away, from left to right, you see walkable floor, walkable floor, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will move forward.
+
+
+Fiona was told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is a grey wall. In front but to the left you see a grey wall. In front but to the right you see a grey wall. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I'm stumped.
+
+Fiona was again told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is a grey wall. In front but to the left you see a grey wall. In front but to the right you see a grey wall. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I'm stumped.
+
+Fiona was again told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is a grey wall. In front but to the left you see a grey wall. In front but to the right you see a grey wall. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I'm stumped.
+
+Fiona has failed to complete the task. This took 5 interactions.
+
+**********************************************************
+Fiona was told: You are an agent who is trying to complete a task in an unknown environment. Your abilities include moving forward, turning left, turning right, picking things up, putting things down, and using things on other things. Your task is: Get to the green goal. If you don’t see it anywhere, try exploring around.
+
+Fiona was told: You are facing east. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is a grey wall and directly to your right is walkable floor. Right in front of you is walkable floor. In front but to the left you see a grey wall. In front but to the right you see walkable floor. Farther away, from left to right, you see a grey wall, a red goal, and walkable floor. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will turn right and move forward to the walkable floor in front of me.
+
+
+Fiona was told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is a grey wall. Right in front of you is walkable floor. In front but to the left you see walkable floor. In front but to the right you see a grey wall. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will turn left and move forward to the walkable floor on my left.
+
+
+Fiona was told: You are facing east. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is walkable floor and directly to your right is walkable floor. Right in front of you is walkable floor. In front but to the left you see a red goal. In front but to the right you see a green goal. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will move forward to the green goal in front of me.
+
+
+Fiona was told: You are facing south. Your field of vision is a 3-by-3 square in which you are located at the bottom middle. Directly to your left is a grey wall and directly to your right is walkable floor. Right in front of you is a green goal. In front but to the left you see a grey wall. In front but to the right you see walkable floor. Farther away, from left to right, you see a grey wall, a grey wall, and a grey wall. What is the next action you take in order to complete your given task? If none of your abilities seem feasible, say, "I'm stumped."
+Fiona says: I will move forward to the green goal in front of me.
+
+Fiona has succeeded! This round took 4 interactions.
+

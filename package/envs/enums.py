@@ -32,7 +32,6 @@ class EnvType(Enum):
     GOTO = "Goto"
     PICKUP = "Pickup"
     PUT = "Put"
-    ARRANGE = "Arrange"
     COLLECT = "Collect"
 
     @classmethod

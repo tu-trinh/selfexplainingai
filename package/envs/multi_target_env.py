@@ -6,21 +6,24 @@ import random
 from utils import *
 from envs.pragmatic_env import PragmaticEnv
 from envs.enums import *
+from typing import List, Tuple, Dict, Any
 
 
 class MultiTargetEnv(PragmaticEnv):
     def __init__(self,
                  env_type: EnvType,
-                 env_seed: int,
                  level: Level,
                  mission_space: MissionSpace,
+                 target_objs: List[PLAYABLE_OBJS],
                  max_steps: int = None,
                  see_through_walls = False,
                  **kwargs):
-        assert env_type not in [EnvType.GOTO, EnvType.PICKUP], "Env type can't be Goto or Pickup"
-        assert level in [Level.EMPTY]
-
-        super().__init__(env_type, env_seed, level, mission_space, max_steps = max_steps, see_through_walls = see_through_walls, **kwargs)
+        super().__init__(env_type,
+                         level,
+                         mission_space,
+                         max_steps = max_steps,
+                         see_through_walls = see_through_walls,
+                         **kwargs)
         
         # Generate random environment
         self.target_objs = []

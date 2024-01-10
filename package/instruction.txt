@@ -1,2 +1,0 @@
-Get to the goal.
-In order to achieve this task, do the following exactly: move forward as much as you can until you hit a wall. Then, turn right and continue moving forward until you reach the goal.

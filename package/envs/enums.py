@@ -1,4 +1,5 @@
 from enum import Enum
+from skills import *
 
 
 class Level(Enum):
@@ -45,6 +46,25 @@ class Variant(Enum):
     NUM_OBJECTS = "num_objects"
     NUM_ROOMS = "num_rooms"
     VIEW_SIZE = "view_size"
+
+    @classmethod
+    def has_value(cls, value):
+        return value in cls
+
+
+class Skill(Enum):
+    GO_FORWARD = go_forward
+    GO_LEFT = go_left
+    GO_RIGHT = go_right
+    GO_BEHIND = go_behind
+    GO_TO_GOAL = go_to_goal
+    # ... other GO TOs here ... #
+    PICK_UP_KEY = pick_up_key
+    # ... other PICK UPs here ... #
+    OPEN_BOX = open_box
+    # ... other OPENs here ... #
+    PUT_DOWN_BALL = put_down_ball
+    # ... other PUT DOWNs here ... #
 
     @classmethod
     def has_value(cls, value):

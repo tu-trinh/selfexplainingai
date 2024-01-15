@@ -2,7 +2,7 @@ from minigrid.core.mission import MissionSpace
 from constants import *
 from utils import *
 from envs.single_target_env import SingleTargetEnv
-from envs.enums import *
+from package.enums import *
 from typing import Tuple, List, Dict, Any
 
 

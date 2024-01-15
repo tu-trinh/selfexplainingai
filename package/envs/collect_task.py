@@ -4,7 +4,7 @@ from minigrid.core.grid import Grid
 from minigrid.core.mission import MissionSpace
 from constants import *
 from utils import *
-from envs.enums import *
+from package.enums import *
 from envs.multi_target_env import MultiTargetEnv
 
 

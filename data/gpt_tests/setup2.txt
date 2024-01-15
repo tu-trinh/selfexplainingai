@@ -1,2 +1,0 @@
-**********************************************************
-STARTING ENVIRONMENT WITH SEED 1, INSTRUCTION high

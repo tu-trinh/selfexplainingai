@@ -5,7 +5,7 @@ import numpy as np
 import random
 from utils import *
 from envs.pragmatic_env import PragmaticEnv
-from envs.enums import *
+from package.enums import *
 from typing import List, Tuple, Dict, Any
 
 

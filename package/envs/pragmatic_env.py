@@ -5,7 +5,7 @@ from constants import *
 import numpy as np
 import random
 from utils import *
-from envs.enums import *
+from package.enums import *
 import random
 
 

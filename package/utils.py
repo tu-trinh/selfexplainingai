@@ -1,6 +1,9 @@
 from minigrid.core.constants import IDX_TO_COLOR, IDX_TO_OBJECT, STATE_TO_IDX
 from constants import *
 import numpy as np
+import Enum
+from enums import *
+from typing import Union, List
 
 
 IDX_TO_STATE = {
@@ -312,3 +315,9 @@ def manhattan_distance(p1, p2):
 def get_adjacent_cells(cell):
     x, y = cell
     return set([(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)])
+
+def convert_to_enum(enum: Enum, value: Union[List, str]):
+    if isinstance(value, str):
+        return enum[value]
+    return [enum[val] for val in value]
+    

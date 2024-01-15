@@ -1,5 +1,6 @@
 from enum import Enum
 from skills import *
+from reward_functions import *
 
 
 class Level(Enum):
@@ -26,7 +27,9 @@ class Level(Enum):
 
     @classmethod
     def has_value(cls, value):
-        return value in cls
+        if isinstance(value, Enum):
+            return value in cls
+        return any(value == item.value for item in cls)
 
 
 class EnvType(Enum):
@@ -37,7 +40,9 @@ class EnvType(Enum):
 
     @classmethod
     def has_value(cls, value):
-        return value in cls
+        if isinstance(value, Enum):
+            return value in cls
+        return any(value == item.value for item in cls)
 
 
 class Variant(Enum):
@@ -49,23 +54,10 @@ class Variant(Enum):
 
     @classmethod
     def has_value(cls, value):
-        return value in cls
+        if isinstance(value, Enum):
+            return value in cls
+        return any(value == item.value for item in cls)
 
 
-class Skill(Enum):
-    GO_FORWARD = go_forward
-    GO_LEFT = go_left
-    GO_RIGHT = go_right
-    GO_BEHIND = go_behind
-    GO_TO_GOAL = go_to_goal
-    # ... other GO TOs here ... #
-    PICK_UP_KEY = pick_up_key
-    # ... other PICK UPs here ... #
-    OPEN_BOX = open_box
-    # ... other OPENs here ... #
-    PUT_DOWN_BALL = put_down_ball
-    # ... other PUT DOWNs here ... #
-
-    @classmethod
-    def has_value(cls, value):
-        return value in cls
+class PrimitiveAction(Enum):
+    LEFT = 0

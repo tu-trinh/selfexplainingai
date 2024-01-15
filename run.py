@@ -34,7 +34,7 @@ def manual_test(env, seed):
 
 
 def automated_main(scenario, instruction, inst_type, start_idx = 0, end_idx = 10):
-    la = LearningAgent("", "scale", "mistral")
+    la = Attendant("", "scale", "mistral")
     iter_tries = {i: 0 for i in range(start_idx, end_idx)}
     i = start_idx
     retry_env = None
@@ -114,7 +114,7 @@ def automated_main(scenario, instruction, inst_type, start_idx = 0, end_idx = 10
 
 
 def manual_main(query_src, model_src, seed, inst_type, task, teacher_level, student_level = None, student_variants = None):
-    la = LearningAgent("Geronimo Stilton", query_src, model_src)
+    la = Attendant("Geronimo Stilton", query_src, model_src)
     ref = pd.read_csv("./data/reference/reference.csv")
     _, student_env = make_envs(task = task,
                                teacher_level = teacher_level,

@@ -65,7 +65,7 @@ def construct_instruction(scenario: int, inst_type: str, env_obs: dict):
     return instruction
 
 def manual_main(scenario, seed):
-    la = LearningAgent("Gingerbread Man", "openai", "gpt-3.5-turbo")
+    la = Attendant("Gingerbread Man", "openai", "gpt-3.5-turbo")
     learning_env = generate_env(scenario)
     while True:
         teaching_input = input().split()

@@ -22,3 +22,6 @@ class Trajectory:
 
     def add_transition(self, transition: Transition):
         self.transitions.append(transition)
+    
+    def __iter__(self):
+        return iter(self.transitions)

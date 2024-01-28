@@ -1,11 +1,15 @@
+from package.constants import *
+from package.utils import *
+from package.enums import *
+from package.skills import *
+
 from minigrid.minigrid_env import MiniGridEnv
 from minigrid.core.grid import Grid
 from minigrid.core.mission import MissionSpace
-from constants import *
+from minigrid.wrappers import FullyObsWrapper
+from minigrid.core.constants import IDX_TO_OBJECT, IDX_TO_COLOR
+
 import numpy as np
-import random
-from utils import *
-from package.enums import *
 import random
 
 
@@ -31,6 +35,7 @@ class PragmaticEnv(MiniGridEnv):
             self.max_steps = 4 * self.room_size ** 2
         else:
             self.max_steps = max_steps
+        self.allowable_skills = None
         super().__init__(mission_space = mission_space, grid_size = self.room_size, max_steps = self.max_steps,
                          see_through_walls = see_through_walls, render_mode = "human", agent_view_size = AGENT_VIEW_SIZE, **kwargs)
         
@@ -79,3 +84,55 @@ class PragmaticEnv(MiniGridEnv):
             self.agent_dir = self.agent_start_dir
         else:
             self.place_agent()
+    
+
+    def set_allowable_skills(self):
+        skills = {}  # maps skill name to function
+        can_pickup_and_drop = False
+        can_toggle = False
+
+        # Directional skills
+        for d in ["forward", "left", "right", "backward"]:
+            for i in range(1, self.room_size - 2):
+                skills[f"move_{d}_{i}_steps"] = move_DIRECTION_N_steps_hof(d, i)
+
+        # Object-based skills
+        fully_obs_copy = FullyObsWrapper(self)
+        obs, _ = fully_obs_copy.reset()
+        obs = obs["image"]
+        for r in range(len(obs)):
+            for c in range(len(obs[0])):
+                cell = obs[r][c]
+                obj_idx, color_idx, _ = cell[0], cell[1], cell[2]
+                obj, color = IDX_TO_OBJECT[obj_idx], IDX_TO_COLOR[color_idx]
+                if obj in ["wall", "lava"]:
+                    skills.setdefault(f"go_to_{obj}", go_to_COLOR_OBJECT_hof(color, obj))
+                elif obj in ["door", "box"]:
+                    can_toggle = True
+                    skills.setdefault(f"go_to_{color}_{obj}", go_to_COLOR_OBJECT_hof(color, obj))
+                    skills.setdefault(f"open_{color}_{obj}", open_COLOR_OBJECT_hof(color, obj))
+                    if obj == "door":
+                        skills.setdefault(f"close_{color}_{obj}", close_COLOR_door_hof(color))
+                        skills.setdefault(f"unlock_{color}_{obj}", unlock_COLOR_door_hof(color))
+                    elif obj == "box":
+                        can_pickup_and_drop = True
+                        skills.setdefault(f"pickup_{color}_{obj}", pickup_COLOR_OBJECT_hof(color, obj))
+                        skills.setdefault(f"put_down_{color}_{obj}", put_down_COLOR_OBJECT_hof(color, obj))
+                elif obj in ["goal", "ball", "key"]:
+                    skills.setdefault(f"go_to_{color}_{obj}", go_to_COLOR_OBJECT_hof(color, obj))
+                    if obj != "goal":
+                        can_pickup_and_drop = True
+                        skills.setdefault(f"pickup_{color}_{obj}", pickup_COLOR_OBJECT_hof(color, obj))
+                        skills.setdefault(f"put_down_{color}_{obj}", put_down_COLOR_OBJECT_hof(color, obj))
+        
+        # Primitive Minigrid skills
+        skills["turn_left"] = turn_left
+        skills["turn_right"] = turn_right
+        skills["forward"] = forward
+        if can_pickup_and_drop:
+            skills["pickup"] = pickup
+            skills["drop"] = drop
+        if can_toggle:
+            skills["toggle"] = toggle
+        
+        self.allowable_skills = skills

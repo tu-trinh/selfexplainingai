@@ -1,8 +1,9 @@
-from minigrid.core.mission import MissionSpace
-from constants import *
-from utils import *
+from package.constants import *
+from package.utils import *
+from package.envs.multi_target_env import MultiTargetEnv
 from package.enums import *
-from envs.multi_target_env import MultiTargetEnv
+
+from minigrid.core.mission import MissionSpace
 
 
 class PutTask(MultiTargetEnv):
@@ -20,13 +21,13 @@ class PutTask(MultiTargetEnv):
     def _gen_mission(color1: str, object1: str, color2: str, object2: str):
         return f"put the {color1} {object1} next to the {color2} {object2}"
     
-    def step(self, action):
-        obs, reward, terminated, truncated, info = super().step(action)
-        u, v = self.dir_vec
-        px, py = self.agent_pos[0] + u, self.agent_pos[1] + v
-        tx, ty = self.target_objs_pos[1]
-        if action == self.actions.drop and self.grid.get(px, py) == self.target_objs[0]:
-            if abs(px - tx) <= 1 and abs(py - ty) <= 1:
-                reward = self._reward()
-                terminated = True
-        return obs, reward, terminated, truncated, info
+    # def step(self, action):
+    #     obs, reward, terminated, truncated, info = super().step(action)
+    #     u, v = self.dir_vec
+    #     px, py = self.agent_pos[0] + u, self.agent_pos[1] + v
+    #     tx, ty = self.target_objs_pos[1]
+    #     if action == self.actions.drop and self.grid.get(px, py) == self.target_objs[0]:
+    #         if abs(px - tx) <= 1 and abs(py - ty) <= 1:
+    #             reward = self._reward()
+    #             terminated = True
+    #     return obs, reward, terminated, truncated, info

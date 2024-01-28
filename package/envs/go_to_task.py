@@ -1,9 +1,11 @@
+from package.constants import *
+from package.utils import *
+from package.envs.single_target_env import SingleTargetEnv
+from package.enums import *
+
 from minigrid.core.world_object import Goal
 from minigrid.core.mission import MissionSpace
-from constants import *
-from utils import *
-from envs.single_target_env import SingleTargetEnv
-from package.enums import *
+
 from typing import List, Tuple, Dict, Any
 
 
@@ -37,18 +39,18 @@ class GotoTask(SingleTargetEnv):
         return f"get to the {color} {object}"
     
     
-    def step(self, action):
-        obs, reward, terminated, truncated, info = super().step(action)
-        ax, ay = self.agent_pos
-        tx, ty = self.target_obj_pos
-        if type(self.target_obj) == Goal:
-            if ax == tx and ay == ty:
-                reward = self._reward()
-                terminated = True
-        else:
-            if manhattan_distance((ax, ay), (tx, ty)) == 1:
-                target_obj_dir = (tx - ax == 1, ty - ay == 1, ax - tx == 1, ay - ty == 1).index(True)
-                if self.agent_dir == target_obj_dir:
-                    reward = self._reward()
-                    terminated = True
-        return obs, reward, terminated, truncated, info
+    # def step(self, action):
+    #     obs, reward, terminated, truncated, info = super().step(action)
+    #     ax, ay = self.agent_pos
+    #     tx, ty = self.target_obj_pos
+    #     if type(self.target_obj) == Goal:
+    #         if ax == tx and ay == ty:
+    #             reward = self._reward()
+    #             terminated = True
+    #     else:
+    #         if manhattan_distance((ax, ay), (tx, ty)) == 1:
+    #             target_obj_dir = (tx - ax == 1, ty - ay == 1, ax - tx == 1, ay - ty == 1).index(True)
+    #             if self.agent_dir == target_obj_dir:
+    #                 reward = self._reward()
+    #                 terminated = True
+    #     return obs, reward, terminated, truncated, info

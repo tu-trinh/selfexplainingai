@@ -1,8 +1,10 @@
-from minigrid.core.mission import MissionSpace
-from constants import *
-from utils import *
-from envs.single_target_env import SingleTargetEnv
+from package.constants import *
+from package.utils import *
+from package.envs.single_target_env import SingleTargetEnv
 from package.enums import *
+
+from minigrid.core.mission import MissionSpace
+
 from typing import Tuple, List, Dict, Any
 
 
@@ -34,10 +36,10 @@ class PickupTask(SingleTargetEnv):
     def _gen_mission(color: str, object: str):
         return f"pick up the {color} {object}"
     
-    def step(self, action):
-        obs, reward, terminated, truncated, info = super().step(action)
-        if action == self.actions.pickup:
-            if self.carrying and self.carrying == self.target_obj:
-                reward = self._reward()
-                terminated = True
-        return obs, reward, terminated, truncated, info
+    # def step(self, action):
+    #     obs, reward, terminated, truncated, info = super().step(action)
+    #     if action == self.actions.pickup:
+    #         if self.carrying and self.carrying == self.target_obj:
+    #             reward = self._reward()
+    #             terminated = True
+    #     return obs, reward, terminated, truncated, info

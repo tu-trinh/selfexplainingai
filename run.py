@@ -1,21 +1,22 @@
+from package.constants import *
+from package.enums import *
+from package.builder import *
+from package.utils import *
+
 from minigrid.wrappers import *
 from minigrid.manual_control import ManualControl
-from env_maker import make_envs
+
 import gymnasium
-import gym
-from utils import *
 import argparse
-from agent import *
 import numpy as np
 import pandas as pd
-import random
 import time
 import copy
 import re
-from constants import *
-from envs.enums import *
+
 
 # TODO:
+# 16: Why environments still automatically giving rewards???
 # 11. Refactor the multi target envs
 # 12. Double check how random the color and object generation is?
 # 13. Make the lava more crazy
@@ -188,14 +189,34 @@ def manual_main(query_src, model_src, seed, inst_type, task, teacher_level, stud
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--seed", "-s", type = int, required = True)
-    parser.add_argument("--inst", "-i", type = str, required = True)
+    parser.add_argument("--test", "-t", type = int, required = True)
     args = parser.parse_args()
 
-    seed = args.seed
-    np.random.seed(seed)
-    random.seed(seed)
-    manual_main("openai", "gpt", seed, args.inst, EnvType.PICKUP, Level.BLOCKED_DOOR, student_level = Level.DEATH)
+    if args.test == 1:
+        ### Test 1: learning from image / belief mismatch ###
+        principal, attendant = make_agents("./package/configs/test1_level1.yaml")
+        # demonstrations = principal.speak(mode = "demo_trajectory")
+        # trajectory = attendant.speak(mode = "respond", trajectories = demonstrations)
+        # validation = principal.listen(trajectory)
+    elif args.test == 2:
+        ### Test 2: learning to control attendant / intention mismatch ###
+        principal, attendant = make_agents("./package/configs/test2.yaml")
+        skills, world_model = attendant.speak(mode = "inform")
+        trajectory_description = principal.speak(mode = "adapt_language", skills = skills, world_model = world_model)
+        trajectory = attendant.speak(mode = "respond", utterance = trajectory_description)
+        validation = principal.listen(trajectory)
+    elif args.test == 3:
+        ### Test 3: RLHF / reward mismatch ###
+        principal, attendant = make_agents("./package/configs/test3.yaml")
+        demonstrations = principal.speak(mode = "demo_trajectory")
+        trajectory = attendant.speak(mode = "respond", trajectories = demonstrations)
+        validation = principal.listen(trajectory)
+    
+
+    # seed = args.seed
+    # np.random.seed(seed)
+    # random.seed(seed)
+    # manual_main("openai", "gpt", seed, args.inst, EnvType.PICKUP, Level.BLOCKED_DOOR, student_level = Level.DEATH)
 
     # t, e = make_envs(EnvType.PICKUP, Level.BLOCKED_DOOR, Level.DEATH, seed = seed)
     # manual_test(e, seed)

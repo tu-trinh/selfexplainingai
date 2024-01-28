@@ -1,11 +1,13 @@
+from package.constants import *
+from package.envs.pragmatic_env import PragmaticEnv
+from package.enums import *
+from package.utils import *
+
 from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box
 from minigrid.core.mission import MissionSpace
-from constants import *
+
 import numpy as np
 import random
-from utils import *
-from envs.pragmatic_env import PragmaticEnv
-from package.enums import *
 from typing import List, Tuple, Dict, Any
 
 
@@ -43,11 +45,19 @@ class SingleTargetEnv(PragmaticEnv):
                     num_distractors = random.choice(list(set(range(1, self.room_size - 3)) - set([self.disallowed[Variant.NUM_OBJECTS]])))
                 else:
                     num_distractors = np.random.choice(range(1, self.room_size - 3))
-                for _ in range(num_distractors):
+                disallowed_obj_config = set([(type(self.target_obj), self.target_obj.color)])
+                if Variant.OBJECTS in self.variants:
+                    disallowed_obj_config.update(self.disallowed[Variant.OBJECTS][0])
+                    required_obj_positions = self.disallowed[Variant.OBJECTS][1]
+                    num_distractors = len(required_obj_positions)
+                for i in range(num_distractors):
                     dist_obj = self.target_obj
-                    while type(dist_obj) == type(self.target_obj) and dist_obj.color == self.target_obj.color:
+                    while (type(dist_obj), dist_obj.color) in disallowed_obj_config:
                         dist_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(OBJECT_COLOR_NAMES))
-                    dist_obj_pos = random.choice(list(all_possible_pos))
+                    if Variant.OBJECTS in self.variants and required_obj_positions[i] in all_possible_pos:
+                        dist_obj_pos = required_obj_positions[i]
+                    else:
+                        dist_obj_pos = random.choice(list(all_possible_pos))
                     all_possible_pos -= set([dist_obj_pos])
                     self.objs.append((dist_obj, dist_obj_pos))
         

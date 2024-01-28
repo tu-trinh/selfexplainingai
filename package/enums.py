@@ -1,6 +1,7 @@
+from package.reward_functions import *
+from package.skills import *
+
 from enum import Enum
-from skills import *
-from reward_functions import *
 
 
 class Level(Enum):
@@ -29,35 +30,34 @@ class Level(Enum):
     def has_value(cls, value):
         if isinstance(value, Enum):
             return value in cls
-        return any(value == item.value for item in cls)
+        return any(value == item.name for item in cls)
 
 
 class EnvType(Enum):
     GOTO = "Goto"
-    PICKUP = "Pickup"
+    PICKUP = "Pickup"  # include returning to original spot
     PUT = "Put"
     COLLECT = "Collect"
+    CLUSTER = "Cluster"  # group objects by type or color
 
     @classmethod
     def has_value(cls, value):
         if isinstance(value, Enum):
             return value in cls
-        return any(value == item.value for item in cls)
+        return any(value == item.name for item in cls)
 
 
 class Variant(Enum):
     COLOR = "color"
     ROOM_SIZE = "room_size"
     NUM_OBJECTS = "num_objects"
+    OBJECTS = "objects"
+    DOORS = "doors"
     NUM_ROOMS = "num_rooms"
-    VIEW_SIZE = "view_size"
+    ORIENTATION = "orientation"
 
     @classmethod
     def has_value(cls, value):
         if isinstance(value, Enum):
             return value in cls
-        return any(value == item.value for item in cls)
-
-
-class PrimitiveAction(Enum):
-    LEFT = 0
+        return any(value == item.name for item in cls)

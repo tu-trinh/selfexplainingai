@@ -1,12 +1,13 @@
-from constants import *
-from llm import LLM
-from utils import *
-import gymnasium
+from package.constants import *
+from package.llm import LLM
+from package.utils import *
+from package.trajectories import *
+import package.skills as SKILLS
+import package.reward_functions as REWARD_FUNCTIONS
 from package.enums import *
+
+import gymnasium
 from typing import Callable, Dict, List, Tuple, Any, Union
-from trajectories import *
-import skills as SKILLS
-import reward_functions as REWARD_FUNCTIONS
 
 
 class Agent:
@@ -42,7 +43,7 @@ class Agent:
         return total_reward
     
 
-    def get_action(self, utterance: Union[str, Dict]) -> Skill:
+    def get_action(self, utterance: Union[str, Dict]) -> str:
         if isinstance(utterance, str):
             skill = self.llm.match(utterance)
             return ACTION_TO_IDX[skill]
@@ -64,7 +65,7 @@ class Agent:
 
 
 class Principal(Agent):
-    allowable_modes = ["demo", "adapt_language", "adapt_trajectory"]
+    allowable_modes = ["demo_language", "demo_trajectory", "adapt_language", "adapt_trajectory"]
 
     
     def __init__(self, query_source: str, model_source: str, name: str = None):
@@ -72,15 +73,20 @@ class Principal(Agent):
         super().__init__(query_source, model_source)
     
     
-    def speak(self, mode: str, skills: List[Skill] = None, world_model: gymnasium.Env = None) -> Any:
+    def speak(self, mode: str, skills: List[str] = None, world_model: gymnasium.Env = None) -> Any:
         assert mode in Principal.allowable_modes, "Invalid mode"
-        if mode == "demo":
+        if mode.starstwith("demo"):
             assert (not skills and not world_model), "Demo mode does not require any input"
         elif mode.startswith("adapt"):
             assert (skills and world_model), "Adapt mode requires skills and world model inputs"
         
-        if mode == "demo":
-            return self.generate_trajectory()
+        if mode == "demo_language":
+            return self.generate_trajectory_description()
+        if mode == "demo_trajectory":
+            trajectories = []
+            for _ in range(10):
+                trajectories.append(self.generate_trajectory())
+            return trajectories
         if mode == "adapt_language":
             return self.generate_trajectory_description(skills, world_model)
         if mode == "adapt_trajectory":
@@ -95,17 +101,27 @@ class Principal(Agent):
 
 
     def generate_trajectory(self,
-                            skills: List[Skill] = None,
+                            skills: List[str] = None,
                             world_model: gymnasium.Env = None) -> Trajectory:
-        assert (not skills and not world_model) or (skills and world_model), "Either have both or neither skills and world model"
-
-        if not skills:
+        if skills and world_model:
             pass
+        elif not skills and not world_model:
+            traj = Trajectory()
+            obs, _ = self.world_model.reset()
+            done = False
+            while not done:
+                utterance = get_obs_desc(obs)
+                action = self.get_action(utterance)
+                next_obs, reward, done, trunc, info = self.act(action)
+                traj.add_transition(Transition(obs, action, reward, next_obs, done, trunc, info))
+                if done:
+                    return traj
+                obs = next_obs
         else:
-            pass
+            raise AssertionError("Either have both or neither of skills and world model")
 
 
-    def generate_trajectory_description(self, skills: List[Skill], world_model: gymnasium.Env) -> str:
+    def generate_trajectory_description(self, skills: List[str], world_model: gymnasium.Env) -> str:
         pass
 
 

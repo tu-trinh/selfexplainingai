@@ -1,17 +1,20 @@
-from constants import *
-from minigrid.manual_control import ManualControl
-from utils import *
-from envs.go_to_task import GotoTask
-from envs.pick_up_task import PickupTask
-from envs.put_next_task import PutTask
-from envs.collect_task import CollectTask
+from package.constants import *
+from package.utils import *
 from package.enums import *
+from package.envs.go_to_task import GotoTask
+from package.envs.pick_up_task import PickupTask
+from package.envs.put_next_task import PutTask
+from package.envs.collect_task import CollectTask
+from package.agents import Agent, Principal, Attendant
+import package.reward_functions as REWARD_FUNCTIONS
+
+from minigrid.manual_control import ManualControl
+
 from typing import List, Dict
 import yaml
 import random
-from agents import Principal, Attendant
-import skills as SKILLS
-import reward_functions as REWARD_FUNCTIONS
+import inspect
+import warnings
 
 
 def make_agents(config_path: str):
@@ -28,23 +31,23 @@ def make_agents(config_path: str):
 
 
 def make_envs(task: EnvType,
-              teacher_level: Level,
-              student_level: Level = None,
-              student_variants: List[Variant] = None,
+              principal_level: Level,
+              attendant_level: Level = None,
+              attendant_variants: List[Variant] = None,
               seed: int = None):
     assert EnvType.has_value(task), "Env type is not valid"
-    assert Level.has_value(teacher_level), "Teacher level is not valid"
-    assert student_level or student_variants, "Must have at least one of `student_level` or `student_variants`"
-    if student_level:
-        assert Level.has_value(student_level), "Student level is not valid"
-    if student_variants:
-        for sv in student_variants:
+    assert Level.has_value(principal_level), "Teacher level is not valid"
+    assert attendant_level or attendant_variants, "Must have at least one of `attendant_level` or `attendant_variants`"
+    if attendant_level:
+        assert Level.has_value(attendant_level), "Student level is not valid"
+    if attendant_variants:
+        for sv in attendant_variants:
             assert Variant.has_value(sv), f"Student variant \"{sv}\" is not valid"
     
-    task = convert_to_enum(task)
-    teacher_level = convert_to_enum(teacher_level)
-    student_level = convert_to_enum(student_level)
-    student_variants = convert_to_enum(student_variants)
+    task = convert_to_enum(EnvType, task)
+    principal_level = convert_to_enum(Level, principal_level)
+    attendant_level = convert_to_enum(Level, attendant_level)
+    attendant_variants = convert_to_enum(Variant, attendant_variants)
 
     if task == EnvType.GOTO:
         constructor = GotoTask
@@ -56,32 +59,34 @@ def make_envs(task: EnvType,
         constructor = CollectTask
     
     seed = random.randint(0, 10000) if not seed else seed
-    teacher_env = constructor(seed, teacher_level)
+    principal_env = constructor(seed, principal_level)
     disallowed = {
-        Variant.VIEW_SIZE: teacher_env.agent_view_size,
-        Variant.COLOR: teacher_env.target_obj.color,
-        Variant.ROOM_SIZE: teacher_env.room_size,
-        Variant.NUM_OBJECTS: len(teacher_env.objs) - 1,
-        Variant.NUM_ROOMS: teacher_env.num_rooms if hasattr(teacher_env, "num_rooms") else None,
+        Variant.COLOR: principal_env.target_obj.color,
+        Variant.ROOM_SIZE: principal_env.room_size,
+        Variant.NUM_OBJECTS: len(principal_env.objs) - 1,
+        Variant.OBJECTS: (set([(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] != principal_env.target_obj]), [pos for obj, pos in principal_env.objs if obj != principal_env.target_obj]),  # FIXME: consider for multi target envs?
+        Variant.DOORS: principal_env.objs,  # FIXME: hmm
+        Variant.NUM_ROOMS: principal_env.num_rooms if hasattr(principal_env, "num_rooms") else None,
+        Variant.ORIENTATION: principal_env  # FIXME: hmm
     }
-    if student_level and student_variants:
-        student_env = constructor(seed,
-                                  student_level,
-                                  target_obj = type(teacher_env.target_obj),
-                                  variants = student_variants,
+    if attendant_level and attendant_variants:
+        attendant_env = constructor(seed,
+                                  attendant_level,
+                                  target_obj = type(principal_env.target_obj),
+                                  variants = attendant_variants,
                                   disallowed = disallowed)
-    elif student_level:
-        student_env = constructor(seed,
-                                  student_level,
-                                  target_obj = type(teacher_env.target_obj))
-    elif student_variants:
-        student_env = constructor(seed,
-                                  teacher_env.level,
-                                  target_obj = type(teacher_env.target_obj),
-                                  variants = student_variants,
+    elif attendant_level:
+        attendant_env = constructor(seed,
+                                  attendant_level,
+                                  target_obj = type(principal_env.target_obj))
+    elif attendant_variants:
+        attendant_env = constructor(seed,
+                                  principal_env.level,
+                                  target_obj = type(principal_env.target_obj),
+                                  variants = attendant_variants,
                                   disallowed = disallowed)
 
-    return teacher_env, student_env
+    return principal_env, attendant_env
 
 
 def make_agent(is_principal: bool,
@@ -89,12 +94,12 @@ def make_agent(is_principal: bool,
                name: str = None,
                query_source: str = None,
                model_source: str = None,
-               reward_functions: List[str] = None,
-               reward_weights: List[float] = None,
+               basic_reward_functions: List[str] = None,
+               basic_reward_weights: List[float] = None,
                skills: List[str] = None):
-    assert reward_functions is not None, "Must specify `reward_functions` in config"
-    assert reward_weights is not None, "Must specify `reward_weights` in config"
-    assert len(reward_functions) == len(reward_weights), "`reward_functions` and `reward_weights` must be the same length"
+    assert basic_reward_functions is not None, "Must specify `basic_reward_functions` in config"
+    assert basic_reward_weights is not None, "Must specify `basic_reward_weights` in config"
+    assert len(basic_reward_functions) == len(basic_reward_weights), "`basic_reward_functions` and `basic_reward_weights` must be the same length"
     assert skills is not None, "Must specify `skills` in config"
 
     if is_principal:
@@ -103,33 +108,76 @@ def make_agent(is_principal: bool,
         agent = Attendant(query_source, model_source, name = name)
     agent.set_world_model(world_model)
     
+    with open("./package/configs/skills.txt", "r") as f:
+        all_possible_skills = [s.strip() for s in f.readlines()]
+    world_model.set_allowable_skills()
+    env_allowable_skills = world_model.allowable_skills
+    dropped_skills = 0
     for skill in skills:
-        if skill in dir(SKILLS):
+        if skill in all_possible_skills and skill in env_allowable_skills.keys():
             agent.add_skill(skill)
         else:
-            raise ValueError(f"Skill `{skill}` is not defined in `skills.py`")
-    for i in range(len(reward_functions)):
-        if reward_functions[i] in dir(REWARD_FUNCTIONS):
-            agent.add_reward_function(reward_functions[i], reward_weights[i])
+            dropped_skills += 1
+    if dropped_skills > 0:
+        warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+    
+    all_possible_reward_functions = {name: func for name, func in inspect.getmembers(REWARD_FUNCTIONS, inspect.isfunction)}
+    for i in range(len(basic_reward_functions)):
+        rf = basic_reward_functions[i]
+        func_name = rf.pop("name")
+        reward_amt = rf.get("amount", 1)
+        if func_name in all_possible_reward_functions:
+            agent.add_reward_function(all_possible_reward_functions[func_name](world_model, amt = reward_amt), basic_reward_weights[i])
         else:
-            raise ValueError(f"Reward function `{reward_functions[i]}` is not defined in `reward_functions.py`")
+            warnings.warn(f"Reward function `{func_name}` is not yet defined")
     
     return agent
 
 
+def set_advanced_reward_functions(config_path: str, principal: Principal, attendant: Attendant):
+    with open(config_path, "r") as f:
+        config_kwargs = yaml.load(f, Loader = yaml.SafeLoader)
+    assert "principal" in config_kwargs, "Must define a principal agent"
+    assert "attendant" in config_kwargs, "Must define an attendant agent"
+
+    p_kwargs = config_kwargs["principal"]
+    a_kwargs = config_kwargs["attendant"]
+    if "advanced_reward_functions" in p_kwargs:
+        set_advanced_reward_functions_agent(principal, p_kwargs)
+    if "advanced_reward_functions" in a_kwargs:
+        set_advanced_reward_functions_agent(attendant, a_kwargs)
+
+
+def set_advanced_reward_functions_agent(agent: Agent, agent_kwargs: Dict):
+    assert "advanced_reward_weights" in agent_kwargs, "Must define `advanced_reward_weights` for `advanced_reward_functions`"
+    assert len(agent_kwargs["advanced_reward_functions"]) == len(agent_kwargs["advanced_reward_weights"]), "`advanced_reward_functions` and `advanced_reward_weights` must be the same length"
+
+    all_possible_reward_functions = {name: func for name, func in inspect.getmembers(REWARD_FUNCTIONS, inspect.isfunction)}
+    reward_functions = agent_kwargs["advanced_reward_functions"]
+    reward_weights = agent_kwargs["advanced_reward_weights"]
+    for i in range(len(reward_functions)):
+        rf = reward_functions[i]
+        if rf["name"] in all_possible_reward_functions:
+            func_name = rf.pop("name")
+            func_args = rf
+            agent.add_reward_function(all_possible_reward_functions[func_name](world_model = agent.world_model, **func_args), reward_weights[i])
+        else:
+            raise ValueError(f"Reward function `{rf['name']}` is not yet defined")
+
+
 if __name__ == "__main__":
-    teacher_env, student_env = make_envs(task = EnvType.GOTO,
-                                         teacher_level = Level.HIDDEN_KEY,
-                                         student_level = Level.EMPTY,
-                                         student_variants = None,
+    principal_env, attendant_env = make_envs(task = EnvType.GOTO,
+                                         principal_level = Level.HIDDEN_KEY,
+                                         attendant_level = Level.EMPTY,
+                                         attendant_variants = None,
                                          seed = 222)
-    mc = ManualControl(teacher_env)
+    mc = ManualControl(principal_env)
     mc.start()
 
     # while True:
-    #     teacher_env.reset()
+    #     principal_env.reset()
     #     time.sleep(1)
-    #     teacher_env.step(1)
+    #     principal_env.step(1)
     #     time.sleep(1)
-    #     teacher_env.step(2)
+    #     principal_env.step(2)
     #     time.sleep(1)

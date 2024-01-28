@@ -1,3 +1,6 @@
+from typing import Dict
+
+
 class Transition:
     def __init__(self,
                  obs: Dict,

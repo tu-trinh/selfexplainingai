@@ -1,8 +1,10 @@
+from package.constants import *
+from package.enums import *
+
 from minigrid.core.constants import IDX_TO_COLOR, IDX_TO_OBJECT, STATE_TO_IDX
-from constants import *
+
 import numpy as np
-import Enum
-from enums import *
+from enum import Enum
 from typing import Union, List
 
 
@@ -321,3 +323,14 @@ def convert_to_enum(enum: Enum, value: Union[List, str]):
         return enum[value]
     return [enum[val] for val in value]
     
+def debug(*strs):
+    if not strs:
+        print()
+    else:
+        formatted_strs = []
+        for s in strs:
+            if not type(s) == str:
+                formatted_strs.append(str(s))
+            else:
+                formatted_strs.append(s)
+        print("[DEBUG]", " ".join(formatted_strs))

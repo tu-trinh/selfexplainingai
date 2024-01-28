@@ -30,17 +30,21 @@ MAX_TRIES = 2
 #######################
 #  Environment Setup  #
 #######################
-PLAYABLE_OBJS = [Goal, Box, Ball, Key] # FIXME: SWITCH THESE BACK!!
-TANGIBLE_OBJS = [Ball, Box, Key]
-DISTRACTOR_OBJS = [Box, Ball, Key] # FIXME: SWITCH THESE BACK!!
-DOOR_KEY_COLOR_NAMES = ["blue", "purple", "yellow", "red", "green"]
+PLAYABLE_OBJS = [Goal, Box, Ball]
+TANGIBLE_OBJS = [Ball, Box]
+DISTRACTOR_OBJS = [Box, Ball, Key]
+DOOR_KEY_COLOR_NAMES = ["blue", "purple", "yellow", "red", "green", "grey"]
 OBJECT_COLOR_NAMES = ["red", "green", "blue", "purple", "yellow"]
+ALL_COLOR_NAMES = OBJECT_COLOR_NAMES + ["grey"]
 
 OBJ_NAME_MAPPING = {
     Goal: "goal",
     Ball: "ball",
     Box: "box",
-    Key: "key"
+    Key: "key",
+    Door: "door",
+    Wall: "wall",
+    Lava: "lava"
 }
 OBJ_PLURAL_MAPPING = {
     Goal: "goals",

@@ -1,6 +1,7 @@
+from package.constants import *
+
 import openai
 import llmengine
-from constants import *
 from collections import deque
 from transformers import AutoTokenizer
 import tiktoken

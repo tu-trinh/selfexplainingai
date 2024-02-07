@@ -6,6 +6,7 @@ from minigrid.core.constants import IDX_TO_COLOR, IDX_TO_OBJECT, STATE_TO_IDX
 import numpy as np
 from enum import Enum
 from typing import Union, List
+import gymnasium
 
 
 IDX_TO_STATE = {
@@ -43,6 +44,18 @@ NUM_TO_WORD = {
     3: "three",
     4: "four",
     5: "five"
+}
+NUM_TO_ORDERING = {
+    1: "First",
+    2: "Second",
+    3: "Third",
+    4: "Fourth",
+    5: "Fifth",
+    6: "Sxith",
+    7: "Seventh",
+    8: "Eighth",
+    9: "Ninth",
+    10: "Tenth"
 }
 
 def get_unit_desc(cell):
@@ -271,6 +284,125 @@ def get_obs_desc(obs, left_obs = None, backwards_obs = None, right_obs = None, d
         
         return description
 
+def get_babyai_desc(env: gymnasium.Env, image: np.ndarray):
+    list_textual_descriptions = []
+    if env.carrying is not None:
+        list_textual_descriptions.append("You carry a {} {}".format(env.carrying.color, env.carrying.type))
+
+    agent_pos_vx, agent_pos_vy = env.get_view_coords(env.agent_pos[0], env.agent_pos[1])
+
+    view_field_dictionary = dict()
+
+    for i in range(image.shape[0]):
+        for j in range(image.shape[1]):
+            if image[i][j][0] != 0 and image[i][j][0] != 1 and image[i][j][0] != 2:
+                if i not in view_field_dictionary.keys():
+                    view_field_dictionary[i] = dict()
+                    view_field_dictionary[i][j] = image[i][j]
+                else:
+                    view_field_dictionary[i][j] = image[i][j]
+
+    # Find the wall if any
+    #  We describe a wall only if there is no objects between the agent and the wall in straight line
+
+    # Find wall in front
+    j = agent_pos_vy - 1
+    object_seen = False
+    while j >= 0 and not object_seen:
+        if image[agent_pos_vx][j][0] != 0 and image[agent_pos_vx][j][0] != 1:
+            if image[agent_pos_vx][j][0] == 2:
+                list_textual_descriptions.append(f"You see a wall {agent_pos_vy - j} step{'s' if agent_pos_vy - j > 1 else ''} forward")
+                object_seen = True
+            else:
+                object_seen = True
+        j -= 1
+    # Find wall left
+    i = agent_pos_vx - 1
+    object_seen = False
+    while i >= 0 and not object_seen:
+        if image[i][agent_pos_vy][0] != 0 and image[i][agent_pos_vy][0] != 1:
+            if image[i][agent_pos_vy][0] == 2:
+                list_textual_descriptions.append(f"You see a wall {agent_pos_vx - i} step{'s' if agent_pos_vx - i > 1 else ''} left")
+                object_seen = True
+            else:
+                object_seen = True
+        i -= 1
+    # Find wall right
+    i = agent_pos_vx + 1
+    object_seen = False
+    while i < image.shape[0] and not object_seen:
+        if image[i][agent_pos_vy][0] != 0 and image[i][agent_pos_vy][0] != 1:
+            if image[i][agent_pos_vy][0] == 2:
+                list_textual_descriptions.append(f"You see a wall {i - agent_pos_vx} step{'s' if i - agent_pos_vx > 1 else ''} right")
+                object_seen = True
+            else:
+                object_seen = True
+        i += 1
+
+    # returns the position of seen objects relative to you
+    debug("SFJKDFJSLFJLFJLFJSLFLK")
+    debug(agent_pos_vx)
+    debug(agent_pos_vy)
+    for i in view_field_dictionary.keys():
+        for j in view_field_dictionary[i].keys():
+            if i != agent_pos_vx or j != agent_pos_vy:
+                object = view_field_dictionary[i][j]
+                relative_position = dict()
+
+                if i - agent_pos_vx > 0:
+                    relative_position["x_axis"] = ("right", i - agent_pos_vx)
+                elif i - agent_pos_vx == 0:
+                    relative_position["x_axis"] = ("face", 0)
+                else:
+                    relative_position["x_axis"] = ("left", agent_pos_vx - i)
+                if agent_pos_vy - j > 0:
+                    relative_position["y_axis"] = ("forward", agent_pos_vy - j)
+                elif agent_pos_vy - j == 0:
+                    relative_position["y_axis"] = ("forward", 0)
+
+                distances = []
+                if relative_position["x_axis"][0] in ["face", "en face"]:
+                    distances.append((relative_position["y_axis"][1], relative_position["y_axis"][0]))
+                elif relative_position["y_axis"][1] == 0:
+                    distances.append((relative_position["x_axis"][1], relative_position["x_axis"][0]))
+                else:
+                    distances.append((relative_position["x_axis"][1], relative_position["x_axis"][0]))
+                    distances.append((relative_position["y_axis"][1], relative_position["y_axis"][0]))
+
+                description = ""
+                if object[0] != 4:  # if it is not a door
+                    description = f"You see a {IDX_TO_COLOR[object[1]]} {IDX_TO_OBJECT[object[0]]} "
+
+                else:
+                    if IDX_TO_STATE[object[2]] != 0:  # if it is not open
+                        description = f"You see a {IDX_TO_STATE[object[2]]} {IDX_TO_COLOR[object[1]]} {IDX_TO_OBJECT[object[0]]} "
+
+                    else:
+                        description = f"You see an {IDX_TO_STATE[object[2]]} {IDX_TO_COLOR[object[1]]} {IDX_TO_OBJECT[object[0]]} "
+
+                for _i, _distance in enumerate(distances):
+                    if _i > 0:
+                        description += " and "
+
+                    description += f"{_distance[0]} step{'s' if _distance[0] > 1 else ''} {_distance[1]}"
+
+                list_textual_descriptions.append(description)
+    return ". ".join(list_textual_descriptions) + "."
+
+def get_full_env_desc(full_obs):
+    actual_room_size = full_obs.shape[0] - 2
+    description = f"The environment is a {actual_room_size}x{actual_room_size} square. From top to bottom, it has the following:\n"
+    for row in range(1, actual_room_size + 1):
+        description += f"{NUM_TO_ORDERING[row]} row: "
+        row_objs = []
+        for col in range(1, actual_room_size + 1):
+            cell = full_obs[row][col]
+            obj_desc = get_unit_desc(cell)
+            if "floor" not in obj_desc and "unknown" not in obj_desc:
+                row_objs.append(obj_desc)
+        description += ", ".join(row_objs) + "\n"
+    return description.strip()
+
 def list_available_actions(scenario):
     if scenario == 1:
         actions = """6. Go to key (only if you have seen one).\n7. Go to door (only if you have seen one).\n8. Go to goal (only if you have seen one).\n9. Pick up key (only if you have seen one).\n10. Open door (only if you have seen one)."""
@@ -327,10 +459,8 @@ def debug(*strs):
     if not strs:
         print()
     else:
-        formatted_strs = []
-        for s in strs:
-            if not type(s) == str:
-                formatted_strs.append(str(s))
-            else:
-                formatted_strs.append(s)
-        print("[DEBUG]", " ".join(formatted_strs))
+        print("[DEBUG]", " ".join([str(s) for s in strs]))
+
+def xor(*args):
+    boolean_arr = [arg is not None for arg in args]
+    return np.count_nonzero(boolean_arr) == 1

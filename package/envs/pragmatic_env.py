@@ -47,12 +47,149 @@ class PragmaticEnv(MiniGridEnv):
         self.keys = []  # List of (key, x, y)
         self.agent_start_pos = None
         self.agent_start_dir = None
+
+        # Special case of orientation variant
+        if Variant.ORIENTATION in self.variants:
+            self._gen_rotated_room(self.disallowed[Variant.ORIENTATION], random.choice([90, 180, 270]))
+    
+    
+    def step(self, action):
+        obs, reward, terminated, truncated, info = super().step(action)
+        return obs, 0, False, False, info
+
+    
+    def _gen_path_to_target(self):
+        total_path = set()
+        if self.env_type == EnvType.GOTO or self.env_type == EnvType.PICKUP:
+            targets = [self.target_obj_pos]
+        else:
+            targets = self.target_objs_pos
+        for target_pos in targets:
+            path = [tuple(self.agent_start_pos)]
+            pos = self.agent_start_pos
+            direction = self.agent_start_dir
+            max_turns = random.randint(1, self.room_size - 4)
+            num_turns = 0
+            reached_object = False
+            while not reached_object and num_turns < max_turns:
+                if direction == 0:  # right
+                    steps_ub = self.room_size - 2 - pos[0]
+                    delta = (1, 0)
+                elif direction == 1:  # down
+                    steps_ub = self.room_size - 2 - pos[1]
+                    delta = (0, 1)
+                elif direction == 2:  # left
+                    steps_ub = pos[0] - 1
+                    delta = (-1, 0)
+                elif direction == 3:  # up
+                    steps_ub = pos[1] - 1
+                    delta = (0, -1)
+                if steps_ub <= 1:
+                    direction = random.randint(0, 4)
+                    continue
+                num_steps = random.randint(1, steps_ub)
+                for _ in range(num_steps):
+                    new_pos = (pos[0] + delta[0], pos[1] + delta[1])
+                    path.append(new_pos)
+                    pos = new_pos
+                    if pos == target_pos:
+                        reached_object = True
+                        break
+                direction = min(3, direction + 1) if np.random.random() > 0.5 else max(0, direction - 1)
+                num_turns += 1
+            if pos != target_pos:
+                if pos[0] < target_pos[0]:
+                    horizontal_step = 1
+                elif pos[0] > target_pos[0]:
+                    horizontal_step = -1
+                else:
+                    horizontal_step = None
+                if pos[1] < target_pos[1]:
+                    vertical_step = 1
+                elif pos[1] > target_pos[1]:
+                    vertical_step = -1
+                else:
+                    vertical_step = None
+                if horizontal_step:
+                    for x in range(pos[0] + horizontal_step, target_pos[0] + horizontal_step, horizontal_step):
+                        new_pos = (x, pos[1])
+                        path.append(new_pos)
+                        pos = new_pos
+                if vertical_step:
+                    for y in range(pos[1] + vertical_step, target_pos[1] + vertical_step, vertical_step):
+                        new_pos = (pos[0], y)
+                        path.append(new_pos)
+                        pos = new_pos
+            total_path.update(set(path))
+        return total_path
+    
+    
+    def _get_cells_in_partition(self, start_x, end_x, start_y, end_y):
+        return [(x, y) for x in range(start_x, end_x + 1) for y in range(start_y, end_y + 1)]
+    
+    
+    def _generate_walls_for_partition(self, start_x, end_x, start_y, end_y, min_subroom_size = 2):
+        walls = []
+        door = None  # Initialize door as None; it may remain None based on randomness
+        # Determine if we're splitting vertically or horizontally based on the larger dimension
+        split_vertically = (end_x - start_x) > (end_y - start_y)
+        if split_vertically:
+            # Ensure there's enough space for a subroom on either side of the wall
+            if (end_x - start_x) < 2 * min_subroom_size:
+                return walls, door  # Not enough space to split this partition further
+            wall_x = random.randint(start_x + min_subroom_size, end_x - min_subroom_size)
+            slit_y = random.randint(start_y, end_y)
+            for y in range(start_y, end_y + 1):
+                if y != slit_y:  # Skip the slit position
+                    walls.append((wall_x, y))
+                elif random.random() < 0.5:  # Random chance to turn slit into a door
+                    door = (wall_x, y)
+        else:
+            if (end_y - start_y) < 2 * min_subroom_size:
+                return walls, door
+            wall_y = random.randint(start_y + min_subroom_size, end_y - min_subroom_size)
+            slit_x = random.randint(start_x, end_x)
+            for x in range(start_x, end_x + 1):
+                if x != slit_x:  # Skip the slit position
+                    walls.append((x, wall_y))
+                elif random.random() < 0.5:  # Random chance to turn slit into a door
+                    door = (x, wall_y)
+        return walls, door
     
     
     def _gen_multiple_rooms(self):
-        def helper(self, xlb, xub, ylb, yub):
-            pass
-        # TODO: figure out this recursiveness
+        walls = []
+        doors = []
+        partitions = [(1, self.room_size - 2, 1, self.room_size - 2)]  # Initial partition covering the whole room
+        partition_cells = []
+        while len(partitions) < self.num_rooms:
+            # Randomly select a partition to split
+            partition_to_split = random.choice(partitions)
+            partitions.remove(partition_to_split)
+            start_x, end_x, start_y, end_y = partition_to_split    
+            # Generate walls within the selected partition
+            new_walls, door = self._generate_walls_for_partition(start_x, end_x, start_y, end_y)
+            if not new_walls and not door:
+                partitions.append(partition_to_split)  # Revert if no walls or door were added
+                continue
+            if door:
+                doors.append(door)
+            # Determine new partitions created by the wall
+            if new_walls[0][0] == new_walls[-1][0]:  # Vertical wall
+                left_partition = (start_x, new_walls[0][0] - 1, start_y, end_y)
+                right_partition = (new_walls[0][0] + 1, end_x, start_y, end_y)
+                partitions.extend([left_partition, right_partition])
+            else:  # Horizontal wall
+                top_partition = (start_x, end_x, start_y, new_walls[0][1] - 1)
+                bottom_partition = (start_x, end_x, new_walls[0][1] + 1, end_y)
+                partitions.extend([top_partition, bottom_partition])
+            walls.extend(new_walls)
+        # Generate cell lists for each partition
+        for partition in partitions:
+            start_x, end_x, start_y, end_y = partition
+            cells = self._get_cells_in_partition(start_x, end_x, start_y, end_y)
+            partition_cells.append(set([cell for cell in cells if cell not in walls or cell in doors]))
+        return walls, doors, partition_cells
     
     
     def _gen_grid(self, width, height):
@@ -86,6 +223,33 @@ class PragmaticEnv(MiniGridEnv):
             self.place_agent()
     
 
+    def _gen_rotated_room(self, ref_env, degrees):
+        rotation_deltas = {
+            90: lambda x, y: (ref_env.room_size - 1 - y, x),
+            180: lambda x, y: (ref_env.room_size - 1 - x, ref_env.room_size - 1 - y),
+            270: lambda x, y: (y, ref_env.room_size - 1 - x)
+        }
+        delta_func = rotation_deltas[degrees]
+        for obj, pos in ref_env.objs:
+            self.objs.append((obj, delta_func(*pos)))
+        for wall, pos in ref_env.walls:
+            self.walls.append((wall, delta_func(*pos)))
+        for door, pos in ref_env.doors:
+            self.doors.append((door, delta_func(*pos)))
+        for key, pos in ref_env.keys:
+            self.keys.append((key, delta_func(*pos)))
+        self.agent_start_pos = delta_func(*ref_env.agent_start_pos)
+        self.agent_start_dir = ref_env.agent_start_dir  # dir does not rotate otherwise it's just the same room
+        if self.env_type in [EnvType.GOTO, EnvType.PICKUP]:
+            self.target_obj = ref_env.target_obj
+            self.target_obj_pos = delta_func(*ref_env.target_obj_pos)
+        else:
+            self.target_objs = ref_env.target_objs
+            self.target_objs_pos = [delta_func(*obj_pos) for obj_pos in ref_env.target_objs_pos]
+        if self.level == Level.MULT_ROOMS:
+            self.num_rooms = ref_env.num_rooms
+    
+    
     def set_allowable_skills(self):
         skills = {}  # maps skill name to function
         can_pickup_and_drop = False

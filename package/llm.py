@@ -160,3 +160,23 @@ class LLM:
             self.count_tokens([prompt])
         
         return response
+    
+
+    def get_differences(self, other_desc, own_desc):
+        prompt = DIFFERENCES_QUESTION.format(other_env_desc = other_desc,
+                                             own_env_desc = own_desc,
+                                             differences = "\n".join([f"({k}) {v}" for k, v in DIFFERENCES_MAPPING]))
+        if self.query_source == "openai":
+            try:
+                response_obj = openai.ChatCompletion.create(
+                    model = self.model,
+                    messages = {"role": "user", "content": prompt},
+                    temperature = TEMPERATURE
+                )
+                response = response_obj["choices"][0]["message"]["content"]
+            except Exception as e:
+                print("Could not complete LLM request due to", e)
+        differences = []
+        for diff_letter in response.split(","):
+            differences.append(DIFFERENCES_MAPPING[diff_letter])
+        return ". ".join(differences)

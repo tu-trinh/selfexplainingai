@@ -95,3 +95,24 @@ Note that only a subset of these actions will be valid given the observation you
 # INQUIRY = """\nWhat action do you want to take in this timestep? Choose ONE ACTION from the list you are given. Format your response concisely, EXACTLY like in the example trajectory above; for example, if you want to explore, say \"1. Explore what is around.\" If you see a blue box and you want to go to it, say \"6. Go to the blue box.\" (note that you must fill in the \"[COLOR]\" and \"[OBJECT]\" brackets in such cases) If none of the actions seem feasible, say, \"I'm stumped.\""""
 TASK_PROLOGUE = "\nYOUR TASK IS: "
 INSTRUCTION_PROLOGUE = " To do so, follow these steps exactly: "
+
+DIFFERENCES_MAPPING = {
+    "A": "Environment two is smaller",
+    "B": "Environment two is bigger",
+    "C": "Environment two is environment one rotated 90 degrees to the right",
+    "D": "Environment two is environment one rotated 180 degrees to the right",
+    "E": "Environment two is environment one rotated 270 degrees to the right",
+    "F": "Environment two has fewer objects than environment one",
+    "G": "Environment two has more objects than environment one",
+    "H": "Environment two has the same number of objects as environment one, but the objects are different",
+    "I": "Environment two has fewer doors than environment one",
+    "J": "Environment two has more doors than environment one",
+    "K": "Environment two has the same number of doors as environment one, but they are in different states (i.e. locked, open, or closed)",
+    "L": "Environment two has fewer rooms than environment one",
+    "M": "Environment two has more rooms than environment one"
+}
+DIFFERENCES_QUESTION = """Here is a description environment one: {other_env_desc}
+Here is a description of environment two: {own_env_desc}
+Which of the following reflects the differences in these two environments? There can be multiple answers.
+{differences}
+Please give only the letter(s) in your response in a comma-separated list, such as 'A' or 'A,D,E'."""

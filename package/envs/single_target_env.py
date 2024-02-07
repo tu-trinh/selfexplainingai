@@ -3,7 +3,7 @@ from package.envs.pragmatic_env import PragmaticEnv
 from package.enums import *
 from package.utils import *
 
-from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box
+from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box, WorldObj
 from minigrid.core.mission import MissionSpace
 
 import numpy as np
@@ -16,7 +16,7 @@ class SingleTargetEnv(PragmaticEnv):
                  env_type: EnvType,
                  level: Level,
                  mission_space: MissionSpace,
-                 target_obj: Tuple[PLAYABLE_OBJS] = None,
+                 target_obj: WorldObj = None,
                  max_steps: int = None,
                  see_through_walls = False,
                  **kwargs):
@@ -26,6 +26,10 @@ class SingleTargetEnv(PragmaticEnv):
                          max_steps = max_steps,
                          see_through_walls = see_through_walls,
                          **kwargs)
+        
+        if Variant.ORIENTATION in self.variants:
+            self._gen_grid(self.room_size, self.room_size)
+            return
         
         self.target_obj = None
         self.target_obj_pos = None
@@ -70,7 +74,7 @@ class SingleTargetEnv(PragmaticEnv):
             self._set_target_obj(target_obj)
             self.objs = [(self.target_obj, self.target_obj_pos)]
             path_to_target = self._gen_path_to_target()
-            all_possible_pos -= set(path_to_target)
+            all_possible_pos -= path_to_target
             num_lavas = random.choice(range(int(0.25 * (self.room_size - 2)**2), int(0.4 * (self.room_size - 2)**2)))
             all_possible_pos = list(all_possible_pos)
             lava_positions = np.random.choice(len(all_possible_pos), num_lavas, replace = False)
@@ -181,8 +185,26 @@ class SingleTargetEnv(PragmaticEnv):
             self.doors = [(Door(color = random.choice(OBJECT_COLOR_NAMES)), random.choice(wall_positions))]
         
         elif level in [Level.MULT_ROOMS]:
-            self.num_rooms = random.randint(2, self.room_size - 3 if self.room_size % 2 == 1 else self.room_size - 4)
-            self._gen_multiple_rooms()
+            rooms_range = list(range(2, 5 if self.room_size <= 9 else 7))
+            if Variant.NUM_ROOMS in self.variants:
+                self.num_rooms = random.choice(list(set(rooms_range) - set([self.disallowed[Variant.NUM_ROOMS]])))
+            else:
+                self.num_rooms = random.choice(rooms_range)
+            room_walls, room_doors, room_cells = self._gen_multiple_rooms()
+            self.walls.extend([(Wall(), pos) for pos in room_walls + room_doors])
+            self.doors.extend([(Door(is_locked = random.choice([True, False]), color = random.choice(OBJECT_COLOR_NAMES)), pos) for pos in room_doors])
+            all_possible_pos -= set(room_walls)
+            all_possible_pos -= set(room_doors)
+            self.agent_start_pos = random.choice(list(all_possible_pos))
+            for i in range(len(room_cells)):
+                if self.agent_start_pos in room_cells[i]:
+                    all_possible_pos -= room_cells[i]
+                    break
+            all_possible_pos -= set([self.agent_start_pos])
+            self.target_obj_pos = random.choice(list(all_possible_pos))
+            all_possible_pos -= set([self.target_obj_pos])
+            self._set_target_obj(target_obj)
+            self.objs = [(self.target_obj, self.target_obj_pos)]
         
         self._gen_grid(self.room_size, self.room_size)
             
@@ -216,62 +238,3 @@ class SingleTargetEnv(PragmaticEnv):
             self.target_obj.color = color
         else:
             self.target_obj = target_obj(color = color)
-    
-    
-    def _gen_path_to_target(self):
-        path = [tuple(self.agent_start_pos)]
-        pos = self.agent_start_pos
-        direction = self.agent_start_dir
-        max_turns = random.randint(1, self.room_size - 4)
-        num_turns = 0
-        reached_object = False
-        while not reached_object and num_turns < max_turns:
-            if direction == 0:  # right
-                steps_ub = self.room_size - 2 - pos[0]
-                delta = (1, 0)
-            elif direction == 1:  # down
-                steps_ub = self.room_size - 2 - pos[1]
-                delta = (0, 1)
-            elif direction == 2:  # left
-                steps_ub = pos[0] - 1
-                delta = (-1, 0)
-            elif direction == 3:  # up
-                steps_ub = pos[1] - 1
-                delta = (0, -1)
-            if steps_ub <= 1:
-                direction = random.randint(0, 4)
-                continue
-            num_steps = random.randint(1, steps_ub)
-            for _ in range(num_steps):
-                new_pos = (pos[0] + delta[0], pos[1] + delta[1])
-                path.append(new_pos)
-                pos = new_pos
-                if pos == self.target_obj_pos:
-                    reached_object = True
-                    break
-            direction = min(3, direction + 1) if np.random.random() > 0.5 else max(0, direction - 1)
-            num_turns += 1
-        if pos != self.target_obj_pos:
-            if pos[0] < self.target_obj_pos[0]:
-                horizontal_step = 1
-            elif pos[0] > self.target_obj_pos[0]:
-                horizontal_step = -1
-            else:
-                horizontal_step = None
-            if pos[1] < self.target_obj_pos[1]:
-                vertical_step = 1
-            elif pos[1] > self.target_obj_pos[1]:
-                vertical_step = -1
-            else:
-                vertical_step = None
-            if horizontal_step:
-                for x in range(pos[0] + horizontal_step, self.target_obj_pos[0] + horizontal_step, horizontal_step):
-                    new_pos = (x, pos[1])
-                    path.append(new_pos)
-                    pos = new_pos
-            if vertical_step:
-                for y in range(pos[1] + vertical_step, self.target_obj_pos[1] + vertical_step, vertical_step):
-                    new_pos = (pos[0], y)
-                    path.append(new_pos)
-                    pos = new_pos
-        return path

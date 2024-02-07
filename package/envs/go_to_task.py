@@ -3,7 +3,7 @@ from package.utils import *
 from package.envs.single_target_env import SingleTargetEnv
 from package.enums import *
 
-from minigrid.core.world_object import Goal
+from minigrid.core.world_object import Goal, WorldObj
 from minigrid.core.mission import MissionSpace
 
 from typing import List, Tuple, Dict, Any
@@ -13,7 +13,7 @@ class GotoTask(SingleTargetEnv):
     def __init__(self,
                  env_seed: int,
                  level: Level,
-                 target_obj: Tuple[PLAYABLE_OBJS] = None,
+                 target_obj: WorldObj = None,
                  variants: List[Variant] = None,
                  disallowed: Dict[Variant, Any] = None,
                  max_steps: int = None,
@@ -38,7 +38,7 @@ class GotoTask(SingleTargetEnv):
     def _gen_mission(color: str, object: str):
         return f"get to the {color} {object}"
     
-    
+
     # def step(self, action):
     #     obs, reward, terminated, truncated, info = super().step(action)
     #     ax, ay = self.agent_pos

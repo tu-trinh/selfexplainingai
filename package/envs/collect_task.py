@@ -4,21 +4,36 @@ from package.enums import *
 from package.envs.multi_target_env import MultiTargetEnv
 
 from minigrid.minigrid_env import MiniGridEnv
-from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box
+from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box, WorldObj
 from minigrid.core.grid import Grid
 from minigrid.core.mission import MissionSpace
+
+from typing import Dict, Any
 
 
 class CollectTask(MultiTargetEnv):
     def __init__(self,
                  env_seed: int,
                  level: Level,
+                 target_objs: List[WorldObj] = None,
+                 variants: List[Variant] = None,
+                 disallowed: Dict[Variant, Any] = None,
                  max_steps: int = None,
                  see_through_walls = False,
                  **kwargs):
+        self.env_seed = env_seed
+        self.variants = variants if variants is not None else []
+        self.disallowed = disallowed if disallowed is not None else {}
+
         mission_space = MissionSpace(mission_func = self._gen_mission,
                                      ordered_placeholders = [OBJECT_COLOR_NAMES, TANGIBLE_OBJS])
-        super().__init__(EnvType.COLLECT, env_seed, level, mission_space, max_steps = max_steps, see_through_walls = see_through_walls, **kwargs)
+        super().__init__(EnvType.COLLECT,
+                         level,
+                         mission_space,
+                         target_objs = target_objs,
+                         max_steps = max_steps,
+                         see_through_walls = see_through_walls,
+                         **kwargs)
     
     @staticmethod
     def _gen_mission(color: str, object: str):

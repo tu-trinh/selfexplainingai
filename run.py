@@ -15,15 +15,6 @@ import copy
 import re
 
 
-# TODO:
-# 16: Why environments still automatically giving rewards???
-# 11. Refactor the multi target envs
-# 12. Double check how random the color and object generation is?
-# 13. Make the lava more crazy
-# 14. Fix the gen mission functions to not include color, just to be consistent
-# 15. nit: make cardinal movements more explicit? turn and then move? "from where you are standing?"
-
-
 max_msg_tokens = MAX_MSG_TOKENS
 instruction_types = ["high", "low_teacher", "low_student", "mid_direct", "mid_explore", "mid_direct_explore",
                      "mid_avoid", "mid_explore_avoid"]
@@ -190,87 +181,27 @@ def manual_main(query_src, model_src, seed, inst_type, task, teacher_level, stud
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--test", "-t", type = int, required = True)
+    parser.add_argument("--difficulty", "-d", type = int, required = True)
     args = parser.parse_args()
 
-    if args.test == 1:
-        ### Test 1: learning from image / belief mismatch ###
-        principal, attendant = make_agents("./package/configs/test1_level1.yaml")
-        # demonstrations = principal.speak(mode = "demo_trajectory")
-        # trajectory = attendant.speak(mode = "respond", trajectories = demonstrations)
-        # validation = principal.listen(trajectory)
-    elif args.test == 2:
-        ### Test 2: learning to control attendant / intention mismatch ###
+    ### OLD TASKS ###
+    if args.test == 1: ### Test 1: learning from image / belief mismatch ###
+        principal, attendant = make_agents(f"./package/configs/test1_difficulty{args.difficulty}.yaml")
+        image = principal.speak(mode = "image")
+        differences = attendant.listen(image = image)
+        adapted_solution = principal.listen(differences)
+        trajectory = attendant.execute_actions(adapted_solution)
+        solved = principal.verify(trajectory)
+    
+    elif args.test == 2: ### Test 2: learning to control attendant / intention mismatch ###
         principal, attendant = make_agents("./package/configs/test2.yaml")
         skills, world_model = attendant.speak(mode = "inform")
         trajectory_description = principal.speak(mode = "adapt_language", skills = skills, world_model = world_model)
         trajectory = attendant.speak(mode = "respond", utterance = trajectory_description)
         validation = principal.listen(trajectory)
-    elif args.test == 3:
-        ### Test 3: RLHF / reward mismatch ###
+    
+    elif args.test == 3: ### Test 3: RLHF / reward mismatch ###
         principal, attendant = make_agents("./package/configs/test3.yaml")
         demonstrations = principal.speak(mode = "demo_trajectory")
         trajectory = attendant.speak(mode = "respond", trajectories = demonstrations)
         validation = principal.listen(trajectory)
-    
-
-    # seed = args.seed
-    # np.random.seed(seed)
-    # random.seed(seed)
-    # manual_main("openai", "gpt", seed, args.inst, EnvType.PICKUP, Level.BLOCKED_DOOR, student_level = Level.DEATH)
-
-    # t, e = make_envs(EnvType.PICKUP, Level.BLOCKED_DOOR, Level.DEATH, seed = seed)
-    # manual_test(e, seed)
-
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("-s", "--scenario", type = int, required = True)
-    # parser.add_argument("-t", "--inst_type", type = int, required = True)
-    # parser.add_argument("-si", "--start_idx", type = int, default = 0)
-    # parser.add_argument("-ei", "--end_idx", type = int, default = 100)
-    # args = parser.parse_args()
-
-    # experiment_mapping = {
-    #     1: {
-    #         "high": "Get to the goal.",
-    #         "low": "Go forward all the way until you hit a wall, then turn right, then go forward all the way again until you hit the goal.",
-    #         "mid-direct": "Find and pick up a key, use it to unlock the door, and go through the door to get to the goal.",
-    #         "mid-explore": "Get to the goal. If you don't see the goal at first, explore the room more until you see it.",
-    #         "mid-direct-explore": "Pick up the key, use it to unlock the door, and go through the door to get to the goal. For each of the key, door, and goal, if you don't see it first, explore the room until you find it.",
-    #         "mid-avoid": "Get to the goal. You may need to remove some obstacles in order to see and reach this goal.",
-    #         "mid-explore-avoid": "Get to the goal. You may need to remove some obstacles in order to see and reach this goal. Always look around in case the goal is nearby."
-    #     },
-    #     2: {
-    #         "high": "Get to the goal.",
-    #         "low": "Turn right and move forward until you see a key and pick it up. Then turn around, go forward one step, and turn right to use the key to unlock the door. Then go through the door and continue walking until you hit a wall. Then turn right and go forward until you hit the goal.",
-    #         "mid-direct": "There are no obstacles around you. Find the goal and go straight to it.",
-    #         "mid-explore": "Get to the goal. If you don’t see the goal at first, try exploring the room more until you find it.",
-    #         "mid-direct-explore": "There are no obstacles around you. Find the goal and go straight to it. If you don't see it at first, explore the room more until you find it.",
-    #         "mid-avoid": "Get to the goal by walking around and seeing if you need to remove any obstacles or if you can see and reach the goal directly.",
-    #         "mid-explore-avoid": "Get to the goal by walking around and seeing if you need to remove obstacles first. If you don’t see the goal, try exploring around more until you find it."
-    #     },
-    #     3: {
-    #         "high": "Get to the goal.",
-    #         "low": "Walk forward until you hit a wall, then turn and keep walking forward until you hit the goal.",
-    #         "mid-direct": "There are no obstacles around you. Go straight to the green goal, not another color goal.",
-    #         "mid-explore": "Get to the green goal. If you don't see it anywhere, explore the room more until you find it.",
-    #         "mid-direct-explore": "Go straight to the green goal. If you don't see it anywhere, explore the room more until you find it. Do not go to a goal of another color.",
-    #         "mid-avoid": "Get to the green goal. Avoid everything else.",
-    #         "mid-explore-avoid": "Get to the green goal and avoid everything else. If you don't see it at first, explore the room more until you find it."
-    #     },
-    #     4: {
-    #         "high": "Get to the goal.",
-    #         "low": "Walk forward through the open door. Then keep walking forward until you get to the goal.",
-    #         "mid-direct": "Get to the goal by walking around the wall. There is no key to open the door for a shortcut.",
-    #         "mid-explore": "Get to the goal. If you don’t see it anywhere, explore the room more until you find it.",
-    #         "mid-direct-explore": "Get to the goal. If you get stuck at the door because there is no key, go around the wall. If you do not see the goal at first, explore the room until you find it.",
-    #         "mid-avoid": "Get to the green goal. If you cannot go through the door or wall, try finding a different way around them.",
-    #         "mid-explore-avoid": "Get to the green goal. If you cannot go through the door or wall, try finding a different way around them. If you do not see the goal at first, keep exploring the room until you find it."
-    #     }
-    # }
-    # start = time.time()
-    # main(scenario = args.scenario,
-    #      instruction = experiment_mapping[args.scenario][instruction_types[args.inst_type]],
-    #      inst_type = instruction_types[args.inst_type],
-    #      start_idx = args.start_idx,
-    #      end_idx = args.end_idx)
-    # end = time.time()
-    # print(f"This took {format_seconds(end - start)} to run.")

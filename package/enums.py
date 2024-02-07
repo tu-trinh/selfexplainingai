@@ -48,13 +48,13 @@ class EnvType(Enum):
 
 
 class Variant(Enum):
-    COLOR = "color"
-    ROOM_SIZE = "room_size"
-    NUM_OBJECTS = "num_objects"
-    OBJECTS = "objects"
-    DOORS = "doors"
-    NUM_ROOMS = "num_rooms"
-    ORIENTATION = "orientation"
+    COLOR = "color"  # different target object(s) color(s)
+    ROOM_SIZE = "room_size"  # different room size
+    NUM_OBJECTS = "num_objects"  # different number of objects
+    OBJECTS = "objects"  # same positions but different objects in those positions
+    DOORS = "doors"  # different door types/states
+    NUM_ROOMS = "num_rooms"  # different number of rooms
+    ORIENTATION = "orientation"  # rotated some degrees
 
     @classmethod
     def has_value(cls, value):

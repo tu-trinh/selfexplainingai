@@ -1,10 +1,14 @@
+import sys
+sys.path.append("/Users/tutrinh/Work/CHAI/selfexplainingai")
+
 from package.constants import *
 from package.utils import *
 from package.enums import *
 from package.envs.go_to_task import GotoTask
 from package.envs.pick_up_task import PickupTask
-from package.envs.put_next_task import PutTask
+from package.envs.put_next_task import PutNextTask
 from package.envs.collect_task import CollectTask
+from package.envs.cluster_task import ClusterTask
 from package.agents import Agent, Principal, Attendant
 import package.reward_functions as REWARD_FUNCTIONS
 
@@ -46,45 +50,52 @@ def make_envs(task: EnvType,
     
     task = convert_to_enum(EnvType, task)
     principal_level = convert_to_enum(Level, principal_level)
-    attendant_level = convert_to_enum(Level, attendant_level)
-    attendant_variants = convert_to_enum(Variant, attendant_variants)
+    if attendant_level is not None:
+        attendant_level = convert_to_enum(Level, attendant_level)
+    if attendant_variants is not None:
+        attendant_variants = convert_to_enum(Variant, attendant_variants)
 
     if task == EnvType.GOTO:
         constructor = GotoTask
     elif task == EnvType.PICKUP:
         constructor = PickupTask
     elif task == EnvType.PUT:
-        constructor = PutTask
+        constructor = PutNextTask
     elif task == EnvType.COLLECT:
         constructor = CollectTask
+    elif task == EnvType.CLUSTER:
+        constructor = ClusterTask
     
     seed = random.randint(0, 10000) if not seed else seed
     principal_env = constructor(seed, principal_level)
+    if task in [EnvType.GOTO, EnvType.PICKUP]:
+        disallowed_objects = (set([(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] != principal_env.target_obj]), [pos for obj, pos in principal_env.objs if obj != principal_env.target_obj])
+    else:
+        disallowed_objects = (set([(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] not in principal_env.target_objs]), [pos for obj, pos in principal_env.objs if obj not in principal_env.target_objs])
     disallowed = {
-        Variant.COLOR: principal_env.target_obj.color,
+        Variant.COLOR: principal_env.target_obj.color if hasattr(principal_env, "target_obj") else principal_env.target_objs[0].color,  # FIXME: should have both?
         Variant.ROOM_SIZE: principal_env.room_size,
         Variant.NUM_OBJECTS: len(principal_env.objs) - 1,
-        Variant.OBJECTS: (set([(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] != principal_env.target_obj]), [pos for obj, pos in principal_env.objs if obj != principal_env.target_obj]),  # FIXME: consider for multi target envs?
-        Variant.DOORS: principal_env.objs,  # FIXME: hmm
+        Variant.OBJECTS: disallowed_objects,
+        Variant.DOORS: principal_env.doors,
         Variant.NUM_ROOMS: principal_env.num_rooms if hasattr(principal_env, "num_rooms") else None,
-        Variant.ORIENTATION: principal_env  # FIXME: hmm
+        Variant.ORIENTATION: principal_env
     }
     if attendant_level and attendant_variants:
-        attendant_env = constructor(seed,
-                                  attendant_level,
-                                  target_obj = type(principal_env.target_obj),
-                                  variants = attendant_variants,
-                                  disallowed = disallowed)
+        if task == EnvType.GOTO or task == EnvType.PICKUP:
+            attendant_env = constructor(seed, attendant_level, target_obj = type(principal_env.target_obj), variants = attendant_variants, disallowed = disallowed)
+        else:
+            attendant_env = constructor(seed, attendant_level, target_objs = [type(obj) for obj in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed)
     elif attendant_level:
-        attendant_env = constructor(seed,
-                                  attendant_level,
-                                  target_obj = type(principal_env.target_obj))
+        if task == EnvType.GOTO or task == EnvType.PICKUP:
+            attendant_env = constructor(seed, attendant_level, target_obj = type(principal_env.target_obj))
+        else:
+            attendant_env = constructor(seed, attendant_level, target_objs = [type(obj) for obj in principal_env.target_objs])
     elif attendant_variants:
-        attendant_env = constructor(seed,
-                                  principal_env.level,
-                                  target_obj = type(principal_env.target_obj),
-                                  variants = attendant_variants,
-                                  disallowed = disallowed)
+        if task == EnvType.GOTO or task == EnvType.PICKUP:
+            attendant_env = constructor(seed, principal_env.level, target_obj = type(principal_env.target_obj), variants = attendant_variants, disallowed = disallowed)
+        else:
+            attendant_env = constructor(seed, principal_env.level, target_objs = [type(obj) for obj in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed)
 
     return principal_env, attendant_env
 
@@ -166,12 +177,11 @@ def set_advanced_reward_functions_agent(agent: Agent, agent_kwargs: Dict):
 
 
 if __name__ == "__main__":
-    principal_env, attendant_env = make_envs(task = EnvType.GOTO,
-                                         principal_level = Level.HIDDEN_KEY,
-                                         attendant_level = Level.EMPTY,
-                                         attendant_variants = None,
-                                         seed = 222)
-    mc = ManualControl(principal_env)
+    principal_env, attendant_env = make_envs(task = "CLUSTER",
+                                         principal_level = "HIDDEN_KEY",
+                                         attendant_variants = ["ORIENTATION"],
+                                         seed = 400)
+    mc = ManualControl(attendant_env)
     mc.start()
 
     # while True:

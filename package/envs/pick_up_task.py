@@ -4,6 +4,7 @@ from package.envs.single_target_env import SingleTargetEnv
 from package.enums import *
 
 from minigrid.core.mission import MissionSpace
+from minigrid.core.world_object import WorldObj
 
 from typing import Tuple, List, Dict, Any
 
@@ -12,7 +13,7 @@ class PickupTask(SingleTargetEnv):
     def __init__(self,
                  env_seed: int,
                  level: Level,
-                 target_obj: Tuple[PLAYABLE_OBJS] = None,
+                 target_obj: WorldObj = None,
                  variants: List[Variant] = None,
                  disallowed: Dict[Variant, Any] = None,
                  max_steps: int = None,

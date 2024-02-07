@@ -9,7 +9,6 @@ import gymnasium
 """
 Basic reward functions
 """
-
 # Reward for reaching an object
 def reward_reach_object_hof(world_model: gymnasium.Env, amt = 1):
     obj_name = OBJ_NAME_MAPPING[type(world_model.target_obj)]
@@ -67,7 +66,7 @@ def reward_adjacent_object_hof(world_model: gymnasium.Env, amt = 1):
         remaining_positions = positions[1:]
         return _find_path(start_pos, remaining_positions)
 
-    def reward(env_state: gymnasium.Env, action: int):  # FIXME: this seems sus... why not using env state?
+    def reward(env_state: gymnasium.Env, action: int):
         for i in range(len(obj_groups)):
             obj_group = obj_groups[i]
             obj_positions = []

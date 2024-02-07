@@ -1,14 +1,17 @@
 from package.constants import *
 from package.utils import *
-from package.envs.multi_target_env import MultiTargetEnv
 from package.enums import *
+from package.envs.multi_target_env import MultiTargetEnv
 
+from minigrid.minigrid_env import MiniGridEnv
+from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box, WorldObj
+from minigrid.core.grid import Grid
 from minigrid.core.mission import MissionSpace
 
 from typing import Dict, Any
 
 
-class PutNextTask(MultiTargetEnv):
+class ClusterTask(MultiTargetEnv):
     def __init__(self,
                  env_seed: int,
                  level: Level,
@@ -23,8 +26,8 @@ class PutNextTask(MultiTargetEnv):
         self.disallowed = disallowed if disallowed is not None else {}
 
         mission_space = MissionSpace(mission_func = self._gen_mission,
-                                     ordered_placeholders = [OBJECT_COLOR_NAMES, TANGIBLE_OBJS, OBJECT_COLOR_NAMES, TANGIBLE_OBJS])
-        super().__init__(EnvType.PUT,
+                                     ordered_placeholders = [OBJECT_COLOR_NAMES, TANGIBLE_OBJS])  # FIXME: how does this work with the gen mission below lol
+        super().__init__(EnvType.CLUSTER,
                          level,
                          mission_space,
                          target_objs = target_objs,
@@ -33,16 +36,7 @@ class PutNextTask(MultiTargetEnv):
                          **kwargs)
     
     @staticmethod
-    def _gen_mission(color1: str, object1: str, color2: str, object2: str):
-        return f"put the {color1} {object1} next to the {color2} {object2}"
-    
-    # def step(self, action):
-    #     obs, reward, terminated, truncated, info = super().step(action)
-    #     u, v = self.dir_vec
-    #     px, py = self.agent_pos[0] + u, self.agent_pos[1] + v
-    #     tx, ty = self.target_objs_pos[1]
-    #     if action == self.actions.drop and self.grid.get(px, py) == self.target_objs[0]:
-    #         if abs(px - tx) <= 1 and abs(py - ty) <= 1:
-    #             reward = self._reward()
-    #             terminated = True
-    #     return obs, reward, terminated, truncated, info
+    def _gen_mission(color: str, object: str):
+        if np.random.random() < 0.5:  # TODO: make sure this static method isn't actually needed => seed isn't needed
+            return f"group all {color} objects by type"
+        return f"group all {object}{'es' if object == 'box' else 's'} by color"

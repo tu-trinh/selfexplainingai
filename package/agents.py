@@ -27,31 +27,31 @@ class Agent:
 
     def set_world_model(self, env: gymnasium.Env) -> None:
         self.world_model = env
-    
+
     def add_skill(self, skill: str) -> None:
         self.skills.append(skill)
-    
+
     def add_reward_function(self, reward_function: Callable[[Dict], float], weight: float) -> None:
         self.rewards_and_weights.append((reward_function, weight))
-    
+
     def get_reward(self, env_state: Dict) -> float:
         total_reward = 0
         for rf, w in self.rewards_and_weights:
             reward_func = getattr(REWARD_FUNCTIONS, rf)
             total_reward += w * reward_func(env_state)
         return total_reward
-    
+
     def get_action(self, utterance: Union[str, Dict]) -> str:
         if isinstance(utterance, str):
             skill = self.llm.match(utterance)
             return ACTION_TO_IDX[skill]
         else:
             pass  # see get_action below in Attendant
-    
+
     def act(self, action: int) -> Tuple[Dict, float, bool, bool, Dict]:
         items = self.world_model.step(action)
         return items
-    
+
     def execute_actions(self, actions: List[int]) -> Trajectory:
         traj = Trajectory()
         obs, _ = self.world_model.reset()
@@ -64,10 +64,10 @@ class Agent:
             else:
                 break
         return traj
-    
+
     def speak(self, *args, **kwargs):
         raise NotImplementedError("Must be implemented by the agent itself")
-    
+
     def listen(self, *args, **kwargs):
         raise NotImplementedError("Must be implemented by the agent itself")
 
@@ -81,8 +81,8 @@ class Principal(Agent):
                  model_source: str,
                  name: str = None):
         self.name = name if name else "Principal"
-        super().__init__(query_source, model_source)    
-    
+        super().__init__(query_source, model_source)
+
     def speak(self,
               mode: str,
               skills: List[str] = None,
@@ -92,7 +92,7 @@ class Principal(Agent):
             assert (not skills and not world_model), "Mode does not require any input"
         elif mode.startswith("adapt"):
             assert (skills and world_model), "Mode requires skills and world model inputs"
-        
+
         if mode == "image":
             return self._generate_env_image()
         if mode == "demo_language":
@@ -117,17 +117,17 @@ class Principal(Agent):
         for trans in trajectory:
             total_reward += self.get_reward(trans.obs)
         return total_reward > 0
-    
+
     def solve(self) -> None:
         self.policy = [1, 2, 3]
         pass
-    
+
     def _generate_env_image(self):
         fully_obs_env = FullyObsWrapper(self.world_model)
         obs, _ = fully_obs_env.reset()
         # or RGBImgObsWrapper(...)?
         return obs["image"]
-    
+
     def _generate_trajectory(self,
                             skills: List[str] = None,
                             world_model: gymnasium.Env = None) -> Trajectory:
@@ -166,7 +166,7 @@ class Attendant(Agent):
         self.llm.set_instruction(instruction, additional_actions)
         self.instruction = None
         self.additional_actions = additional_actions
-    
+
     def get_action(self, observation = None, action_failed = False):
         response = self.llm.get_action(observation, action_failed)
         parsed_response = convert_response_to_action(response, self.additional_actions)
@@ -174,14 +174,14 @@ class Attendant(Agent):
         self.llm.responses.append(parsed_response)
         self.tokens = self.llm.total_prompt_tokens
         return parsed_response
-    
+
     def speak(self, mode: str, utterance: str = None, trajectories: List[Trajectory] = None) -> Any:
         assert mode in Attendant.allowable_modes, "Invalid mode"
         if mode == "inform":
             assert (not utterance and not trajectories), "Inform mode does not require any input"
         elif mode == "respond":
             assert (utterance and not trajectories) or (trajectories and not utterance), "Respond mode requires either utterance or trajectories"
-        
+
         if mode == "inform":
             return self.skills, self.world_model
         if mode == "respond":
@@ -198,7 +198,7 @@ class Attendant(Agent):
             return self._follow_trajectories(trajectories)
         elif image is not None:
             return self._describe_differences(image)
-    
+
     def _follow_instruction(self, utterance: str) -> Trajectory:
         pass
 
@@ -212,7 +212,7 @@ class Attendant(Agent):
         own_env_desc = get_full_env_desc[obs["image"]]
         differences = self.llm.get_differences(other_env_desc, own_env_desc)
         return differences
-        
+
 
 
         # fully_obs_env = FullyObsWrapper(self.world_model)
@@ -223,7 +223,7 @@ class Attendant(Agent):
         #     differences += f"My environment is bigger by {len(own_image) - len(image)} cells in both height and width. "
         # elif len(own_image) < len(image):
         #     differences += f"My environment is smaller by {len(own_image) - len(image)} cells in both height and width. "
-        
+
         # def get_present_objs(img):
         #     present_objs = set()
         #     for r in range(len(img)):
@@ -232,7 +232,7 @@ class Attendant(Agent):
         #             if "unseen" not in obj_desc and "wall" not in obj_desc and "floor" not in obj_desc:
         #                 present_objs.add(obj_desc)
         #     return present_objs
-        
+
         # own_objs = get_present_objs(own_image)
         # other_objs = get_present_objs(image)
         # here_but_not_there = own_objs - other_objs

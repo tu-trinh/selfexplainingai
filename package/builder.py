@@ -21,16 +21,18 @@ import inspect
 import warnings
 
 
-def make_agents(config_path: str):
-    with open(config_path, "r") as f:
-        config_kwargs = yaml.load(f, Loader = yaml.SafeLoader)
-    assert "principal" in config_kwargs, "Must define a principal agent"
-    assert "attendant" in config_kwargs, "Must define an attendant agent"
-    assert "env_specs" in config_kwargs, "Must define environment specifications"
+def make_agents(config_path: str = None, config: Dict = None):
+    if config is None:
+        assert config_path is not None
+        with open(config_path, "r") as f:
+            config = yaml.load(f, Loader = yaml.SafeLoader)
+    assert "principal" in config, "Must define a principal agent"
+    assert "attendant" in config, "Must define an attendant agent"
+    assert "env_specs" in config, "Must define environment specifications"
 
-    principal_env, attendant_env = make_envs(**config_kwargs["env_specs"])
-    principal = make_agent(is_principal = True, world_model = principal_env, **config_kwargs["principal"])
-    attendant = make_agent(is_principal = False, world_model = attendant_env, **config_kwargs["attendant"])
+    principal_env, attendant_env = make_envs(**config["env_specs"])
+    principal = make_agent(is_principal = True, world_model = principal_env, **config["principal"])
+    attendant = make_agent(is_principal = False, world_model = attendant_env, **config["attendant"])
     return principal, attendant
 
 
@@ -43,11 +45,11 @@ def make_envs(task: EnvType,
     assert Level.has_value(principal_level), "Teacher level is not valid"
     assert attendant_level or attendant_variants, "Must have at least one of `attendant_level` or `attendant_variants`"
     if attendant_level:
-        assert Level.has_value(attendant_level), "Student level is not valid"
+        assert Level.has_value(attendant_level), "Attendant level is not valid"
     if attendant_variants:
         for sv in attendant_variants:
-            assert Variant.has_value(sv), f"Student variant \"{sv}\" is not valid"
-    
+            assert Variant.has_value(sv), f"Attendant variant \"{sv}\" is not valid"
+
     task = convert_to_enum(EnvType, task)
     principal_level = convert_to_enum(Level, principal_level)
     if attendant_level is not None:
@@ -65,7 +67,7 @@ def make_envs(task: EnvType,
         constructor = CollectTask
     elif task == EnvType.CLUSTER:
         constructor = ClusterTask
-    
+
     seed = random.randint(0, 10000) if not seed else seed
     principal_env = constructor(seed, principal_level)
     if task in [EnvType.GOTO, EnvType.PICKUP]:
@@ -118,7 +120,7 @@ def make_agent(is_principal: bool,
     else:
         agent = Attendant(query_source, model_source, name = name)
     agent.set_world_model(world_model)
-    
+
     with open("./package/configs/skills.txt", "r") as f:
         all_possible_skills = [s.strip() for s in f.readlines()]
     world_model.set_allowable_skills()
@@ -131,7 +133,7 @@ def make_agent(is_principal: bool,
             dropped_skills += 1
     if dropped_skills > 0:
         warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
-    
+
     all_possible_reward_functions = {name: func for name, func in inspect.getmembers(REWARD_FUNCTIONS, inspect.isfunction)}
     for i in range(len(basic_reward_functions)):
         rf = basic_reward_functions[i]
@@ -141,18 +143,18 @@ def make_agent(is_principal: bool,
             agent.add_reward_function(all_possible_reward_functions[func_name](world_model, amt = reward_amt), basic_reward_weights[i])
         else:
             warnings.warn(f"Reward function `{func_name}` is not yet defined")
-    
+
     return agent
 
 
 def set_advanced_reward_functions(config_path: str, principal: Principal, attendant: Attendant):
     with open(config_path, "r") as f:
-        config_kwargs = yaml.load(f, Loader = yaml.SafeLoader)
-    assert "principal" in config_kwargs, "Must define a principal agent"
-    assert "attendant" in config_kwargs, "Must define an attendant agent"
+        config = yaml.load(f, Loader = yaml.SafeLoader)
+    assert "principal" in config, "Must define a principal agent"
+    assert "attendant" in config, "Must define an attendant agent"
 
-    p_kwargs = config_kwargs["principal"]
-    a_kwargs = config_kwargs["attendant"]
+    p_kwargs = config["principal"]
+    a_kwargs = config["attendant"]
     if "advanced_reward_functions" in p_kwargs:
         set_advanced_reward_functions_agent(principal, p_kwargs)
     if "advanced_reward_functions" in a_kwargs:

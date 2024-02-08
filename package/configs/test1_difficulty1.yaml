@@ -256,7 +256,7 @@ attendant:
 
 env_specs:
   task: GOTO
-  principal_level: DIST
-  attendant_level: DIST
+  principal_level: EMPTY
+  attendant_level: DEATH
   seed: 168
   attendant_variants: [OBJECTS]

@@ -40,7 +40,9 @@ def make_envs(task: EnvType,
               principal_level: Level,
               attendant_level: Level = None,
               attendant_variants: List[Variant] = None,
-              seed: int = None):
+              seed: int = None,
+              principal_render_mode: str = None,
+              attendant_render_mode: str = None):
     assert EnvType.has_value(task), "Env type is not valid"
     assert Level.has_value(principal_level), "Teacher level is not valid"
     assert attendant_level or attendant_variants, "Must have at least one of `attendant_level` or `attendant_variants`"
@@ -69,7 +71,7 @@ def make_envs(task: EnvType,
         constructor = ClusterTask
 
     seed = random.randint(0, 10000) if not seed else seed
-    principal_env = constructor(seed, principal_level)
+    principal_env = constructor(seed, principal_level, render_mode = principal_render_mode)
     if task in [EnvType.GOTO, EnvType.PICKUP]:
         disallowed_objs = set([(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] != principal_env.target_obj])
         disallowed_poses = [pos for obj, pos in principal_env.objs if obj != principal_env.target_obj]
@@ -89,25 +91,25 @@ def make_envs(task: EnvType,
     }
     if attendant_level and attendant_variants:
         if task == EnvType.GOTO or task == EnvType.PICKUP:
-            attendant_env = constructor(seed, attendant_level, target_obj = type(principal_env.target_obj), variants = attendant_variants, disallowed = disallowed)
+            attendant_env = constructor(seed, attendant_level, target_obj = type(principal_env.target_obj), variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
         elif task == EnvType.CLUSTER:
-            attendant_env = constructor(seed, attendant_level, target_objs = [[type(obj) for obj in obj_cluster] for obj_cluster in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed)
+            attendant_env = constructor(seed, attendant_level, target_objs = [[type(obj) for obj in obj_cluster] for obj_cluster in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
         else:
-            attendant_env = constructor(seed, attendant_level, target_objs = [type(obj) for obj in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed)
+            attendant_env = constructor(seed, attendant_level, target_objs = [type(obj) for obj in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
     elif attendant_level:
         if task == EnvType.GOTO or task == EnvType.PICKUP:
-            attendant_env = constructor(seed, attendant_level, target_obj = type(principal_env.target_obj))
+            attendant_env = constructor(seed, attendant_level, target_obj = type(principal_env.target_obj), render_mode = attendant_render_mode)
         elif task == EnvType.CLUSTER:
-            attendant_env = constructor(seed, attendant_level, target_objs = [[type(obj) for obj in obj_cluster] for obj_cluster in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed)
+            attendant_env = constructor(seed, attendant_level, target_objs = [[type(obj) for obj in obj_cluster] for obj_cluster in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
         else:
-            attendant_env = constructor(seed, attendant_level, target_objs = [type(obj) for obj in principal_env.target_objs])
+            attendant_env = constructor(seed, attendant_level, target_objs = [type(obj) for obj in principal_env.target_objs], render_mode = attendant_render_mode)
     elif attendant_variants:
         if task == EnvType.GOTO or task == EnvType.PICKUP:
-            attendant_env = constructor(seed, principal_env.level, target_obj = type(principal_env.target_obj), variants = attendant_variants, disallowed = disallowed)
+            attendant_env = constructor(seed, principal_env.level, target_obj = type(principal_env.target_obj), variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
         elif task == EnvType.CLUSTER:
-            attendant_env = constructor(seed, attendant_level, target_objs = [[type(obj) for obj in obj_cluster] for obj_cluster in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed)
+            attendant_env = constructor(seed, attendant_level, target_objs = [[type(obj) for obj in obj_cluster] for obj_cluster in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
         else:
-            attendant_env = constructor(seed, principal_env.level, target_objs = [type(obj) for obj in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed)
+            attendant_env = constructor(seed, principal_env.level, target_objs = [type(obj) for obj in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
 
     return principal_env, attendant_env
 

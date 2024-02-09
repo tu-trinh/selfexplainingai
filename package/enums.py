@@ -1,6 +1,3 @@
-from package.reward_functions import *
-from package.skills import *
-
 from enum import Enum
 
 
@@ -10,10 +7,12 @@ class Level(Enum):
     DEATH: Presence of lava that will kill the agent if touched
     DIST: Presence of random distractors of all types and colors
     OPEN_DOOR: Must open an unlocked door at some point to complete mission
+    BLOCKED_DOOR: Must move an object away from the door before opening it
     UNLOCK_DOOR: Must find a key to unlock and open a door at some point to complete mission
+    HIDDEN_KEY: Must open a box to retrieve the key before using it to open a door
     GO_AROUND: Must go around a line of walls or some other blocking object at some point
-    MULT_ROOMS: Multiple rooms with doors of various locked/unlocked states
-    BOSS: Combine MULT_ROOMS, DIST_SAME, DIST_DIFF, and BLOCKED_DOOR
+    MULT_ROOMS: Multiple rooms with doors of various open/unlocked states
+    BOSS: Combine MULT_ROOMS, DIST, DEATH, and UNLOCK_DOOR
     """
     EMPTY = "Empty"
     DEATH = "Death"

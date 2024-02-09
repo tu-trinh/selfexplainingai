@@ -3,9 +3,7 @@ from package.utils import *
 from package.enums import *
 from package.envs.multi_target_env import MultiTargetEnv
 
-from minigrid.minigrid_env import MiniGridEnv
-from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box, WorldObj
-from minigrid.core.grid import Grid
+from minigrid.core.world_object import WorldObj
 from minigrid.core.mission import MissionSpace
 
 from typing import Dict, Any

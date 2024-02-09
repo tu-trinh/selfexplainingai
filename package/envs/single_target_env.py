@@ -192,7 +192,7 @@ class SingleTargetEnv(PragmaticEnv):
                 self.num_rooms = random.choice(rooms_range)
             room_walls, room_doors, room_cells = self._gen_multiple_rooms()
             self.walls.extend([(Wall(), pos) for pos in room_walls + room_doors])
-            self.doors.extend([(Door(is_locked = random.choice([True, False]), color = random.choice(OBJECT_COLOR_NAMES)), pos) for pos in room_doors])
+            self.doors.extend([(Door(is_locked = False, color = random.choice(OBJECT_COLOR_NAMES)), pos) for pos in room_doors])
             all_possible_pos -= set(room_walls)
             all_possible_pos -= set(room_doors)
             self.agent_start_pos = random.choice(list(all_possible_pos))
@@ -205,6 +205,75 @@ class SingleTargetEnv(PragmaticEnv):
             all_possible_pos -= set([self.target_obj_pos])
             self._set_target_obj(target_obj)
             self.objs = [(self.target_obj, self.target_obj_pos)]
+        
+        elif level in [Level.BOSS]:
+            # Handle the MULT_ROOMS characteristics
+            rooms_range = list(range(2, 5 if self.room_size <= 9 else 7))
+            if Variant.NUM_ROOMS in self.variants:
+                self.num_rooms = random.choice(list(set(rooms_range) - set([self.disallowed[Variant.NUM_ROOMS]])))
+            else:
+                self.num_rooms = random.choice(rooms_range)
+            room_walls, room_doors, room_cells = self._gen_multiple_rooms()
+            self.walls.extend([(Wall(), pos) for pos in room_walls + room_doors])
+            # Handle the UNLOCK_DOOR characteristics
+            necessary_key_colors = []
+            locked_doors = 0
+            for room_door_pos in room_doors:
+                is_locked = random.choice([True, False])
+                door = Door(is_locked = is_locked and locked_doors < MAX_NUM_LOCKED_DOORS, color = random.choice(OBJECT_COLOR_NAMES))
+                if is_locked:
+                    necessary_key_colors.append(door.color)
+                    locked_doors += 1
+                self.doors.append((door, room_door_pos))
+            all_possible_pos -= set(room_walls)
+            all_possible_pos -= set(room_doors)
+            self.agent_start_pos = random.choice(list(all_possible_pos))
+            all_possible_pos -= set([self.agent_start_pos])
+            for i in range(len(room_cells)):
+                if self.agent_start_pos in room_cells[i]:
+                    for key_color in necessary_key_colors:
+                        key_pos = random.choice(list(room_cells[i]))
+                        room_cells[i].remove(key_pos)
+                        self.keys.append((Key(color = key_color), key_pos))
+                    all_possible_pos -= room_cells[i]
+                    agent_cell_idx = i
+                    break
+            del room_cells[agent_cell_idx]
+            # Set the target object
+            self.target_obj_pos = random.choice(list(all_possible_pos))
+            all_possible_pos.remove(self.target_obj_pos)
+            self._set_target_obj(target_obj)
+            self.objs = [(self.target_obj, self.target_obj_pos)]
+            # Handle the DIST and DEATH characteristics
+            smallest_room = len(min(room_cells, key = len))
+            if Variant.NUM_OBJECTS in self.variants:
+                num_distractors = random.choice(list(set(range(1, smallest_room)) - set([self.disallowed[Variant.NUM_OBJECTS]])))
+            else:
+                num_distractors = np.random.choice(range(1, smallest_room))
+            disallowed_obj_config = set([(type(self.target_obj), self.target_obj.color)])
+            if Variant.OBJECTS in self.variants:
+                disallowed_obj_config.update(self.disallowed[Variant.OBJECTS][0])
+                required_obj_positions = self.disallowed[Variant.OBJECTS][1]
+                num_distractors = min(smallest_room, len(required_obj_positions))
+            for i in range(num_distractors):
+                actually_lava = random.choice([True, False])
+                if actually_lava:
+                    if Variant.OBJECTS in self.variants and required_obj_positions[i] in all_possible_pos:
+                        lava_pos = required_obj_positions[i]
+                    else:
+                        lava_pos = random.choice(list(all_possible_pos))
+                    all_possible_pos -= set([lava_pos])
+                    self.objs.append((Lava(), lava_pos))
+                else:
+                    dist_obj = self.target_obj
+                    while (type(dist_obj), dist_obj.color) in disallowed_obj_config:
+                        dist_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(OBJECT_COLOR_NAMES))
+                    if Variant.OBJECTS in self.variants and required_obj_positions[i] in all_possible_pos:
+                        dist_obj_pos = required_obj_positions[i]
+                    else:
+                        dist_obj_pos = random.choice(list(all_possible_pos))
+                    all_possible_pos -= set([dist_obj_pos])
+                    self.objs.append((dist_obj, dist_obj_pos))
         
         self._gen_grid(self.room_size, self.room_size)
             

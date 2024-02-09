@@ -4,6 +4,7 @@ from package.envs.multi_target_env import MultiTargetEnv
 from package.enums import *
 
 from minigrid.core.mission import MissionSpace
+from minigrid.core.world_object import WorldObj
 
 from typing import Dict, Any
 

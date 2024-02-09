@@ -56,6 +56,7 @@ OBJ_PLURAL_MAPPING = {
 AGENT_VIEW_SIZE = 5
 MIN_ROOM_SIZE = 7
 MAX_ROOM_SIZE = 12
+MAX_NUM_LOCKED_DOORS = 3
 
 
 #########################

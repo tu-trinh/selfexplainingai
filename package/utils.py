@@ -464,3 +464,12 @@ def debug(*strs):
 def xor(*args):
     boolean_arr = [arg is not None for arg in args]
     return np.count_nonzero(boolean_arr) == 1
+
+def make_clusters(arr, num_clusters):
+    clusters = [[] for _ in range(num_clusters)]
+    for i, elem in enumerate(arr):
+        clusters[i % num_clusters].append(elem)
+    return clusters
+
+def flatten_list(nested_list):
+    return [item for sublist in nested_list for item in (sublist if isinstance(sublist, list) else [sublist])]

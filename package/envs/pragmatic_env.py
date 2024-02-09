@@ -55,7 +55,7 @@ class PragmaticEnv(MiniGridEnv):
     
     def step(self, action):
         obs, reward, terminated, truncated, info = super().step(action)
-        return obs, 0, False, False, info
+        return obs, 0, terminated, truncated, info
 
     
     def _gen_path_to_target(self):
@@ -64,7 +64,7 @@ class PragmaticEnv(MiniGridEnv):
             targets = [self.target_obj_pos]
         else:
             targets = self.target_objs_pos
-        for target_pos in targets:
+        for target_pos in flatten_list(targets):
             path = [tuple(self.agent_start_pos)]
             pos = self.agent_start_pos
             direction = self.agent_start_dir
@@ -202,9 +202,15 @@ class PragmaticEnv(MiniGridEnv):
         wall_positions = [wall[1] for wall in self.walls]
         # Set objects
         for i in range(len(self.objs)):
-            obj, obj_pos = self.objs[i]
-            assert obj_pos not in wall_positions, "Object cannot be in a wall"
-            self.grid.set(obj_pos[0], obj_pos[1], obj)
+            if isinstance(self.objs[i], list):
+                for j in range(len(self.objs[i])):
+                    obj, obj_pos = self.objs[i][j]
+                    assert obj_pos not in wall_positions, "Object cannot be in a wall"
+                    self.grid.set(obj_pos[0], obj_pos[1], obj)
+            else:
+                obj, obj_pos = self.objs[i]
+                assert obj_pos not in wall_positions, "Object cannot be in a wall"
+                self.grid.set(obj_pos[0], obj_pos[1], obj)
         # Set doors
         for i in range(len(self.doors)):
             door, door_pos = self.doors[i]

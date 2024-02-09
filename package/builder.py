@@ -71,11 +71,15 @@ def make_envs(task: EnvType,
     seed = random.randint(0, 10000) if not seed else seed
     principal_env = constructor(seed, principal_level)
     if task in [EnvType.GOTO, EnvType.PICKUP]:
-        disallowed_objects = (set([(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] != principal_env.target_obj]), [pos for obj, pos in principal_env.objs if obj != principal_env.target_obj])
+        disallowed_objs = set([(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] != principal_env.target_obj])
+        disallowed_poses = [pos for obj, pos in principal_env.objs if obj != principal_env.target_obj]
+        disallowed_objects = (disallowed_objs, disallowed_poses)
     else:
-        disallowed_objects = (set([(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] not in principal_env.target_objs]), [pos for obj, pos in principal_env.objs if obj not in principal_env.target_objs])
+        disallowed_objs = set([(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] not in flatten_list(principal_env.target_objs)])
+        disallowed_poses = [pos for obj, pos in principal_env.objs if obj not in flatten_list(principal_env.target_objs)]
+        disallowed_objects = (disallowed_objs, disallowed_poses)
     disallowed = {
-        Variant.COLOR: principal_env.target_obj.color if hasattr(principal_env, "target_obj") else principal_env.target_objs[0].color,  # FIXME: should have both?
+        Variant.COLOR: principal_env.target_obj.color if hasattr(principal_env, "target_obj") else flatten_list(principal_env.target_objs)[0].color,
         Variant.ROOM_SIZE: principal_env.room_size,
         Variant.NUM_OBJECTS: len(principal_env.objs) - 1,
         Variant.OBJECTS: disallowed_objects,
@@ -86,16 +90,22 @@ def make_envs(task: EnvType,
     if attendant_level and attendant_variants:
         if task == EnvType.GOTO or task == EnvType.PICKUP:
             attendant_env = constructor(seed, attendant_level, target_obj = type(principal_env.target_obj), variants = attendant_variants, disallowed = disallowed)
+        elif task == EnvType.CLUSTER:
+            attendant_env = constructor(seed, attendant_level, target_objs = [[type(obj) for obj in obj_cluster] for obj_cluster in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed)
         else:
             attendant_env = constructor(seed, attendant_level, target_objs = [type(obj) for obj in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed)
     elif attendant_level:
         if task == EnvType.GOTO or task == EnvType.PICKUP:
             attendant_env = constructor(seed, attendant_level, target_obj = type(principal_env.target_obj))
+        elif task == EnvType.CLUSTER:
+            attendant_env = constructor(seed, attendant_level, target_objs = [[type(obj) for obj in obj_cluster] for obj_cluster in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed)
         else:
             attendant_env = constructor(seed, attendant_level, target_objs = [type(obj) for obj in principal_env.target_objs])
     elif attendant_variants:
         if task == EnvType.GOTO or task == EnvType.PICKUP:
             attendant_env = constructor(seed, principal_env.level, target_obj = type(principal_env.target_obj), variants = attendant_variants, disallowed = disallowed)
+        elif task == EnvType.CLUSTER:
+            attendant_env = constructor(seed, attendant_level, target_objs = [[type(obj) for obj in obj_cluster] for obj_cluster in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed)
         else:
             attendant_env = constructor(seed, principal_env.level, target_objs = [type(obj) for obj in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed)
 

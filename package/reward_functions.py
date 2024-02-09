@@ -1,5 +1,6 @@
 from package.utils import *
 from package.constants import *
+from package.enums import *
 
 from minigrid.core.world_object import WorldObj
 
@@ -9,10 +10,21 @@ import gymnasium
 """
 Basic reward functions
 """
-# Reward for reaching an object
+
 def reward_reach_object_hof(world_model: gymnasium.Env, amt = 1):
-    obj_name = OBJ_NAME_MAPPING[type(world_model.target_obj)]
-    target_obj_pos = world_model.target_obj_pos
+    """
+    Reward for reaching an object
+    Most applicable to GOTO task, perhaps PUT task
+    """
+    task = world_model.env_type
+    if task == EnvType.GOTO:
+        obj_name = OBJ_NAME_MAPPING[type(world_model.target_obj)]
+        target_obj_pos = world_model.target_obj_pos
+    elif task == EnvType.PUT:
+        obj_name = OBJ_NAME_MAPPING[type(world_model.target_objs[1])]
+        target_obj_pos = world_model.target_objs_pos[1]
+    else:
+        raise AssertionError(f"Rewarding reaching an object is not appropriate for the {task.value} task")
 
     def reward(env_state: gymnasium.Env, action: int):
         ax, ay = env_state.agent_pos
@@ -31,9 +43,18 @@ def reward_reach_object_hof(world_model: gymnasium.Env, amt = 1):
     return reward
 
 
-# Reward for carrying an object
 def reward_carry_object_hof(world_model: gymnasium.Env, amt = 1):
-    target_obj = world_model.target_obj
+    """
+    Reward for carrying an object
+    Most applicable to PICKUP task, perhaps PUT task
+    """
+    task = world_model.env_type
+    if task == EnvType.PICKUP:
+        target_obj = world_model.target_obj
+    elif task == EnvType.PUT:
+        target_obj = world_model.target_objs[0]
+    else:
+        raise AssertionError(f"Rewarding carrying an object is not appropriate for the {task.value} task")
 
     def reward(env_state: gymnasium.Env, action: int):
         if action == env_state.actions.pickup and env_state.carrying and env_state.carrying == target_obj:
@@ -44,12 +65,17 @@ def reward_carry_object_hof(world_model: gymnasium.Env, amt = 1):
     return reward
 
 
-# Reward for objects being adjacent to one another
 def reward_adjacent_object_hof(world_model: gymnasium.Env, amt = 1):
+    """
+    Reward for objects being adjacent to one another
+    Most applicable to PUT, COLLECT, and CLUSTER tasks
+    """
+    assert hasattr(world_model, "target_objs"), f"Rewarding adjacent objects is not appropriate for the {world_model.env_type.value} task"
+
     obj_groups = world_model.target_objs
     if not isinstance(obj_groups[0], list):
         obj_groups = [obj_groups]
-    obj_group_pos = world_model.target_obj_pos
+    obj_group_pos = world_model.target_objs_pos
     if not isinstance(obj_group_pos[0], list):
         obj_group_pos = [obj_group_pos]
     

@@ -260,3 +260,5 @@ env_specs:
   attendant_level: DEATH
   seed: 168
   attendant_variants: [OBJECTS]
+  principal_render_mode: human
+  attendant_render_mode: human

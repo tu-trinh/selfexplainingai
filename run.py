@@ -187,11 +187,12 @@ if __name__ == "__main__":
     ### OLD TASKS ###
     if args.test == 1: ### Test 1: learning from image / belief mismatch ###
         principal, attendant = make_agents(f"./package/configs/test1_difficulty{args.difficulty}.yaml")
-        image = principal.speak(mode = "image")
-        differences = attendant.listen(image = image)
-        adapted_solution = principal.listen(differences)
-        trajectory = attendant.execute_actions(adapted_solution)
-        solved = principal.verify(trajectory)
+        manual_test(attendant.world_model, seed = attendant.world_model.env_seed)
+        # image = principal.speak(mode = "image")
+        # differences = attendant.listen(image = image)
+        # adapted_solution = principal.listen(differences)
+        # trajectory = attendant.execute_actions(adapted_solution)
+        # solved = principal.verify(trajectory)
     
     elif args.test == 2: ### Test 2: learning to control attendant / intention mismatch ###
         principal, attendant = make_agents("./package/configs/test2.yaml")

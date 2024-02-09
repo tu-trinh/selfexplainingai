@@ -18,10 +18,12 @@ class ClusterTask(MultiTargetEnv):
                  disallowed: Dict[Variant, Any] = None,
                  max_steps: int = None,
                  see_through_walls = False,
+                 render_mode = None,
                  **kwargs):
         self.env_seed = env_seed
         self.variants = variants if variants is not None else []
         self.disallowed = disallowed if disallowed is not None else {}
+        self.render_mode = render_mode
 
         mission_space = MissionSpace(mission_func = self._gen_mission,
                                      ordered_placeholders = [OBJECT_COLOR_NAMES, TANGIBLE_OBJS])  # FIXME: how does this work with the gen mission below lol

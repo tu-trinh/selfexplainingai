@@ -37,7 +37,7 @@ class PragmaticEnv(MiniGridEnv):
             self.max_steps = max_steps
         self.allowable_skills = None
         super().__init__(mission_space = mission_space, grid_size = self.room_size, max_steps = self.max_steps,
-                         see_through_walls = see_through_walls, render_mode = "human", agent_view_size = AGENT_VIEW_SIZE, **kwargs)
+                         see_through_walls = see_through_walls, render_mode = self.render_mode, agent_view_size = AGENT_VIEW_SIZE, **kwargs)
         
         # Generate random environment
         self.env_id = f"{self.env_type}-{self.level}-{self.env_seed}"

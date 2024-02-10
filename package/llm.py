@@ -25,8 +25,8 @@ assert all([src in MODEL_MAPPING for src in AVAILABLE_MODEL_SOURCES]), "Missing 
 
 class LLM:
     def __init__(self, query_source, model_source):
-        self.query_source = query_source
-        self.model_source = model_source
+        self.query_source = query_source if query_source else "openai"
+        self.model_source = model_source if query_source else "gpt"
         try:
             self.model = MODEL_MAPPING[model_source][query_source]
         except:

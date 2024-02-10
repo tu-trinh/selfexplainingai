@@ -259,6 +259,6 @@ env_specs:
   principal_level: DIST
   attendant_level: DIST
   seed: 168
-  attendant_variants: [COLOR, ROOM_SIZE, NUM_OBJECTS, OBJECTS, DOORS, NUM_ROOMS, ORIENTATION]
+  attendant_variants: [COLOR, ROOM_SIZE, NUM_OBJECTS, OBJECTS, NUM_ROOMS, ORIENTATION]
   principal_render_mode: human
   attendant_render_mode: human

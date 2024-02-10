@@ -256,9 +256,9 @@ attendant:
 
 env_specs:
   task: GOTO
-  principal_level: EMPTY
-  attendant_level: DEATH
+  principal_level: DIST
+  attendant_level: DIST
   seed: 168
-  attendant_variants: [OBJECTS]
+  attendant_variants: [COLOR, ROOM_SIZE, NUM_OBJECTS, OBJECTS, DOORS, NUM_ROOMS, ORIENTATION]
   principal_render_mode: human
   attendant_render_mode: human

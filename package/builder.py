@@ -72,6 +72,7 @@ def make_envs(task: EnvType,
 
     seed = random.randint(0, 10000) if not seed else seed
     principal_env = constructor(seed, principal_level, render_mode = principal_render_mode)
+    
     if task in [EnvType.GOTO, EnvType.PICKUP]:
         disallowed_objs = set([(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] != principal_env.target_obj])
         disallowed_poses = [pos for obj, pos in principal_env.objs if obj != principal_env.target_obj]
@@ -85,10 +86,10 @@ def make_envs(task: EnvType,
         Variant.ROOM_SIZE: principal_env.room_size,
         Variant.NUM_OBJECTS: len(principal_env.objs) - 1,
         Variant.OBJECTS: disallowed_objects,
-        Variant.DOORS: principal_env.doors,
         Variant.NUM_ROOMS: principal_env.num_rooms if hasattr(principal_env, "num_rooms") else None,
         Variant.ORIENTATION: principal_env
     }
+
     if attendant_level and attendant_variants:
         if task == EnvType.GOTO or task == EnvType.PICKUP:
             attendant_env = constructor(seed, attendant_level, target_obj = type(principal_env.target_obj), variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
@@ -188,6 +189,16 @@ def set_advanced_reward_functions_agent(agent: Agent, agent_kwargs: Dict):
             agent.add_reward_function(all_possible_reward_functions[func_name](world_model = agent.world_model, **func_args), reward_weights[i])
         else:
             raise ValueError(f"Reward function `{rf['name']}` is not yet defined")
+
+
+def print_allowable_variants(level: Level = None):
+    if not level:
+        msg = "The following are allowable variants for each level:"
+        for level, variants in ALLOWABLE_VARIANTS:
+            msg += f"{level.value}: {[v.value for v in variants]}\n"
+        print(msg.strip())
+    else:
+        print(f"The following are allowable variants for level {level.value.upper()}:\n{[v.value for v in ALLOWABLE_VARIANTS[level]]}")
 
 
 if __name__ == "__main__":

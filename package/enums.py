@@ -51,7 +51,6 @@ class Variant(Enum):
     ROOM_SIZE = "room_size"  # different room size
     NUM_OBJECTS = "num_objects"  # different number of objects
     OBJECTS = "objects"  # same positions but different objects in those positions
-    DOORS = "doors"  # different door types/states
     NUM_ROOMS = "num_rooms"  # different number of rooms
     ORIENTATION = "orientation"  # rotated some degrees
 

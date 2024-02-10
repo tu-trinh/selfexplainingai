@@ -1,3 +1,5 @@
+from enums import *
+
 from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box
 
 
@@ -57,6 +59,19 @@ AGENT_VIEW_SIZE = 5
 MIN_ROOM_SIZE = 7
 MAX_ROOM_SIZE = 12
 MAX_NUM_LOCKED_DOORS = 3
+UNIVERSAL_VARIANTS = [Variant.COLOR, Variant.ROOM_SIZE, Variant.ORIENTATION]
+ALLOWABLE_VARIANTS = {
+    Level.EMPTY: UNIVERSAL_VARIANTS,
+    Level.DEATH: UNIVERSAL_VARIANTS,
+    Level.DIST: UNIVERSAL_VARIANTS + [Variant.NUM_OBJECTS, Variant.OBJECTS],
+    Level.OPEN_DOOR: UNIVERSAL_VARIANTS,
+    Level.BLOCKED_DOOR: UNIVERSAL_VARIANTS,
+    Level.UNLOCK_DOOR: UNIVERSAL_VARIANTS,
+    Level.HIDDEN_KEY: UNIVERSAL_VARIANTS,
+    Level.GO_AROUND: UNIVERSAL_VARIANTS,
+    Level.MULT_ROOMS: UNIVERSAL_VARIANTS + [Variant.NUM_ROOMS],
+    Level.BOSS: UNIVERSAL_VARIANTS + [Variant.NUM_OBJECTS, Variant.OBJECTS, Variant.NUM_ROOMS]
+}
 
 
 #########################

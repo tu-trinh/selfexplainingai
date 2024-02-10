@@ -187,7 +187,7 @@ if __name__ == "__main__":
     ### OLD TASKS ###
     if args.test == 1: ### Test 1: learning from image / belief mismatch ###
         principal, attendant = make_agents(f"./package/configs/test1_difficulty{args.difficulty}.yaml")
-        manual_test(attendant.world_model, seed = attendant.world_model.env_seed)
+        # manual_test(attendant.world_model, seed = attendant.world_model.env_seed)
         # image = principal.speak(mode = "image")
         # differences = attendant.listen(image = image)
         # adapted_solution = principal.listen(differences)

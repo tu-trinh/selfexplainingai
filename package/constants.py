@@ -1,4 +1,4 @@
-from enums import *
+from package.enums import *
 
 from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box
 
@@ -132,3 +132,8 @@ Here is a description of environment two: {own_env_desc}
 Which of the following reflects the differences in these two environments? There can be multiple answers.
 {differences}
 Please give only the letter(s) in your response in a comma-separated list, such as 'A' or 'A,D,E'."""
+
+GET_SKILL_NAME_QUESTION = """Below is a sequence of observations and corresponding actions taken by an AI agent in trying to execute a 'skill'. Observations should be interpreted as environment descriptions told to the agent. Given this, please assign a name or short description to the skill that the agent is doing. Your response should just be the word or phrase for the skill: for example, 'pick up key', 'turn around', 'unlock door', etc. Don't say anything else.
+Sequence of observations (obs) and actions (act):
+{obs_act_seq}
+"""

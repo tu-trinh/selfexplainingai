@@ -7,6 +7,7 @@ import package.reward_functions as REWARD_FUNCTIONS
 from package.enums import *
 
 from minigrid.wrappers import FullyObsWrapper, RGBImgObsWrapper
+from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box
 
 import gymnasium
 from typing import Callable, Dict, List, Tuple, Any, Union
@@ -156,18 +157,19 @@ class Principal(Agent):
 
 
 class Attendant(Agent):
-    allowable_modes = ["inform", "respond"]
+    speak_modes = ["inform", "describe"]
+    listen_modes = ["plan", "replan"]
 
     def __init__(self, query_source: str, model_source: str, name: str = None):
         self.name = name if name else "Attendant"
         super().__init__(query_source, model_source)
 
-    def set_instruction(self, instruction, additional_actions = None):
+    def set_instruction(self, instruction, additional_actions = None) -> None:
         self.llm.set_instruction(instruction, additional_actions)
         self.instruction = None
         self.additional_actions = additional_actions
 
-    def get_action(self, observation = None, action_failed = False):
+    def get_action(self, observation = None, action_failed = False) -> str:
         response = self.llm.get_action(observation, action_failed)
         parsed_response = convert_response_to_action(response, self.additional_actions)
         self.interactions += 1
@@ -175,17 +177,28 @@ class Attendant(Agent):
         self.tokens = self.llm.total_prompt_tokens
         return parsed_response
 
-    def speak(self, mode: str, utterance: str = None, trajectories: List[Trajectory] = None) -> Any:
-        assert mode in Attendant.allowable_modes, "Invalid mode"
+    def speak(self, mode: str) -> Any:
+        assert mode in Attendant.speak_modes, "Invalid mode"
         if mode == "inform":
-            assert (not utterance and not trajectories), "Inform mode does not require any input"
-        elif mode == "respond":
-            assert (utterance and not trajectories) or (trajectories and not utterance), "Respond mode requires either utterance or trajectories"
-
-        if mode == "inform":
-            return self.skills, self.world_model
-        if mode == "respond":
-            return self.listen(utterance = utterance, trajectories = trajectories)
+            skill_descs = []
+            for skill in ["move_forward_2_steps", "pickup_green_key", "open_blue_door"]:
+                skill_func = self.world_model.allowable_skills[skill]
+                if skill.startswith("move"):
+                    actions = skill_func()
+                elif skill.startswith("pickup"):
+                    pickup_obj = None
+                    for obj, _ in self.world_model.objs:
+                        if type(obj) == Key and obj.color == "green":
+                            pickup_obj = obj
+                            break
+                    actions = skill_func(self.world_model.agent_pos, self.world_model.agent_dir, pickup_obj.cur_pos if pickup_obj.cur_pos else pickup_obj.init_pos)
+                elif skill.startswith("open"):
+                    _, door_pos = self.world_model.doors[0]
+                    actions = skill_func(self.world_model.agent_pos, self.world_model.agent_dir, door_pos)
+                obs_act_seq = self._generate_obs_act_sequence(actions)
+                skill_desc = self.llm.get_skill_description(obs_act_seq)
+                skill_descs.append(skill_desc)
+            return skill_descs
 
     def listen(self,
                utterance: str = None,
@@ -212,9 +225,7 @@ class Attendant(Agent):
         own_env_desc = get_full_env_desc[obs["image"]]
         differences = self.llm.get_differences(other_env_desc, own_env_desc)
         return differences
-
-
-
+    
         # fully_obs_env = FullyObsWrapper(self.world_model)
         # obs, _ = fully_obs_env.reset()
         # own_image = obs["image"]
@@ -246,6 +257,23 @@ class Attendant(Agent):
         #     differences += ", ".join(list(there_but_not_here))
         #     differences += ". "
         # return differences
+    
+    def _generate_obs_act_sequence(self, action_sequence):
+        obs_act_seq = ""
+        obs, _ = self.world_model.reset()
+        idx = 0
+        while idx < len(action_sequence):
+            obs_act_seq += f"Obs {idx + 1}: "
+            obs_act_seq += get_obs_desc(obs, detail = 1)
+            obs_act_seq += "\n"
+            obs_act_seq += f"Act {idx + 1}: "
+            obs_act_seq += IDX_TO_ACTION[action_sequence[idx]]
+            obs_act_seq += "\n"
+            obs, _, _, _, _ = self.world_model.step(action_sequence[idx])
+            idx += 1
+        obs_act_seq += "Final obs: "
+        obs_act_seq += get_obs_desc(obs, detail = 1)
+        return obs_act_seq
 
 
 if __name__ == "__main__":

@@ -123,7 +123,11 @@ class SingleTargetEnv(PragmaticEnv):
                         blocker_obj_pos = (self.doors[0][1][0], self.doors[0][1][1] + 1)
                 all_possible_pos -= set([blocker_obj_pos])
                 blocker_obj = self.target_obj
-                while type(blocker_obj) == type(self.target_obj) and blocker_obj.color == self.target_obj.color:
+                disallowed_blocker_obj_config = set([(type(self.target_obj), self.target_obj.color)])
+                if Variant.OBJECTS in self.variants:
+                    disallowed_blocker_obj, disallowed_blocker_color = self.disallowed[Variant.OBJECTS][0][-1]
+                    disallowed_blocker_obj_config.add((disallowed_blocker_obj, disallowed_blocker_color))
+                while (type(blocker_obj), blocker_obj.color) in disallowed_blocker_obj_config:
                     blocker_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(OBJECT_COLOR_NAMES))
                 self.objs.append((blocker_obj, blocker_obj_pos))
             elif level in [Level.UNLOCK_DOOR, Level.HIDDEN_KEY]:

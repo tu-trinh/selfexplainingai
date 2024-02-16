@@ -217,7 +217,11 @@ class MultiTargetEnv(PragmaticEnv):
                 all_possible_pos -= set([blocker_obj_pos])
                 temp = flatten_list(self.target_objs)
                 blocker_obj = temp[0]
-                while (type(blocker_obj), blocker_obj.color) in set([(type(obj), obj.color) for obj in temp]):
+                disallowed_blocker_obj_config = set([(type(temp[0]), temp[0].color)])
+                if Variant.OBJECTS in self.variants:
+                    disallowed_blocker_obj, disallowed_blocker_color = self.disallowed[Variant.OBJECTS][0][-1]
+                    disallowed_blocker_obj_config.add((disallowed_blocker_obj, disallowed_blocker_color))
+                while (type(blocker_obj), blocker_obj.color) in disallowed_blocker_obj_config:
                     blocker_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(OBJECT_COLOR_NAMES))
                 self.objs.append((blocker_obj, blocker_obj_pos))
             elif level in [Level.UNLOCK_DOOR, Level.HIDDEN_KEY]:

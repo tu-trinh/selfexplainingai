@@ -207,10 +207,12 @@ class PragmaticEnv(MiniGridEnv):
                     obj, obj_pos = self.objs[i][j]
                     assert obj_pos not in wall_positions, "Object cannot be in a wall"
                     self.grid.set(obj_pos[0], obj_pos[1], obj)
+                    obj.init_pos = obj_pos
             else:
                 obj, obj_pos = self.objs[i]
                 assert obj_pos not in wall_positions, "Object cannot be in a wall"
                 self.grid.set(obj_pos[0], obj_pos[1], obj)
+                obj.init_pos = obj_pos
         # Set doors
         for i in range(len(self.doors)):
             door, door_pos = self.doors[i]
@@ -306,3 +308,51 @@ class PragmaticEnv(MiniGridEnv):
             skills["toggle"] = toggle
         
         self.allowable_skills = skills
+
+    
+    """
+    General Edits
+    """
+    def change_room_size(self, new_size = None):
+        if not new_size:
+            new_size = random.choice(list(range(MIN_ROOM_SIZE, self.room_size)) + list(range(self.room_size + 1, MAX_ROOM_SIZE)))
+        size_delta = new_size - self.room_size
+        if size_delta < 0:
+            pass
+            # Remove original walls since they surround a bigger perimeter
+            # Calculate which cells of the room will be deleted (i.e. replaced by new walls). Keep track of them as we will need them for wall building
+            # Go to each cell of those cells and keep inventory of objects, if any, that are there and which location they were in
+            # Generate new locations for each of the misplaced objects AS CLOSE TO THE PREVIOUS LOCATION AS POSSIBLE. For example, say there was a key that was right next to the old wall. Now with the new walls surrounding a smaller perimeter, we want this key to still be right next to the wall IF POSSIBLE.
+            # Just think of this like taking a square and then shrinking it. Everything inside the square will keep its original relative position, they will just be more tightly squished. (If there is no possible new place to put an object because there simply aren't enough free cells due to the room becoming too small, raise a ValueError.)
+        else:
+            pass
+            # Remove original walls since they surround a smaller perimeter
+            # Calculate and keep track of which cell coordinates will become the new walls. Keep in mind that by making this into a bigger room, we also change the (0, 0) coordinate to be the top left wall of the NEW room, and likewise for the (room_size - 1, room_size - 1) coordinate at the bottom right wall.
+            # For existing objects in the room, if they are NOT another wall (so like, an internal wall, not a perimeter wall), recalculate their coordinates accordingly to fit with the new room size
+            # If the existing object IS an internal wall, that means it is part of a (partial) row or column of internal walls that extended out to meet the original perimeter walls. That means there should now be a gap between the end of the internal walls that was originally touching the perimeter walls, and the new perimeter walls themselves, since we expanded the room. Fill this gap in with more walls.
+        self._gen_grid()
+    
+
+    def change_room_orientation(self, rotate_degrees = None):
+        if not rotate_degrees:
+            rotate_degrees = random.choice([90, 180, 270])
+        self._gen_rotated_room(self, rotate_degrees)
+        self._gen_grid()
+    
+
+    def change_target_color(self, new_color1 = None, new_color2 = None):
+        assert self.env_type != EnvType.CLUSTER, "CLUSTER tasks do not have a singular target color to change"
+        if not new_color1:
+            old_color = self.target_obj.color if hasattr(self, "target_obj") else self.target_objs[0].color
+            new_color = random.choice(list(set(OBJECT_COLOR_NAMES) - set([old_color])))
+        if hasattr(self, "target_obj"):
+            self.target_obj.color = new_color
+        else:
+            if self.env_type == PUT:
+                self.target_objs[0].color = new_color1
+                if new_color2 is not None:
+                    self.target_objs[1].color = new_color2
+            else:
+                for to in self.target_objs:
+                    to.color = new_color
+        self._gen_grid()

@@ -143,26 +143,32 @@ def _find_path(agent_pos, agent_dir, object_pos, can_overlap = False):
         required_dir_x = 0
     elif dx < 0:
         required_dir_x = 2
+    else:
+        required_dir_x = None
     if dy > 0:
         required_dir_y = 1
     elif dy < 0:
         required_dir_y = 3
+    else:
+        required_dir_y = None
 
-    while agent_dir < required_dir_x:
-        actions.append(1)
-        agent_dir += 1
-    while agent_dir > required_dir_x:
-        actions.append(0)
-        agent_dir -= 1
-    for _ in range(abs(dx)):
-        actions.append(2)
+    if required_dir_x:
+        while agent_dir < required_dir_x:
+            actions.append(1)
+            agent_dir += 1
+        while agent_dir > required_dir_x:
+            actions.append(0)
+            agent_dir -= 1
+        for _ in range(abs(dx)):
+            actions.append(2)
 
-    while agent_dir < required_dir_y:
-        actions.append(1)
-        agent_dir += 1
-    while agent_dir > required_dir_y:
-        actions.append(0)
-        agent_dir -= 1
-    for _ in range(abs(dy) if can_overlap else abs(dy) - 1):
-        actions.append(2)
+    if required_dir_y:
+        while agent_dir < required_dir_y:
+            actions.append(1)
+            agent_dir += 1
+        while agent_dir > required_dir_y:
+            actions.append(0)
+            agent_dir -= 1
+        for _ in range(abs(dy) if can_overlap else abs(dy) - 1):
+            actions.append(2)
     return actions

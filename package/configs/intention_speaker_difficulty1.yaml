@@ -1,8 +1,8 @@
 principal:
-  query_source: scale
-  model_source: mistral
+  query_source: openai
+  model_source: gpt
   basic_reward_functions:
-    - { name: "reward_reach_object_hof" }
+    - { name: "reward_carry_object_hof" }
   basic_reward_weights:
     - 1
   skills:
@@ -127,10 +127,10 @@ principal:
     - close_purple_door
 
 attendant:
-  query_source: scale
-  model_source: mistral
+  query_source: openai
+  model_source: gpt
   basic_reward_functions:
-    - { name: "reward_reach_object_hof" }
+    - { name: "reward_carry_object_hof" }
   basic_reward_weights:
     - 1
   skills:
@@ -255,10 +255,8 @@ attendant:
     - close_purple_door
 
 env_specs:
-  task: GOTO
-  principal_level: DIST
-  attendant_level: DIST
+  task: PICKUP
+  principal_level: BLOCKED_DOOR
+  attendant_level: BLOCKED_DOOR
   seed: 168
-  attendant_variants: [COLOR, ROOM_SIZE, NUM_OBJECTS, OBJECTS, NUM_ROOMS, ORIENTATION]
-  principal_render_mode: human
-  attendant_render_mode: human
+  attendant_variants: [OBJECTS]

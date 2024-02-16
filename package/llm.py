@@ -170,7 +170,7 @@ class LLM:
             try:
                 response_obj = openai.ChatCompletion.create(
                     model = self.model,
-                    messages = {"role": "user", "content": prompt},
+                    messages = [{"role": "user", "content": prompt}],
                     temperature = TEMPERATURE
                 )
                 response = response_obj["choices"][0]["message"]["content"]
@@ -180,3 +180,18 @@ class LLM:
         for diff_letter in response.split(","):
             differences.append(DIFFERENCES_MAPPING[diff_letter])
         return ". ".join(differences)
+    
+    def get_skill_description(self, obs_act_seq):
+        prompt = GET_SKILL_NAME_QUESTION.format(obs_act_seq = obs_act_seq)
+        if self.query_source == "openai":
+            try:
+                response_obj = openai.ChatCompletion.create(
+                    model = self.model,
+                    messages = [{"role": "user", "content": prompt}],
+                    temperature = TEMPERATURE
+                )
+                response = response_obj["choices"][0]["message"]["content"]
+            except Exception as e:
+                print("Could not complete LLM request due to", e)
+                response = None
+            return response

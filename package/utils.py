@@ -28,6 +28,14 @@ ACTION_TO_IDX = {
     "drop": 4,
     "toggle": 5
 }
+IDX_TO_ACTION = {
+    0: "turn left",
+    1: "turn right",
+    2: "go forward",
+    3: "pick up",
+    4: "drop",
+    5: "toggle"
+}
 CUSTOM_ACTION_TO_TRUE_ACTION = {
     1: 2,
     2: 0,
@@ -138,7 +146,7 @@ def get_obs_desc(obs, left_obs = None, backwards_obs = None, right_obs = None, d
     """
     Detail levels:
     1 - list objects in the field of vision
-    2 - list objects in the field of vision and their location
+    2 - list objects in the 360 field of vision and their location
     3 - list what is in the field of vision row-by-row and directly at front/left/right
     4 - list everything cell by cell
     """

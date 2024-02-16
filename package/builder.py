@@ -74,11 +74,11 @@ def make_envs(task: EnvType,
     principal_env = constructor(seed, principal_level, render_mode = principal_render_mode)
     
     if task in [EnvType.GOTO, EnvType.PICKUP]:
-        disallowed_objs = set([(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] != principal_env.target_obj])
+        disallowed_objs = [(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] != principal_env.target_obj]
         disallowed_poses = [pos for obj, pos in principal_env.objs if obj != principal_env.target_obj]
         disallowed_objects = (disallowed_objs, disallowed_poses)
     else:
-        disallowed_objs = set([(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] not in flatten_list(principal_env.target_objs)])
+        disallowed_objs = [(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] not in flatten_list(principal_env.target_objs)]
         disallowed_poses = [pos for obj, pos in principal_env.objs if obj not in flatten_list(principal_env.target_objs)]
         disallowed_objects = (disallowed_objs, disallowed_poses)
     disallowed = {

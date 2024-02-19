@@ -255,7 +255,7 @@ attendant:
     - close_purple_door
 
 env_specs:
-  task: GOTO
+  task: PICKUP
   principal_level: DIST
   attendant_level: DIST
   seed: 168

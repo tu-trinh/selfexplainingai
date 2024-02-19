@@ -1,4 +1,4 @@
-from enums import *
+from package.enums import *
 
 from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box
 

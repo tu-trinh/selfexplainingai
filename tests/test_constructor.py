@@ -2,7 +2,8 @@ from copy import deepcopy as dc
 import yaml
 import numpy as np
 import sys
-sys.path.append("/Users/tutrinh/Work/CHAI/selfexplainingai")
+sys.path.append('.')
+#sys.path.append("/Users/tutrinh/Work/CHAI/selfexplainingai")
 
 from package.enums import *
 from package.builder import *

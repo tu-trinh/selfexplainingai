@@ -25,6 +25,9 @@ class Level(Enum):
     MULT_ROOMS = "MultRooms"
     BOSS = "Boss"
 
+    ROOM_DOOR_KEY = "RoomDoorKey"
+    TREASURE_ISLAND = "TreasureIsland"
+
     @classmethod
     def has_value(cls, value):
         if isinstance(value, Enum):

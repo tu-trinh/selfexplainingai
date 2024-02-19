@@ -8,9 +8,12 @@ from minigrid.core.grid import Grid
 from minigrid.core.mission import MissionSpace
 from minigrid.wrappers import FullyObsWrapper
 from minigrid.core.constants import IDX_TO_OBJECT, IDX_TO_COLOR
+from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box
 
 import numpy as np
 import random
+import copy
+import warnings
 
 
 class PragmaticEnv(MiniGridEnv):
@@ -50,7 +53,7 @@ class PragmaticEnv(MiniGridEnv):
 
         # Special case of orientation variant
         if Variant.ORIENTATION in self.variants:
-            self._gen_rotated_room(self.disallowed[Variant.ORIENTATION], random.choice([90, 180, 270]))
+            self._gen_rotated_room(random.choice([90, 180, 270]), ref_env = self.disallowed[Variant.ORIENTATION])
     
     
     def step(self, action):
@@ -231,31 +234,61 @@ class PragmaticEnv(MiniGridEnv):
             self.place_agent()
     
 
-    def _gen_rotated_room(self, ref_env, degrees):
+    def _gen_rotated_room(self, degrees, ref_env = None):
+        room_size = ref_env.room_size if ref_env is not None else self.room_size
         rotation_deltas = {
-            90: lambda x, y: (ref_env.room_size - 1 - y, x),
-            180: lambda x, y: (ref_env.room_size - 1 - x, ref_env.room_size - 1 - y),
-            270: lambda x, y: (y, ref_env.room_size - 1 - x)
+            90: lambda x, y: (room_size - 1 - y, x),
+            180: lambda x, y: (room_size - 1 - x, room_size - 1 - y),
+            270: lambda x, y: (y, room_size - 1 - x)
         }
         delta_func = rotation_deltas[degrees]
-        for obj, pos in ref_env.objs:
-            self.objs.append((obj, delta_func(*pos)))
-        for wall, pos in ref_env.walls:
-            self.walls.append((wall, delta_func(*pos)))
-        for door, pos in ref_env.doors:
-            self.doors.append((door, delta_func(*pos)))
-        for key, pos in ref_env.keys:
-            self.keys.append((key, delta_func(*pos)))
-        self.agent_start_pos = delta_func(*ref_env.agent_start_pos)
-        self.agent_start_dir = ref_env.agent_start_dir  # dir does not rotate otherwise it's just the same room
-        if self.env_type in [EnvType.GOTO, EnvType.PICKUP]:
-            self.target_obj = ref_env.target_obj
-            self.target_obj_pos = delta_func(*ref_env.target_obj_pos)
+
+        if ref_env is None:  # editing self; no need for reference environment
+            ref_objs, self.objs = self.objs, []
+            ref_walls, self.walls = self.walls, []
+            ref_doors, self.doors = self.doors, []
+            ref_keys, self.keys = self.keys, []
+            self.agent_start_pos = delta_func(*self.agent_start_pos)
+            if self.env_type in [EnvType.GOTO, EnvType.PICKUP]:
+                self.target_obj_pos = delta_func(*self.target_obj_pos)
+            elif self.env_type in [EnvType.CLUSTER]:
+                for i in range(len(self.target_objs_pos)):
+                    for j in range(len(self.target_objs_pos[i])):
+                        self.target_objs_pos[i][j] = delta_func(*self.target_objs_pos[i][j])
+            else:
+                self.target_objs_pos = [delta_func(*obj_pos) for obj_pos in self.target_objs_pos]
+        
         else:
-            self.target_objs = ref_env.target_objs
-            self.target_objs_pos = [delta_func(*obj_pos) for obj_pos in ref_env.target_objs_pos]
-        if self.level == Level.MULT_ROOMS:
-            self.num_rooms = ref_env.num_rooms
+            ref_objs = ref_env.objs
+            ref_walls = ref_env.walls
+            ref_doors = ref_env.doors
+            ref_keys = ref_env.keys
+            self.agent_start_pos = delta_func(*ref_env.agent_start_pos)
+            self.agent_start_dir = ref_env.agent_start_dir  # dir does not rotate otherwise it's just the same room
+            if self.env_type in [EnvType.GOTO, EnvType.PICKUP]:
+                self.target_obj = ref_env.target_obj
+                self.target_obj_pos = delta_func(*ref_env.target_obj_pos)
+            elif self.env_type in [EnvType.CLUSTER]:
+                self.target_objs = ref_env.target_objs
+                self.target_objs_pos = []
+                for i in range(len(ref_env.target_objs_pos)):
+                    objs_pos = []
+                    for j in range(len(ref_env.target_objs_pos[i])):
+                        objs_pos.append(delta_func(*ref_env.target_objs_pos[i][j]))
+                    self.target_objs_pos.append(objs_pos)
+            else:
+                self.target_objs_pos = [delta_func(*obj_pos) for obj_pos in ref_env.target_objs_pos]
+            if self.level == Level.MULT_ROOMS:
+                self.num_rooms = ref_env.num_rooms
+
+        for obj, pos in ref_objs:
+            self.objs.append((obj, delta_func(*pos)))
+        for wall, pos in ref_walls:
+            self.walls.append((wall, delta_func(*pos)))
+        for door, pos in ref_doors:
+            self.doors.append((door, delta_func(*pos)))
+        for key, pos in ref_keys:
+            self.keys.append((key, delta_func(*pos)))
     
     
     def set_allowable_skills(self):
@@ -317,36 +350,175 @@ class PragmaticEnv(MiniGridEnv):
         if not new_size:
             new_size = random.choice(list(range(MIN_ROOM_SIZE, self.room_size)) + list(range(self.room_size + 1, MAX_ROOM_SIZE)))
         size_delta = new_size - self.room_size
-        if size_delta < 0:
-            pass
-            # Remove original walls since they surround a bigger perimeter
-            # Calculate which cells of the room will be deleted (i.e. replaced by new walls). Keep track of them as we will need them for wall building
-            # Go to each cell of those cells and keep inventory of objects, if any, that are there and which location they were in
-            # Generate new locations for each of the misplaced objects AS CLOSE TO THE PREVIOUS LOCATION AS POSSIBLE. For example, say there was a key that was right next to the old wall. Now with the new walls surrounding a smaller perimeter, we want this key to still be right next to the wall IF POSSIBLE.
-            # Just think of this like taking a square and then shrinking it. Everything inside the square will keep its original relative position, they will just be more tightly squished. (If there is no possible new place to put an object because there simply aren't enough free cells due to the room becoming too small, raise a ValueError.)
-        else:
-            pass
-            # Remove original walls since they surround a smaller perimeter
-            # Calculate and keep track of which cell coordinates will become the new walls. Keep in mind that by making this into a bigger room, we also change the (0, 0) coordinate to be the top left wall of the NEW room, and likewise for the (room_size - 1, room_size - 1) coordinate at the bottom right wall.
-            # For existing objects in the room, if they are NOT another wall (so like, an internal wall, not a perimeter wall), recalculate their coordinates accordingly to fit with the new room size
-            # If the existing object IS an internal wall, that means it is part of a (partial) row or column of internal walls that extended out to meet the original perimeter walls. That means there should now be a gap between the end of the internal walls that was originally touching the perimeter walls, and the new perimeter walls themselves, since we expanded the room. Fill this gap in with more walls.
-        self._gen_grid()
+        offset = abs(size_delta) // 2 if size_delta < 0 else size_delta // 2
+        new_doors, new_keys, new_walls, new_objs = [], [], [], []
+
+        def calculate_new_position(pos):
+            x, y = pos
+            if size_delta > 0:
+                return (x + offset, y + offset)
+            else:
+                return (x - offset, y - offset)
+        
+        def is_within_bounds(pos):
+            x, y = pos
+            return 1 <= x < new_size - 1 and 1 <= y < new_size - 1
+        
+        def find_next_available_position(pos):
+            for dx in [-1, 0, 1]:
+                for dy in [-1, 0, 1]:
+                    new_pos = (pos[0] + dx, pos[1] + dy)
+                    if is_within_bounds(new_pos):
+                        return new_pos
+            return None
+        
+        def calculate_new_wall_assignments(wall_detection):
+            ratios = []
+            curr_walls = 0
+            curr_cleft = 0
+            if wall_detection[0]:
+                curr_walls += 1
+                currently_wall = True
+            else:
+                curr_cleft += 1
+                currently_wall = False
+            for i in range(1, len(wall_detection)):
+                if currently_wall and wall_detection[i]:  # continuing the wall
+                    curr_walls += 1
+                elif currently_wall and not wall_detection[i]:  # found a cleft
+                    ratios.append((curr_walls / (self.room_size - 2), True))
+                    curr_walls = 0
+                    curr_cleft += 1
+                elif not currently_wall and not wall_detection[i]:  # continuing the cleft
+                    curr_cleft += 1
+                else:  # found a wall
+                    ratios.append((curr_cleft / (self.room_size - 2), False))
+                    curr_cleft = 0
+                    curr_walls += 1
+            if currently_wall:
+                ratios.append((curr_walls / (self.room_size - 2), True))
+            else:
+                ratios.append((curr_cleft / (self.room_size - 2), False))
+            new_assignments = []
+            for i in range(len(ratios) - 1):
+                assignment = (np.ceil(ratios[i][0] * new_size), ratios[i][1])
+                new_assignments.append(assignment)
+            if len(ratios) > 0:
+                new_assignments.append((new_size - 2 - sum([cells for cells, _ in new_assignments]), ratios[-1][1]))
+            return new_assignments
+        
+        def calculate_new_wall_positions(wall_distribution):
+            splits = np.where(wall_distribution)[0]
+            non_wall_sections = []
+            for i in range(len(splits)):
+                if i == 0:
+                    non_wall_sections.append(wall_distribution[:splits[i]])
+                else:
+                    non_wall_sections.append(wall_distribution[splits[i - 1] + 1 : splits[i]])
+            non_wall_sections.append(wall_distribution[splits[-1] + 1:])
+            j = 0
+            for i in range(size_delta):
+                non_wall_sections[j].append(False)
+                j = (j + 1) % len(non_wall_sections)
+            total_sections = []
+            for i, section in enumerate(non_wall_sections):
+                total_sections.append(section)
+                if i < len(non_wall_sections) - 1:
+                    total_sections.append([True])
+            return total_sections
+        
+        def fill_new_walls(sections, assignments, is_horizontal_walls):
+            sections = flatten_list(sections)
+            j = 0
+            for i in range(new_size - 2):
+                if sections[i]:
+                    k = 1
+                    try:  # might not be any assignments
+                        for num_cells, is_wall in assignments[j]:
+                            for _ in range(int(num_cells)):
+                                if is_wall:
+                                    if is_horizontal_walls:
+                                        new_walls.append((Wall(), (k, i + 1)))
+                                    else:
+                                        new_walls.append((Wall(), (i + 1, k)))
+                                k += 1
+                        j += 1
+                    except IndexError:
+                        return
+
+        # Handle repositioning of objects
+        for obj_list, new_list in [(self.doors, new_doors), (self.keys, new_keys), (self.objs, new_objs)]:
+            for obj, pos in obj_list:
+                new_pos = calculate_new_position(pos)
+                if not is_within_bounds(new_pos):  # Find new position if out of bounds
+                    new_pos = find_next_available_position(new_pos)
+                    if not new_pos:
+                        raise ValueError("Unable to find suitable positions for all objects when changing room size")
+                new_list.append((obj, new_pos))
+        new_agent_start_pos = calculate_new_position(self.agent_start_pos)
+        if not is_within_bounds(new_agent_start_pos):
+            new_agent_start_pos = find_next_available_position(new_agent_start_pos)
+            if not new_agent_start_pos:
+                raise ValueError("Unable to find suitable positions for all objects when changing room size")
+        
+        # Handle repositioning of walls
+        if size_delta < 0:  # shrinking
+            for _, (x, y) in self.walls:
+                new_x, new_y = x - offset, y - offset
+                if is_within_bounds((new_x, new_y)):
+                    new_walls.append((Wall(), (new_x, new_y)))
+        else:  # expanding
+            wall_positions = [pos for _, pos in self.walls]
+            # Search for and make row walls
+            row_distribution = []
+            new_assignments = []
+            for y in range(1, self.room_size - 1):
+                curr_row = [(x, y) for x in range(1, self.room_size - 1)]
+                wall_detection = [cell in wall_positions for cell in curr_row]
+                if any(wall_detection):
+                    row_distribution.append(True)
+                    new_assignments.append(calculate_new_wall_assignments(wall_detection))
+                else:
+                    row_distribution.append(False)
+            row_sections = calculate_new_wall_positions(row_distribution)
+            fill_new_walls(row_sections, new_assignments, True)
+            # Search for and make  column walls
+            col_distribution = []
+            new_assignments = []
+            for x in range(1, self.room_size - 1):
+                curr_col = [(x, y) for y in range(1, self.room_size - 1)]
+                wall_detection = [cell in wall_positions for cell in curr_col]
+                if any(wall_detection):
+                    col_distribution.append(True)
+                    new_assignments.append(calculate_new_wall_assignments(wall_detection))
+                else:
+                    col_distribution.append(False)
+            col_sections = calculate_new_wall_positions(col_distribution)
+            fill_new_walls(col_sections, new_assignments, False)
+            
+            
+        self.doors, self.keys, self.objs, self.walls = new_doors, new_keys, new_objs, new_walls
+        self.agent_start_pos = new_agent_start_pos
+        self.room_size = new_size
+        self.width = new_size
+        self.height = new_size
+        self._gen_grid(new_size, new_size)
     
 
     def change_room_orientation(self, rotate_degrees = None):
         if not rotate_degrees:
             rotate_degrees = random.choice([90, 180, 270])
-        self._gen_rotated_room(self, rotate_degrees)
-        self._gen_grid()
+        self._gen_rotated_room(rotate_degrees)
+        self._gen_grid(self.room_size, self.room_size)
     
 
     def change_target_color(self, new_color1 = None, new_color2 = None):
         assert self.env_type != EnvType.CLUSTER, "CLUSTER tasks do not have a singular target color to change"
         if not new_color1:
             old_color = self.target_obj.color if hasattr(self, "target_obj") else self.target_objs[0].color
-            new_color = random.choice(list(set(OBJECT_COLOR_NAMES) - set([old_color])))
+            new_color1 = random.choice(list(set(OBJECT_COLOR_NAMES) - set([old_color])))
         if hasattr(self, "target_obj"):
-            self.target_obj.color = new_color
+            self.target_obj.color = new_color1
         else:
             if self.env_type == PUT:
                 self.target_objs[0].color = new_color1
@@ -354,5 +526,62 @@ class PragmaticEnv(MiniGridEnv):
                     self.target_objs[1].color = new_color2
             else:
                 for to in self.target_objs:
-                    to.color = new_color
-        self._gen_grid()
+                    to.color = new_color1
+        self._gen_grid(self.room_size, self.room_size)
+    
+
+    def hide_targets(self):
+        if self.env_type in [EnvType.GOTO, EnvType.PICKUP]:
+            if type(self.target_obj) != Box:
+                box = Box(color = random.choice(OBJECT_COLOR_NAMES))
+                box.contains = self.target_obj
+                self.objs.remove((self.target_obj, self.target_obj_pos))
+                self.objs.append((box, self.target_obj_pos))
+        else:
+            target_objs = flatten_list(self.target_objs)
+            target_objs_pos = flatten_list(self.target_objs_pos)
+            for to, top in zip(target_objs, target_objs_pos):
+                if type(to) != Box:
+                    box = Box(color = random.choice(OBJECT_COLOR_NAMES))
+                    box.contains = to
+                    self.objs.remove((to, top))
+                    self.objs.append((box, top))
+        self._gen_grid(self.room_size, self.room_size)
+    
+
+    def hide_keys(self):
+        if len(self.keys) == 0:
+            warnings.warn("Cannot hide keys in environment without keys")
+            return
+        for key, pos in self.keys:
+            box = Box(color = random.choice(OBJECT_COLOR_NAMES))
+            box.contains = key
+            self.objs.remove((key, pos))
+            self.objs.append((box, pos))
+        self._gen_grid(self.room_size, self.room_size)
+    
+
+    def remove_keys(self):
+        if len(self.keys) == 0:
+            warnings.warn("Cannot remove keys in environment without keys")
+            return
+        self.keys = []
+        for door, _ in self.doors:
+            door.is_locked = False
+        self._gen_grid(self.room_size, self.room_size)
+    
+
+    def change_field_of_vision(self, new_fov = None):
+        if not new_fov:
+            new_fov = random.choice(list(range(MIN_VIEW_SIZE, MAX_VIEW_SIZE + 1, 2)))
+        self.agent_view_size = new_fov
+        self._gen_grid(self.room_size, self.room_size)
+
+    
+    def toggle_doors(self):
+        if len(self.doors) == 0:
+            warnings.warn("Cannot toggle doors for environment without doors")
+            return
+        for door, _ in self.doors:
+            door.is_locked = not door.is_locked
+        self._gen_grid(self.room_size, self.room_size)

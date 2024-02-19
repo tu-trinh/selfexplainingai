@@ -256,7 +256,7 @@ attendant:
 
 env_specs:
   task: PICKUP
-  principal_level: BLOCKED_DOOR
-  attendant_level: BLOCKED_DOOR
+  principal_level: MULT_ROOMS
+  attendant_level: MULT_ROOMS
   seed: 168
-  attendant_variants: [OBJECTS]
+  principal_render_mode: human

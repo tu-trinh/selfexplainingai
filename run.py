@@ -12,7 +12,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     principal, attendant = make_agents(f"./package/configs/{args.mismatch}_{args.side}_difficulty{args.difficulty}.yaml")
-    
+    env = principal.world_model
+    time.sleep(5)
+    debug("editing")
+    env.hide_keys()
+    debug("done")
+    env.render()
+    time.sleep(5)
     """
     ## Speaking task
     if args.side == "speaker":

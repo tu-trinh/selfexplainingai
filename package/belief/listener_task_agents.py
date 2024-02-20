@@ -2,7 +2,7 @@ import os
 import sys
 
 
-class Speaker(Agent):
+class LanguagePrincipal(Agent):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -14,7 +14,7 @@ class Speaker(Agent):
         return edits
 
 
-class Listener(Agent):
+class LanguageAttendant(Agent):
 
     def __init__(self, model=None, **kwargs):
         super().__init__(**kwargs)

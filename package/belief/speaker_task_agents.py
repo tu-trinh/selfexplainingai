@@ -2,7 +2,7 @@ import os
 import sys
 
 
-class Speaker(Agent):
+class LanguageAttendant(Agent):
 
     def __init__(self, model=None, **kwargs):
         super().__init__(**kwargs)
@@ -15,7 +15,7 @@ class Speaker(Agent):
         return prediction
 
 
-class Listener(Agent):
+class LanguagePrincipal(Agent):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

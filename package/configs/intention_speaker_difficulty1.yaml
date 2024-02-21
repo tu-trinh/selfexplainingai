@@ -260,4 +260,5 @@ env_specs:
   attendant_edits:
     - { name: "change_room_size", new_size: 12 }
   seed: 16
+  principal_render_mode: human
   attendant_render_mode: human

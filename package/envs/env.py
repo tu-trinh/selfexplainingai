@@ -9,7 +9,7 @@ from minigrid.minigrid_env import MiniGridEnv
 from minigrid.core.grid import Grid
 from minigrid.wrappers import FullyObsWrapper
 from minigrid.core.constants import IDX_TO_OBJECT, IDX_TO_COLOR
-from minigrid.core.world_object import Wall, Box, WorldObj
+from minigrid.core.world_object import Wall, Box, WorldObj, Door
 
 from typing import Dict, Any
 import numpy as np
@@ -170,30 +170,35 @@ class Environment(MiniGridEnv):
         if not new_size:
             new_size = random.choice(list(range(MIN_ROOM_SIZE, self.room_size)) + list(range(self.room_size + 1, MAX_ROOM_SIZE)))
         size_delta = new_size - self.room_size
-        debug("old", self.room_size, "new", new_size)
         offset = abs(size_delta) // 2 if size_delta < 0 else size_delta // 2
         new_doors, new_keys, new_walls, new_objs = [], [], [], []
 
-        def calculate_new_position(pos):
+        def calculate_new_position(pos, x_offset = None, y_offset = None):
             x, y = pos
             if size_delta > 0:
-                return (x + offset, y + offset)
+                return (x + x_offset, y + y_offset)
             else:
                 return (x - offset, y - offset)
         
-        def is_within_bounds(pos):
+        def is_valid_position(pos, for_door = False):
             x, y = pos
-            return 1 <= x < new_size - 1 and 1 <= y < new_size - 1
+            in_bounds = 1 <= x < new_size - 1 and 1 <= y < new_size - 1
+            if for_door:
+                not_taken = pos not in [p for _, p in new_doors + new_keys + new_objs]
+            else:
+                not_taken = pos not in [p for _, p in new_doors + new_keys + new_walls + new_objs]
+            return in_bounds and not_taken
         
-        def find_next_available_position(pos):
+        def find_next_available_position(pos, for_door = False):
             for dx in [-1, 0, 1]:
                 for dy in [-1, 0, 1]:
                     new_pos = (pos[0] + dx, pos[1] + dy)
-                    if is_within_bounds(new_pos):
+                    if is_valid_position(new_pos, for_door = for_door):
                         return new_pos
             return None
         
         def calculate_new_wall_assignments(wall_detection):
+            num_walls = np.count_nonzero(wall_detection)
             ratios = []
             curr_walls = 0
             curr_cleft = 0
@@ -210,43 +215,59 @@ class Environment(MiniGridEnv):
                     ratios.append((curr_walls / (self.room_size - 2), True))
                     curr_walls = 0
                     curr_cleft += 1
+                    currently_wall = False
                 elif not currently_wall and not wall_detection[i]:  # continuing the cleft
                     curr_cleft += 1
                 else:  # found a wall
                     ratios.append((curr_cleft / (self.room_size - 2), False))
                     curr_cleft = 0
                     curr_walls += 1
+                    currently_wall = True
             if currently_wall:
                 ratios.append((curr_walls / (self.room_size - 2), True))
             else:
                 ratios.append((curr_cleft / (self.room_size - 2), False))
             new_assignments = []
             for i in range(len(ratios) - 1):
-                assignment = (np.ceil(ratios[i][0] * new_size), ratios[i][1])
-                new_assignments.append(assignment)
+                if num_walls == 1 and ratios[i][1]:  # if we've found the singular wall, we don't want to accidentally make it thicker
+                    new_assignments.append((1, True))
+                    break
+                else:
+                    assignment = (np.ceil(ratios[i][0] * (new_size - 2)), ratios[i][1])
+                    new_assignments.append(assignment)
             if len(ratios) > 0:
-                new_assignments.append((new_size - 2 - sum([cells for cells, _ in new_assignments]), ratios[-1][1]))
+                if num_walls == 1:
+                    new_assignments.append((new_size - 2 - sum([cells for cells, _ in new_assignments]), False))
+                else:
+                    new_assignments.append((new_size - 2 - sum([cells for cells, _ in new_assignments]), ratios[-1][1]))
             return new_assignments
         
         def calculate_new_wall_positions(wall_distribution):
-            splits = np.where(wall_distribution)[0]
-            non_wall_sections = []
-            for i in range(len(splits)):
-                if i == 0:
-                    non_wall_sections.append(wall_distribution[:splits[i]])
+            all_sections = []
+            non_wall_section = []
+            for spot in wall_distribution:
+                if spot:  # there is a wall somewhere in this row/col
+                    if len(non_wall_section) > 0:
+                        all_sections.append(non_wall_section)
+                        non_wall_section = []
+                    all_sections.append([True])
                 else:
-                    non_wall_sections.append(wall_distribution[splits[i - 1] + 1 : splits[i]])
-            non_wall_sections.append(wall_distribution[splits[-1] + 1:])
+                    non_wall_section.append(False)
+            if len(non_wall_section) > 0:
+                all_sections.append(non_wall_section)
+            non_wall_sections = [i for i, section in enumerate(all_sections) if not any(section)]
+            if len(non_wall_sections) == 0:
+                for i in range(size_delta):
+                    all_sections.insert(0, [False])
+                    return all_sections
             j = 0
-            for i in range(size_delta):
-                non_wall_sections[j].append(False)
-                j = (j + 1) % len(non_wall_sections)
-            total_sections = []
-            for i, section in enumerate(non_wall_sections):
-                total_sections.append(section)
-                if i < len(non_wall_sections) - 1:
-                    total_sections.append([True])
-            return total_sections
+            for i in range(size_delta):  # adding new non-wall rows/cols to the existing non-wall spaces
+                if j < len(non_wall_sections):
+                    all_sections[non_wall_sections[j]].append(False)
+                    j = (j + 1) % len(non_wall_sections)
+                else:
+                    break
+            return all_sections
         
         def fill_new_walls(sections, assignments, is_horizontal_walls):
             sections = flatten_list(sections)
@@ -266,27 +287,12 @@ class Environment(MiniGridEnv):
                         j += 1
                     except IndexError:
                         return
-
-        # Handle repositioning of objects
-        for obj_list, new_list in [(self.doors, new_doors), (self.keys, new_keys), (self.objs, new_objs)]:
-            for obj, pos in obj_list:
-                new_pos = calculate_new_position(pos)
-                if not is_within_bounds(new_pos):  # Find new position if out of bounds
-                    new_pos = find_next_available_position(new_pos)
-                    if not new_pos:
-                        raise ValueError("Unable to find suitable positions for all objects when changing room size")
-                new_list.append((obj, new_pos))
-        new_agent_start_pos = calculate_new_position(self.agent_start_pos)
-        if not is_within_bounds(new_agent_start_pos):
-            new_agent_start_pos = find_next_available_position(new_agent_start_pos)
-            if not new_agent_start_pos:
-                raise ValueError("Unable to find suitable positions for all objects when changing room size")
         
         # Handle repositioning of walls
         if size_delta < 0:  # shrinking
             for _, (x, y) in self.walls:
                 new_x, new_y = x - offset, y - offset
-                if is_within_bounds((new_x, new_y)):
+                if is_valid_position((new_x, new_y)):
                     new_walls.append((Wall(), (new_x, new_y)))
         else:  # expanding
             wall_positions = [pos for _, pos in self.walls]
@@ -316,6 +322,24 @@ class Environment(MiniGridEnv):
                     col_distribution.append(False)
             col_sections = calculate_new_wall_positions(col_distribution)
             fill_new_walls(col_sections, new_assignments, False)
+
+        # Handle repositioning of objects
+        for obj_list, new_list in [(self.doors, new_doors), (self.keys, new_keys), (self.objs, new_objs)]:
+            for obj, pos in obj_list:
+                if size_delta < 0:
+                    new_pos = calculate_new_position(pos)
+                else:
+                    new_pos = calculate_new_position(pos, )
+                if not is_valid_position(new_pos, for_door = type(obj) == Door):
+                    new_pos = find_next_available_position(new_pos, for_door = type(obj) == Door)
+                    if not new_pos:
+                        raise ValueError("Unable to find suitable positions for all objects when changing room size")
+                new_list.append((obj, new_pos))
+        new_agent_start_pos = calculate_new_position(self.agent_start_pos)
+        if not is_valid_position(new_agent_start_pos):
+            new_agent_start_pos = find_next_available_position(new_agent_start_pos)
+            if not new_agent_start_pos:
+                raise ValueError("Unable to find suitable positions for all objects when changing room size")
             
         self.doors, self.keys, self.objs, self.walls = new_doors, new_keys, new_objs, new_walls
         self.agent_start_pos = new_agent_start_pos
@@ -340,7 +364,7 @@ class Environment(MiniGridEnv):
         if hasattr(self, "target_obj"):
             self.target_obj.color = new_color1
         else:
-            if self.task == PUT:
+            if self.task == Task.PUT:
                 self.target_objs[0].color = new_color1
                 if new_color2 is not None:
                     self.target_objs[1].color = new_color2
@@ -376,7 +400,7 @@ class Environment(MiniGridEnv):
         for key, pos in self.keys:
             box = Box(color = random.choice(OBJECT_COLOR_NAMES))
             box.contains = key
-            self.objs.remove((key, pos))
+            self.keys.remove((key, pos))
             self.objs.append((box, pos))
         self._gen_grid(self.room_size, self.room_size)
     

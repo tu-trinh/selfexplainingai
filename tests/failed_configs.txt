@@ -1,17 +1,90 @@
-[DEBUG] old 8 new 9
-FAILED: change_room_size
-Traceback (most recent call last):
-  File "/Users/tutrinh/Work/CHAI/selfexplainingai/tests/test_constructor.py", line 70, in test_control
-    make_agents(config = config)
-  File "/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py", line 31, in make_agents
-    principal_env, attendant_env = make_envs(**config["env_specs"])
-  File "/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py", line 101, in make_envs
-    apply_edits(attendant_env, attendant_edits)
-  File "/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py", line 144, in apply_edits
-    edit_method(**edit)
-  File "/Users/tutrinh/Work/CHAI/selfexplainingai/package/envs/env.py", line 325, in change_room_size
-    self._gen_grid(new_size, new_size)
-  File "/Users/tutrinh/Work/CHAI/selfexplainingai/package/envs/env.py", line 437, in _gen_grid
-    assert door_pos in wall_positions, "Door can only be for going through walls"
-AssertionError: Door can only be for going through walls
-Door can only be for going through walls
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 88 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 88 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 87 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 82 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 84 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 81 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 80 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 77 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 69 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 75 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 87 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 82 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 84 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 81 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 80 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 77 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 69 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 75 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 90 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 90 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 89 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 85 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 78 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 70 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 89 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 85 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 78 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 70 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 79 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 74 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 76 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 86 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 79 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 74 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 76 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 83 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 63 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 65 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 86 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 73 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 73 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 72 skills were either not possible or not allowed in this world model for the attendant
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 72 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py:183: UserWarning: 63 skills were either not possible or not allowed in this world model for the principal
+  warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
+Failure rate: 0.0
+AssertionError rate: 0.0

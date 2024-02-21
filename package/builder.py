@@ -15,6 +15,7 @@ from minigrid.manual_control import ManualControl
 from typing import List, Dict, Any
 import yaml
 import random
+import time
 import inspect
 import warnings
 
@@ -61,6 +62,7 @@ def make_envs(task: Task,
     seed = random.randint(0, 10000) if not seed else seed
     p_env_cls = create_env_class(task, principal_level)
     principal_env = p_env_cls(seed, task, principal_level, render_mode = principal_render_mode)
+    # time.sleep(10)
     
     if attendant_variants is not None:
         disallowed = {}  # FIXME: just revisit some of these

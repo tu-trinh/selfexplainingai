@@ -16,11 +16,11 @@ def reward_reach_object_hof(world_model: gymnasium.Env, amt = 1):
     Reward for reaching an object
     Most applicable to GOTO task, perhaps PUT task
     """
-    task = world_model.env_type
-    if task == EnvType.GOTO:
+    task = world_model.task
+    if task == Task.GOTO:
         obj_name = OBJ_NAME_MAPPING[type(world_model.target_obj)]
         target_obj_pos = world_model.target_obj_pos
-    elif task == EnvType.PUT:
+    elif task == Task.PUT:
         obj_name = OBJ_NAME_MAPPING[type(world_model.target_objs[1])]
         target_obj_pos = world_model.target_objs_pos[1]
     else:
@@ -48,10 +48,10 @@ def reward_carry_object_hof(world_model: gymnasium.Env, amt = 1):
     Reward for carrying an object
     Most applicable to PICKUP task, perhaps PUT task
     """
-    task = world_model.env_type
-    if task == EnvType.PICKUP:
+    task = world_model.task
+    if task == Task.PICKUP:
         target_obj = world_model.target_obj
-    elif task == EnvType.PUT:
+    elif task == Task.PUT:
         target_obj = world_model.target_objs[0]
     else:
         raise AssertionError(f"Rewarding carrying an object is not appropriate for the {task.value} task")
@@ -70,7 +70,7 @@ def reward_adjacent_object_hof(world_model: gymnasium.Env, amt = 1):
     Reward for objects being adjacent to one another
     Most applicable to PUT, COLLECT, and CLUSTER tasks
     """
-    assert hasattr(world_model, "target_objs"), f"Rewarding adjacent objects is not appropriate for the {world_model.env_type.value} task"
+    assert hasattr(world_model, "target_objs"), f"Rewarding adjacent objects is not appropriate for the {world_model.task.value} task"
 
     obj_groups = world_model.target_objs
     if not isinstance(obj_groups[0], list):

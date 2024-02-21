@@ -25,7 +25,7 @@ def toggle():
 """
 Basic directional movement
 """
-def move_DIRECTION_N_steps_hof(direction: str, n: int):
+def move_direction_n_steps_hof(direction: str, n: int):
     assert direction in ["left", "right", "forward", "backward"]
     assert 1 <= n <= MAX_ROOM_SIZE - 3
 
@@ -47,7 +47,7 @@ def move_DIRECTION_N_steps_hof(direction: str, n: int):
 """
 Going to an object
 """
-def go_to_COLOR_OBJECT_hof(color: str, obj: str):
+def go_to_color_object_hof(color: str, obj: str):
     assert color in ALL_COLOR_NAMES
     assert obj in OBJ_NAME_MAPPING.values()
 
@@ -62,7 +62,7 @@ def go_to_COLOR_OBJECT_hof(color: str, obj: str):
 """
 Picking up an object
 """
-def pickup_COLOR_OBJECT_hof(color: str, obj: str):
+def pickup_color_object_hof(color: str, obj: str):
     assert color in OBJECT_COLOR_NAMES
     assert obj in OBJ_NAME_MAPPING.values()
 
@@ -78,7 +78,7 @@ def pickup_COLOR_OBJECT_hof(color: str, obj: str):
 """
 Putting down an object
 """
-def put_down_COLOR_OBJECT_hof(color: str, obj: str):
+def put_down_color_object_hof(color: str, obj: str):
     assert color in OBJECT_COLOR_NAMES
     assert obj in OBJ_NAME_MAPPING.values()
 
@@ -91,7 +91,7 @@ def put_down_COLOR_OBJECT_hof(color: str, obj: str):
 """
 Opening an object
 """
-def open_COLOR_OBJECT_hof(color: str, obj: str):
+def open_color_object_hof(color: str, obj: str):
     assert color in OBJECT_COLOR_NAMES
     assert obj in ["door", "box"]
 
@@ -106,7 +106,7 @@ def open_COLOR_OBJECT_hof(color: str, obj: str):
 """
 Unlocking a door
 """
-def unlock_COLOR_door_hof(color: str):
+def unlock_color_door_hof(color: str):
     assert color in OBJECT_COLOR_NAMES
 
     def unlock_color_door(agent_pos, agent_dir, door_pos):
@@ -120,7 +120,7 @@ def unlock_COLOR_door_hof(color: str):
 """
 Closing a door
 """
-def close_COLOR_door_hof(color: str):
+def close_color_door_hof(color: str):
     assert color in OBJECT_COLOR_NAMES
 
     def close_color_door(agent_pos, agent_dir, door_pos):

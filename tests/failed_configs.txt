@@ -1,7 +1,17 @@
-pygame 2.5.2 (SDL 2.28.3, Python 3.12.0)
-Hello from the pygame community. https://www.pygame.org/contribute.html
-A newer version (0.0.0b25) of 'scale-llm-engine' is available. Please upgrade!
-To upgrade, run: pip install --upgrade scale-llm-engine
-Don't want to see this message? Set the environment variable 'LLM_ENGINE_DISABLE_VERSION_CHECK' to 'true'.
-Failure rate: 0.0
-AssertionError rate: 0.0
+[DEBUG] old 8 new 9
+FAILED: change_room_size
+Traceback (most recent call last):
+  File "/Users/tutrinh/Work/CHAI/selfexplainingai/tests/test_constructor.py", line 70, in test_control
+    make_agents(config = config)
+  File "/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py", line 31, in make_agents
+    principal_env, attendant_env = make_envs(**config["env_specs"])
+  File "/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py", line 101, in make_envs
+    apply_edits(attendant_env, attendant_edits)
+  File "/Users/tutrinh/Work/CHAI/selfexplainingai/package/builder.py", line 144, in apply_edits
+    edit_method(**edit)
+  File "/Users/tutrinh/Work/CHAI/selfexplainingai/package/envs/env.py", line 325, in change_room_size
+    self._gen_grid(new_size, new_size)
+  File "/Users/tutrinh/Work/CHAI/selfexplainingai/package/envs/env.py", line 437, in _gen_grid
+    assert door_pos in wall_positions, "Door can only be for going through walls"
+AssertionError: Door can only be for going through walls
+Door can only be for going through walls

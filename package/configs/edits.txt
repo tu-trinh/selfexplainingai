@@ -1,0 +1,20 @@
+General:
+- change_room_size
+- change_room_orientation
+- change_target_color
+- hide_targets
+- hide_keys
+- remove_keys
+- change_field_of_vision
+- toggle_doors
+
+Room Door Key:
+- add_opening_to_wall
+- block_door
+- put_agent_in_room
+
+Treasure Island:
+- add_bridge
+- make_lava_safe
+- add_fireproof_shoes
+- put_agent_on_island

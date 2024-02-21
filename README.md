@@ -40,7 +40,7 @@ There are also optional subfields:
 
 ### Configuring Environments
 This applies to the `env_specs` field in the YAML. There are three required subfields:
-- `task`: This should be a member of the `EnvType` enum (see `enums.py`)
+- `task`: This should be a member of the `Task` enum (see `enums.py`)
 - `principal_level`: This should be a member of the `Level` enum that you want the principal's world model to be
 - `seed`: This is a seed that will control the configuration of both the principal and attendant world models
 
@@ -62,7 +62,7 @@ Great question! Inside the `selfexplainingai` directory itself, the only necessa
 Inside `package` are most of the files I mentioned before. In addition:
 - `configs` directory: meant to hold `skills.txt` and any custom YAML files
 - `envs` directory: holds all the environment making logic.
-    - Each of the five tasks have their own file (e.g. `go_to_task.py`). `GotoTask` and `PickupTask` extend from `SingleTargetEnv` as they both only have one target object to interact with. `PutNextTask`, `CollectTask`, and `ClusterTask` extend from `MultiTargetEnv` as the agent needs to interact with multiple objects to succeed. Both `Single`- and `Multi-` target envs extend from `PragmaticEnv` just because there's lots of logic that overlaps. Also there is still some repetitive code, apologies, but you probably won't have to touch it. I can also modify anything you want me to
+    - Each of the five tasks have their own file (e.g. `go_to_task.py`). `GoToTask` and `PickUpTask` extend from `SingleTargetEnv` as they both only have one target object to interact with. `PutNextTask`, `CollectTask`, and `ClusterTask` extend from `MultiTargetEnv` as the agent needs to interact with multiple objects to succeed. Both `Single`- and `Multi-` target envs extend from `PragmaticEnv` just because there's lots of logic that overlaps. Also there is still some repetitive code, apologies, but you probably won't have to touch it. I can also modify anything you want me to
     - `modifications.py` stores Minigrid-style objects we want to have, right now it just has the door that can't be opened
     - `register_envs.py` is for registering the environments with gymnasium but I don't think we will use it
 - `agents.py`: defines `Agent`, `Principal`, and `Attendant`. Each has the ability to add skills, add rewards, speak, and listen. `Principal` also additionally has the option to verify if the attendant has succeeded in the task

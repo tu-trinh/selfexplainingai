@@ -4,17 +4,15 @@ sys.path.append("/Users/tutrinh/Work/CHAI/selfexplainingai")
 from package.constants import *
 from package.utils import *
 from package.enums import *
-from package.envs.go_to_task import GotoTask
-from package.envs.pick_up_task import PickupTask
-from package.envs.put_next_task import PutNextTask
-from package.envs.collect_task import CollectTask
-from package.envs.cluster_task import ClusterTask
+from package.envs.env import *
+from package.envs.tasks import *
+from package.envs.levels import *
 from package.agents import Agent, Principal, Attendant
 import package.reward_functions as REWARD_FUNCTIONS
 
 from minigrid.manual_control import ManualControl
 
-from typing import List, Dict
+from typing import List, Dict, Any
 import yaml
 import random
 import inspect
@@ -36,83 +34,118 @@ def make_agents(config_path: str = None, config: Dict = None):
     return principal, attendant
 
 
-def make_envs(task: EnvType,
+def make_envs(task: Task,
               principal_level: Level,
               attendant_level: Level = None,
               attendant_variants: List[Variant] = None,
+              attendant_edits: List[str] = None,
               seed: int = None,
               principal_render_mode: str = None,
               attendant_render_mode: str = None):
-    assert EnvType.has_value(task), "Env type is not valid"
+    assert Task.has_value(task), "Env type is not valid"
     assert Level.has_value(principal_level), "Teacher level is not valid"
-    assert attendant_level or attendant_variants, "Must have at least one of `attendant_level` or `attendant_variants`"
+    assert xor(attendant_level, attendant_variants, attendant_edits), "Must have only one of `attendant_level`, `attendant_variants`, or `attendant_edits`"
     if attendant_level:
         assert Level.has_value(attendant_level), "Attendant level is not valid"
     if attendant_variants:
         for sv in attendant_variants:
             assert Variant.has_value(sv), f"Attendant variant \"{sv}\" is not valid"
 
-    task = convert_to_enum(EnvType, task)
+    task = convert_to_enum(Task, task)
     principal_level = convert_to_enum(Level, principal_level)
     if attendant_level is not None:
         attendant_level = convert_to_enum(Level, attendant_level)
     if attendant_variants is not None:
         attendant_variants = convert_to_enum(Variant, attendant_variants)
 
-    if task == EnvType.GOTO:
-        constructor = GotoTask
-    elif task == EnvType.PICKUP:
-        constructor = PickupTask
-    elif task == EnvType.PUT:
-        constructor = PutNextTask
-    elif task == EnvType.COLLECT:
-        constructor = CollectTask
-    elif task == EnvType.CLUSTER:
-        constructor = ClusterTask
-
     seed = random.randint(0, 10000) if not seed else seed
-    principal_env = constructor(seed, principal_level, render_mode = principal_render_mode)
+    p_env_cls = create_env_class(task, principal_level)
+    principal_env = p_env_cls(seed, task, principal_level, render_mode = principal_render_mode)
     
-    if task in [EnvType.GOTO, EnvType.PICKUP]:
-        disallowed_objs = [(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] != principal_env.target_obj]
-        disallowed_poses = [pos for obj, pos in principal_env.objs if obj != principal_env.target_obj]
-        disallowed_objects = (disallowed_objs, disallowed_poses)
-    else:
-        disallowed_objs = [(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] not in flatten_list(principal_env.target_objs)]
-        disallowed_poses = [pos for obj, pos in principal_env.objs if obj not in flatten_list(principal_env.target_objs)]
-        disallowed_objects = (disallowed_objs, disallowed_poses)
-    disallowed = {
-        Variant.COLOR: principal_env.target_obj.color if hasattr(principal_env, "target_obj") else flatten_list(principal_env.target_objs)[0].color,
-        Variant.ROOM_SIZE: principal_env.room_size,
-        Variant.NUM_OBJECTS: len(principal_env.objs) - 1,
-        Variant.OBJECTS: disallowed_objects,
-        Variant.NUM_ROOMS: principal_env.num_rooms if hasattr(principal_env, "num_rooms") else None,
-        Variant.ORIENTATION: principal_env
-    }
+    if attendant_variants is not None:
+        disallowed = {}  # FIXME: just revisit some of these
+        if Variant.COLOR in attendant_variants:
+            disallowed[Variant.COLOR] = principal_env.target_obj.color if hasattr(principal_env, "target_obj") else flatten_list(principal_env.target_objs)[0].color
+        if Variant.ROOM_SIZE in attendant_variants:
+            disallowed[Variant.ROOM_SIZE] = principal_env.room_size
+        if Variant.NUM_OBJECTS in attendant_variants:
+            disallowed[Variant.NUM_OBJECTS] = len(principal_env.objs) - 1
+        if Variant.OBJECTS in attendant_variants:
+            if task in [Task.GOTO, Task.PICKUP]:
+                disallowed_objs = [(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] != principal_env.target_obj]
+                disallowed_poses = [pos for obj, pos in principal_env.objs if obj != principal_env.target_obj]
+                disallowed[Variant.OBJECTS] = (disallowed_objs, disallowed_poses)
+            else:
+                disallowed_objs = [(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] not in flatten_list(principal_env.target_objs)]
+                disallowed_poses = [pos for obj, pos in principal_env.objs if obj not in flatten_list(principal_env.target_objs)]
+                disallowed[Variant.OBJECTS] = (disallowed_objs, disallowed_poses)
+        if Variant.NUM_ROOMS in attendant_variants:
+            disallowed[Variant.NUM_ROOMS] = principal_env.num_rooms if hasattr(principal_env, "num_rooms") else None
+        if Variant.ORIENTATION in attendant_variants:
+            disallowed[Variant.ORIENTATION] = principal_env
 
-    if attendant_level and attendant_variants:
-        if task == EnvType.GOTO or task == EnvType.PICKUP:
-            attendant_env = constructor(seed, attendant_level, target_obj = type(principal_env.target_obj), variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
-        elif task == EnvType.CLUSTER:
-            attendant_env = constructor(seed, attendant_level, target_objs = [[type(obj) for obj in obj_cluster] for obj_cluster in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
-        else:
-            attendant_env = constructor(seed, attendant_level, target_objs = [type(obj) for obj in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
-    elif attendant_level:
-        if task == EnvType.GOTO or task == EnvType.PICKUP:
-            attendant_env = constructor(seed, attendant_level, target_obj = type(principal_env.target_obj), render_mode = attendant_render_mode)
-        elif task == EnvType.CLUSTER:
-            attendant_env = constructor(seed, attendant_level, target_objs = [[type(obj) for obj in obj_cluster] for obj_cluster in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
-        else:
-            attendant_env = constructor(seed, attendant_level, target_objs = [type(obj) for obj in principal_env.target_objs], render_mode = attendant_render_mode)
+    target_obj_kwargs = {}
+    if task in [Task.GOTO, Task.PICKUP]:
+        target_obj_kwargs["target_obj"] = type(principal_env.target_obj)
+    elif task == Task.CLUSTER:
+        target_obj_kwargs["target_objs"] = [[type(obj) for obj in obj_cluster] for obj_cluster in principal_env.target_objs]
+    else:
+        target_obj_kwargs["target_objs"] = [type(obj) for obj in principal_env.target_objs]
+    if attendant_level:
+        a_env_cls = create_env_class(task, attendant_level)
+        attendant_env = a_env_cls(seed, task, attendant_level, **target_obj_kwargs, render_mode = attendant_render_mode)
     elif attendant_variants:
-        if task == EnvType.GOTO or task == EnvType.PICKUP:
-            attendant_env = constructor(seed, principal_env.level, target_obj = type(principal_env.target_obj), variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
-        elif task == EnvType.CLUSTER:
-            attendant_env = constructor(seed, attendant_level, target_objs = [[type(obj) for obj in obj_cluster] for obj_cluster in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
-        else:
-            attendant_env = constructor(seed, principal_env.level, target_objs = [type(obj) for obj in principal_env.target_objs], variants = attendant_variants, disallowed = disallowed, render_mode = attendant_render_mode)
+        attendant_env = p_env_cls(seed, task, principal_level, **target_obj_kwargs, disallowed = disallowed, render_mode = attendant_render_mode)
+    elif attendant_edits:
+        attendant_env = copy.deepcopy(principal_env)
+        apply_edits(attendant_env, attendant_edits)
 
     return principal_env, attendant_env
+
+
+def create_env_class(task: Task, level: Level):
+    class_name = f"{task.value}_{level.value}_Env"
+    new_class = type(class_name, (Environment, task_class_mapping[task], level_class_mapping[level]), {"__init__": _custom_init})
+    return new_class
+
+
+def _custom_init(self,
+                 env_seed: int,
+                 task: Task,
+                 level: Level,
+                 target_obj: WorldObj = None,
+                 target_objs: List[WorldObj] = None,
+                 disallowed: Dict[Variant, Any] = None,
+                 max_steps: int = None,
+                 agent_view_size: int = 5,
+                 render_mode = None,
+                 **kwargs):
+    Environment.__init__(self, env_seed, task, level, target_obj, target_objs, disallowed, max_steps, agent_view_size, render_mode, **kwargs)
+    task_cls = task_class_mapping[task]
+    level_cls = level_class_mapping[level]
+    task_cls.__init__(self)
+    level_cls.__init__(self)
+    self.initialize_level()
+    self._gen_grid(self.room_size, self.room_size)
+    self.set_mission()
+    level_cls.assert_successful_creation(self)
+
+
+def apply_edits(env: gymnasium.Env, edits: List[Dict]) -> None:
+    for parent_class in env.__class__.mro():
+        if issubclass(parent_class, BaseLevel) and parent_class is not BaseLevel:
+            level_class = parent_class
+            break
+    invalid_edits = []
+    for edit in edits:
+        edit_name = edit.pop("name")
+        if hasattr(level_class, edit_name):
+            edit_method = getattr(env, edit_name)
+            edit_method(**edit)
+        else:
+            invalid_edits.append(edit_name)
+    if len(invalid_edits) > 0:
+        warnings.warn(f"{len(invalid_edits)} edits could not be applied: {invalid_edits}")
 
 
 def make_agent(is_principal: bool,

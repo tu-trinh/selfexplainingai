@@ -35,7 +35,7 @@ class Level(Enum):
         return any(value == item.name for item in cls)
 
 
-class EnvType(Enum):
+class Task(Enum):
     GOTO = "Goto"
     PICKUP = "Pickup"  # include returning to original spot
     PUT = "Put"

@@ -192,12 +192,24 @@ class BaseLevel(ABC):
 
     def _set_agent_in_region(self, cell_region: set[Tuple[int, int]]) -> None:
         old_agent_pos = self.agent_start_pos
-        new_agent_pos = random.choice(list(cell_region))
-        while new_agent_pos not in self.all_possible_pos:
+        if len(cell_region) > 0:
             new_agent_pos = random.choice(list(cell_region))
-        self.all_possible_pos -= set([new_agent_pos])
-        self.all_possible_pos.add(old_agent_pos)
-        self.agent_start_pos = new_agent_pos
+            while new_agent_pos not in self.all_possible_pos:
+                new_agent_pos = random.choice(list(cell_region))
+            self.all_possible_pos -= set([new_agent_pos])
+            self.all_possible_pos.add(old_agent_pos)
+            self.agent_start_pos = new_agent_pos
+        else:  # perhaps objects took up all the space. or # FIXME: make sure always one cell left inside? and outside
+            repurposed_pos = self.objs[-1][1]
+            del self.objs[-1]
+            matching_pos_idx = []
+            for i in range(len(self.objs)):
+                if self.objs[i][1] == repurposed_pos:
+                    matching_pos_idx.append(i)
+            matching_pos_idx.sort(reverse = True)
+            for i in matching_pos_idx:
+                del self.objs[i]
+            self.agent_start_pos = repurposed_pos
 
 
     def _rearrange_objects(self, conflicting_positions: List[Tuple[int, int]]) -> None:
@@ -795,7 +807,7 @@ class RoomDoorKeyLevel(BaseLevel):
         self._make_distractor_objects(self.inner_cells)
     
 
-    def add_opening_to_wall(self, is_door):
+    def add_opening_to_wall(self, is_door = True):
         available_openings = set([pos for _, pos in self.walls]) - set([pos for _, pos in self.doors])
         opening_pos = random.choice(list(available_openings))
         if is_door:
@@ -829,8 +841,11 @@ class RoomDoorKeyLevel(BaseLevel):
                 failed = True
             else:
                 self.all_possible_pos -= set([blocker_pos])
-                blocker_obj = self.target_obj
-                disallowed_blocker_obj_config = set([(type(self.target_obj), self.target_obj.color)])
+                if self.is_single_target:
+                    blocker_obj = self.target_obj
+                else:
+                    blocker_obj = flatten_list(self.target_objs)[0]
+                disallowed_blocker_obj_config = set([(type(blocker_obj), blocker_obj.color)])
                 while (type(blocker_obj), blocker_obj.color) in disallowed_blocker_obj_config:
                     blocker_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(OBJECT_COLOR_NAMES))
                 self.objs.append((blocker_obj, blocker_pos))
@@ -854,11 +869,11 @@ class TreasureIslandLevel(BaseLevel):
         if self.is_single_target:
             self._set_target_start_position(self.inner_cells)
             self._make_target_obj()
-            self.objs = [(self.target_obj, self.target_obj_pos)]
+            self.objs.extend([(self.target_obj, self.target_obj_pos)])
         else:
             self._set_targets_start_positions(allowed_positions = self.inner_cells, using = "inner")
             self._make_target_objs()
-            self.objs = list(zip(flatten_list(self.target_objs), flatten_list(self.target_objs_pos)))
+            self.objs.extend(list(zip(flatten_list(self.target_objs), flatten_list(self.target_objs_pos))))
 
         # Generate objects inside room
         self._determine_num_distractors(1, self.room_size - 3)
@@ -883,8 +898,13 @@ class TreasureIslandLevel(BaseLevel):
         self._gen_grid(self.room_size, self.room_size)
 
     
-    def make_lava_safe(self, lava_cost = 0):
-        self = NoDeath(self, no_death_types = ("lava",), death_cost = lava_cost)
+    def make_lava_safe(self, lava_cost = 0):  # FIXME: which one?
+        # self = NoDeath(self, no_death_types = ("lava",), death_cost = lava_cost)
+        for i in range(len(self.objs)):
+            if type(self.objs[i][0]) == Lava:
+                replacement_lava = Goal()
+                replacement_lava.color = "red"
+                self.objs[i] = (replacement_lava, self.objs[i][1])
         self._gen_grid(self.room_size, self.room_size)
 
     

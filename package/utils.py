@@ -348,9 +348,6 @@ def get_babyai_desc(env: gymnasium.Env, image: np.ndarray):
         i += 1
 
     # returns the position of seen objects relative to you
-    debug("SFJKDFJSLFJLFJLFJSLFLK")
-    debug(agent_pos_vx)
-    debug(agent_pos_vy)
     for i in view_field_dictionary.keys():
         for j in view_field_dictionary[i].keys():
             if i != agent_pos_vx or j != agent_pos_vy:

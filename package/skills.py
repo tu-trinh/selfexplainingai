@@ -1,4 +1,13 @@
 from package.constants import *
+from package.utils import *
+from package.search import *
+
+from minigrid.core.constants import DIR_TO_VEC
+
+from typing import Tuple
+from gymnasium import Env
+import copy
+
 
 """
 Primitive Minigrid Actions
@@ -51,9 +60,9 @@ def go_to_color_object_hof(color: str, obj: str):
     assert color in ALL_COLOR_NAMES
     assert obj in OBJ_NAME_MAPPING.values()
 
-    def go_to_color_object(agent_pos, agent_dir, object_pos):
+    def go_to_color_object(env: Env, object_pos: Tuple[int, int]):
         actions = []
-        actions.extend(_find_path(agent_pos, agent_dir, object_pos, can_overlap = obj == "goal"))
+        actions.extend(_find_path(env, object_pos, "goto", can_overlap = obj == "goal"))
         return actions
     
     return go_to_color_object
@@ -66,10 +75,9 @@ def pickup_color_object_hof(color: str, obj: str):
     assert color in OBJECT_COLOR_NAMES
     assert obj in OBJ_NAME_MAPPING.values()
 
-    def pickup_color_object(agent_pos, agent_dir, object_pos):
+    def pickup_color_object(env: Env, object_pos: Tuple[int, int]):
         actions = []
-        actions.extend(_find_path(agent_pos, agent_dir, object_pos))
-        actions.append(3)
+        actions.extend(_find_path(env, object_pos, action_type = "pickup"))
         return actions
     
     return pickup_color_object
@@ -95,9 +103,9 @@ def open_color_object_hof(color: str, obj: str):
     assert color in OBJECT_COLOR_NAMES
     assert obj in ["door", "box"]
 
-    def open_color_object(agent_pos, agent_dir, object_pos):
+    def open_color_object(env: Env, object_pos: Tuple[int, int]):
         actions = []
-        actions.extend(_find_path(agent_pos, agent_dir, object_pos))
+        actions.extend(_find_path(env, object_pos, "goto"))
         actions.append(5)
         return actions
     
@@ -106,12 +114,16 @@ def open_color_object_hof(color: str, obj: str):
 """
 Unlocking a door
 """
-def unlock_color_door_hof(color: str):
+def unlock_color_door_hof(color: str, necessary_key_pos: Tuple[int, int]):
     assert color in OBJECT_COLOR_NAMES
 
-    def unlock_color_door(agent_pos, agent_dir, door_pos):
+    def unlock_color_door(env: Env, door_pos: Tuple[int, int]):
         actions = []
-        actions.extend(_find_path(agent_pos, agent_dir, door_pos))
+        actions.extend(_find_path(env, necessary_key_pos, "pickup"))
+        new_env = copy.deepcopy(env)
+        for action in actions:
+            new_env.step(action)
+        actions.extend(_find_path(new_env, door_pos, "goto", reset = False))
         actions.append(5)
         return actions
     
@@ -123,9 +135,9 @@ Closing a door
 def close_color_door_hof(color: str):
     assert color in OBJECT_COLOR_NAMES
 
-    def close_color_door(agent_pos, agent_dir, door_pos):
+    def close_color_door(env: Env, door_pos: Tuple[int, int]):
         actions = []
-        actions.extend(_find_path(agent_pos, agent_dir, door_pos))
+        actions.extend(_find_path(env, door_pos, "goto"))
         actions.append(5)
         return actions
     
@@ -135,40 +147,23 @@ def close_color_door_hof(color: str):
 """
 Helper skills
 """
-def _find_path(agent_pos, agent_dir, object_pos, can_overlap = False):
-    actions = []
-    dx = object_pos[0] - agent_pos[0]
-    dy = object_pos[1] - agent_pos[1]
-    if dx > 0:
-        required_dir_x = 0
-    elif dx < 0:
-        required_dir_x = 2
-    else:
-        required_dir_x = None
-    if dy > 0:
-        required_dir_y = 1
-    elif dy < 0:
-        required_dir_y = 3
-    else:
-        required_dir_y = None
-
-    if required_dir_x:
-        while agent_dir < required_dir_x:
-            actions.append(1)
-            agent_dir += 1
-        while agent_dir > required_dir_x:
-            actions.append(0)
-            agent_dir -= 1
-        for _ in range(abs(dx)):
-            actions.append(2)
-
-    if required_dir_y:
-        while agent_dir < required_dir_y:
-            actions.append(1)
-            agent_dir += 1
-        while agent_dir > required_dir_y:
-            actions.append(0)
-            agent_dir -= 1
-        for _ in range(abs(dy) if can_overlap else abs(dy) - 1):
-            actions.append(2)
+def _find_path(master_env: Env, object_pos: Tuple[int, int], action_type: str, can_overlap: bool = False, reset: bool = True):
+    env = copy.deepcopy(master_env)
+    if reset:
+        env.reset()
+    if action_type == "goto" and can_overlap:
+        def goal_check(state: State):
+            return state.loc == object_pos
+    elif action_type == "goto" and not can_overlap:
+        def goal_check(state: State):
+            dir_vec = DIR_TO_VEC[state.dir]
+            in_front = state.grid.get(state.loc[0] + dir_vec[0], state.loc[1] + dir_vec[1])
+            return manhattan_distance(state.loc, object_pos) == 1 and in_front == state.grid.get(*object_pos)
+    elif action_type == "pickup":
+        def goal_check(state: State):
+            return manhattan_distance(state.loc, object_pos) == 1 and state.carrying == state.grid.get(*object_pos)
+    search_problem = Search("bfs", env, goal_check)
+    actions = search_problem.search()
+    if actions is None:  # TODO: idk
+        return [0]
     return actions

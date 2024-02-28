@@ -5,12 +5,14 @@ from package.trajectories import *
 import package.skills as SKILLS
 import package.reward_functions as REWARD_FUNCTIONS
 from package.enums import *
+from package.message import *
 
-from minigrid.wrappers import FullyObsWrapper, RGBImgObsWrapper
-from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box
+from minigrid.wrappers import FullyObsWrapper
+from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box, WorldObj
 
 import gymnasium
 from typing import Callable, Dict, List, Tuple, Any, Union
+import time
 
 
 class Agent:
@@ -19,6 +21,7 @@ class Agent:
         self.skills = []
         self.rewards_and_weights = []
         self.policy = None
+        self.task = None
 
         self.llm = LLM(query_source, model_source)
         self.tokens = 0
@@ -28,6 +31,7 @@ class Agent:
 
     def set_world_model(self, env: gymnasium.Env) -> None:
         self.world_model = env
+        self.task = self.world_model.mission
 
     def add_skill(self, skill: str) -> None:
         self.skills.append(skill)
@@ -71,10 +75,43 @@ class Agent:
 
     def listen(self, *args, **kwargs):
         raise NotImplementedError("Must be implemented by the agent itself")
+    
+    def generate_skill_descriptions(self):
+        skill_descs = []
+        # TODO: figure out how to select skills for description
+        for skill in ["move_forward_3_steps", "go_to_blue_ball", "pickup_green_key", "unlock_purple_door"]:
+            actions = self._retrieve_actions_from_skill_func(skill)
+            skill_descs.append(skill)
+            obs_act_seq = self._generate_obs_act_sequence(actions)
+            skill_desc = self.llm.get_skill_description(obs_act_seq)
+            skill_descs.append(skill_desc)
+        return skill_descs
+    
+    def generate_modified_policy(self, skill_descs: List[str]) -> str:
+        self.policy = [2, 2, 2, 0, 2, 3, 0, 2, 2, 2, 1, 5, 1, 4, 0, 2, 3]  # FIXME: BFS TAKES FOREVERRR
+        obs_act_seq = self._generate_obs_act_sequence(self.policy)
+        policy_desc = self.llm.get_new_plan_based_on_skills(self.task, obs_act_seq, skill_descs)
+        return policy_desc
+    
+    def _generate_obs_act_sequence(self, action_sequence: List[int]) -> str:
+        obs_act_seq = ""
+        obs, _ = self.world_model.reset()
+        idx = 0
+        while idx < len(action_sequence):
+            obs_act_seq += f"Obs {idx + 1}: "
+            obs_act_seq += get_obs_desc(obs, detail = 3)
+            obs_act_seq += "\n"
+            obs_act_seq += f"Act {idx + 1}: "
+            obs_act_seq += IDX_TO_ACTION[action_sequence[idx]]
+            obs_act_seq += "\n"
+            obs, _, _, _, _ = self.world_model.step(action_sequence[idx])
+            idx += 1
+        obs_act_seq += "Final obs: "
+        obs_act_seq += get_obs_desc(obs, detail = 3)
+        return obs_act_seq
 
 
 class Principal(Agent):
-    # allowable_modes = ["demo_language", "demo_trajectory", "adapt_language", "adapt_trajectory"]
     allowable_modes = ["image"]
 
     def __init__(self,
@@ -84,34 +121,19 @@ class Principal(Agent):
         self.name = name if name else "Principal"
         super().__init__(query_source, model_source)
 
-    def speak(self,
-              mode: str,
-              skills: List[str] = None,
-              world_model: gymnasium.Env = None) -> Any:
-        assert mode in Principal.allowable_modes, "Invalid mode"
-        if mode.startswith("demo") or mode == "image":
-            assert (not skills and not world_model), "Mode does not require any input"
-        elif mode.startswith("adapt"):
-            assert (skills and world_model), "Mode requires skills and world model inputs"
+    def speak(self, message: Message):
+        if message.type == MessageType.INTENTION_START:
+            skill_descriptions = self.generate_skill_descriptions()
+            return Message(MessageType.SKILL_DESC, skill_descriptions)
+        # TODO: add other speaks
 
-        if mode == "image":
-            return self._generate_env_image()
-        if mode == "demo_language":
-            return self._generate_trajectory_description()
-        if mode == "demo_trajectory":
-            trajectories = []
-            for _ in range(10):
-                trajectories.append(self._generate_trajectory())
-            return trajectories
-        if mode == "adapt_language":
-            return self._generate_trajectory_description(skills, world_model)
-        if mode == "adapt_trajectory":
-            return self._generate_trajectory(skills, world_model)
-
-    def listen(self,
-               differences: str = None) -> Any:
-        if differences is not None:
-            return self._generate_modified_policy(differences)
+    def listen(self, message: Message) -> Message:
+        if message.type == MessageType.SKILL_DESC:
+            new_plan = self.generate_modified_policy(message.content)
+            debug("NEW PLAN")
+            debug(new_plan)
+            return Message(MessageType.LANGUAGE_PLAN, new_plan)
+        # TODO: add other listens
 
     def verify(self, trajectory: Trajectory) -> bool:
         total_reward = 0
@@ -152,14 +174,8 @@ class Principal(Agent):
     def _generate_trajectory_description(self, skills: List[str], world_model: gymnasium.Env) -> str:
         pass
 
-    def _generate_modified_policy(self, differences: str) -> List[int]:
-        pass
-
 
 class Attendant(Agent):
-    speak_modes = ["inform", "describe"]
-    listen_modes = ["plan", "replan"]
-
     def __init__(self, query_source: str, model_source: str, name: str = None):
         self.name = name if name else "Attendant"
         super().__init__(query_source, model_source)
@@ -177,40 +193,67 @@ class Attendant(Agent):
         self.tokens = self.llm.total_prompt_tokens
         return parsed_response
 
-    def speak(self, mode: str) -> Any:
-        assert mode in Attendant.speak_modes, "Invalid mode"
-        if mode == "inform":
-            skill_descs = []
-            for skill in ["move_forward_2_steps", "pickup_green_key", "open_blue_door"]:
-                skill_func = self.world_model.allowable_skills[skill]
-                if skill.startswith("move"):
-                    actions = skill_func()
-                elif skill.startswith("pickup"):
-                    pickup_obj = None
-                    for obj, _ in self.world_model.objs:
-                        if type(obj) == Key and obj.color == "green":
-                            pickup_obj = obj
-                            break
-                    actions = skill_func(self.world_model.agent_pos, self.world_model.agent_dir, pickup_obj.cur_pos if pickup_obj.cur_pos else pickup_obj.init_pos)
-                elif skill.startswith("open"):
-                    _, door_pos = self.world_model.doors[0]
-                    actions = skill_func(self.world_model.agent_pos, self.world_model.agent_dir, door_pos)
-                obs_act_seq = self._generate_obs_act_sequence(actions)
-                skill_desc = self.llm.get_skill_description(obs_act_seq)
-                skill_descs.append(skill_desc)
-            return skill_descs
+    def speak(self, message: Message) -> Any:
+        if message.type == MessageType.BELIEF_START:
+            world_model_description = self.describe_world_model()
+            return Message(MessageType.MODEL_DESC, world_model_description)
+        elif message.type == MessageType.INTENTION_START:
+            skill_descriptions = self.generate_skill_descriptions()
+            return Message(MessageType.SKILL_DESC, skill_descriptions)
+        elif message.type == MessageType.REWARD_START:
+            pass
+        # TODO: add other message types that might be returned by the listener
 
-    def listen(self,
-               utterance: str = None,
-               trajectories: List[Trajectory] = None,
-               image: np.ndarray = None) -> Any:
-        assert xor(utterance, trajectories, image), "Only one of utterance, trajectories, and image can be given"
-        if utterance is not None:
-            return self._follow_instruction(utterance)
-        elif trajectories is not None:
-            return self._follow_trajectories(trajectories)
-        elif image is not None:
-            return self._describe_differences(image)
+    
+    def describe_world_model(self):
+        pass
+
+    def listen(self, message: Message):
+        if message.type == MessageType.SKILL_DESC:
+            new_plan = self.generate_modified_policy(message.content)
+            return Message(MessageType.LANGUAGE_PLAN, new_plan)
+        # TODO: add new listens
+    
+    def _retrieve_actions_from_skill_func(self, skill: str):
+        debug(skill)
+        skill_func = self.world_model.allowable_skills[skill]
+        basic_skill = True
+        prefixes = ["go_to_", "pickup_", "open_", "unlock_", "close_"]
+        for prefix in prefixes:
+            if prefix in skill:
+                color, target = self._retrieve_color_and_target_components_from_skill(prefix, skill)
+                basic_skill = False
+                break
+        if basic_skill:  # covers primitive MiniGrid skills, `move` skills, and `put_down` skills
+            debug("basic skill")
+            actions = skill_func()
+        else:
+            # TODO: what if there are multiple objects that match color and target type? most obvious example is wall
+            debug("intended color and target")
+            debug(color, target)
+            if target == Door:
+                search_list = self.world_model.doors
+            elif target == Key:
+                search_list = self.world_model.keys
+            else:
+                search_list = self.world_model.objs
+            for obj, _ in search_list:
+                if type(obj) == target and obj.color == color:
+                    target_pos = obj.cur_pos if obj.cur_pos is not None else obj.init_pos
+                    break
+            actions = skill_func(self.world_model, target_pos)
+            debug("resulting actions")
+            debug(actions)
+        return actions
+    
+    def _retrieve_color_and_target_components_from_skill(self, prefix: str, skill: str) -> Tuple[str, WorldObj]:
+        components = skill.replace(prefix, "").split("_")
+        if "wall" in components:
+            color, target = "grey", "wall"
+        else:
+            color, target = components[0], components[1]
+        return color, NAME_OBJ_MAPPING[target]
+
 
     def _follow_instruction(self, utterance: str) -> Trajectory:
         pass
@@ -257,23 +300,6 @@ class Attendant(Agent):
         #     differences += ", ".join(list(there_but_not_here))
         #     differences += ". "
         # return differences
-    
-    def _generate_obs_act_sequence(self, action_sequence):
-        obs_act_seq = ""
-        obs, _ = self.world_model.reset()
-        idx = 0
-        while idx < len(action_sequence):
-            obs_act_seq += f"Obs {idx + 1}: "
-            obs_act_seq += get_obs_desc(obs, detail = 1)
-            obs_act_seq += "\n"
-            obs_act_seq += f"Act {idx + 1}: "
-            obs_act_seq += IDX_TO_ACTION[action_sequence[idx]]
-            obs_act_seq += "\n"
-            obs, _, _, _, _ = self.world_model.step(action_sequence[idx])
-            idx += 1
-        obs_act_seq += "Final obs: "
-        obs_act_seq += get_obs_desc(obs, detail = 1)
-        return obs_act_seq
 
 
 if __name__ == "__main__":

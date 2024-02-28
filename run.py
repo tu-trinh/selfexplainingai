@@ -1,24 +1,55 @@
 from package.builder import *
 from environment_play import *
+from package.message import *
+from package.constants import *
 
 import argparse
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--mismatch", "-m", type = str, required = True, choices = ["belief", "intention"])
-    parser.add_argument("--side", "-s", type = str, required = True, choices = ["speaker", "listener"])
-    parser.add_argument("--difficulty", "-d", type = int, required = True, choices = [1, 2, 3])
-    args = parser.parse_args()
+def yaml_builder(args):
+    file_name = ""
+    if args.belief_mismatch:
+        file_name += "belief_"
+    elif args.intention_mismatch:
+        file_name += "intention_"
+    elif args.reward_mismatch:
+        file_name += "reward_"
+    if args.speaker_task:
+        file_name += "speaker_"
+    elif args.listener_task:
+        file_name += "listener_"
+    file_name += f"difficulty{args.difficulty}.yaml"
+    return file_name
 
-    principal, attendant = make_agents(f"./package/configs/{args.mismatch}_{args.side}_difficulty{args.difficulty}.yaml")
-    env = principal.world_model
-    time.sleep(5)
-    debug("editing")
-    env.hide_keys()
-    debug("done")
-    env.render()
-    time.sleep(5)
+
+if __name__ == "__main__":
+    print(OBJECT_TO_IDX)
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("--belief_mismatch", "-b", action = "store_true")
+    # parser.add_argument("--intention_mismatch", "-i", action = "store_true")
+    # parser.add_argument("--reward_mismatch", "-r", action = "store_true")
+    # parser.add_argument("--speaker_task", "-s", action = "store_true")
+    # parser.add_argument("--listener_task", "-l", action = "store_true")
+    # parser.add_argument("--difficulty", "-d", type = int, required = True, choices = [1, 2, 3])
+    # args = parser.parse_args()
+
+    # assert xor(args.belief_mismatch, args.intention_mismatch, args.reward_mismatch, none_check = False), "Exactly one type of mismatch needed"
+    # assert xor(args.speaker_task, args.listener_task, none_check = False), "Exactly one type of task needed"
+
+    # principal, attendant = make_agents(f"./package/configs/{yaml_builder(args)}")
+    # attendant.world_model.render()
+    # time.sleep(5)
+    # attendant.generate_skill_descriptions()
+    # env = principal.world_model
+    # env.render()
+    # time.sleep(3)
+    # apply_edits(env, [{"name": "change_target_color"}, {"name": "hide_keys"}, {"name": "add_opening_to_wall"}])
+    # env.render()
+    # time.sleep(3)
+    # message = attendant.speak(Message(MessageType.INTENTION_START))
+    # message = principal.listen(message)
+    # message = principal.speak(Message(MessageType.INTENTION_START))
+    # message = attendant.listen(message)
     """
     ## Speaking task
     if args.side == "speaker":

@@ -62,3 +62,12 @@ class Variant(Enum):
         if isinstance(value, Enum):
             return value in cls
         return any(value == item.name for item in cls)
+
+
+class MessageType(Enum):
+    BELIEF_START = "belief_start"
+    INTENTION_START = "intention_start"
+    REWARD_START = "reward_start"
+    MODEL_DESC = "world_model_description"
+    SKILL_DESC = "skill_description"
+    LANGUAGE_PLAN = "language_plan"

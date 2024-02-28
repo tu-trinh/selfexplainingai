@@ -48,6 +48,7 @@ OBJ_NAME_MAPPING = {
     Wall: "wall",
     Lava: "lava"
 }
+NAME_OBJ_MAPPING = {v: k for k, v in OBJ_NAME_MAPPING.items()}
 OBJ_PLURAL_MAPPING = {
     Goal: "goals",
     Ball: "balls",
@@ -135,7 +136,20 @@ Which of the following reflects the differences in these two environments? There
 {differences}
 Please give only the letter(s) in your response in a comma-separated list, such as 'A' or 'A,D,E'."""
 
-GET_SKILL_NAME_QUESTION = """Below is a sequence of observations and corresponding actions taken by an AI agent in trying to execute a 'skill'. Observations should be interpreted as environment descriptions told to the agent. Given this, please assign a name or short description to the skill that the agent is doing. Your response should just be the word or phrase for the skill: for example, 'pick up key', 'turn around', 'unlock door', etc. Don't say anything else.
+GET_SKILL_NAME_QUESTION = """
+Below is a sequence of observations and corresponding actions taken by an AI agent in trying to execute a 'skill'. Observations should be interpreted as environment descriptions told to the agent. Given this sequence, please choose from the available choices the skill name that best describes the agent's trajectory. Don't say anything else except your chosen skill name.
 Sequence of observations (obs) and actions (act):
 {obs_act_seq}
+
+Skill choices:
+{skill_choices}
+"""
+
+GET_NEW_PLAN_BASED_ON_SKILLS_QUESTION = """
+Below is a sequence of observations and corresponding actions taken by AI agent 1 in executing the following task: {task}. The observations should be interpreted as environment descriptions told to agent 1. Now there is another AI agent, agent 2, who has a (potentially) different set of skills but who also wants to achieve the same task. Given agent 1's sequence and agent 2's skills, please come up with a sequence of skills agent 2 should execute that will help it achieve the task in as few steps as possible. Your answer should just be comma-separated skills chosen from the list; don't say anything else.
+Agent 1 sequence of observations (obs) and actions (act):
+{obs_act_seq}
+
+Agent 2 skills:
+{skill_choices}
 """

@@ -16,13 +16,7 @@ class HeavyDoor(Door):
     def see_behind(self):
         return False
 
-    def toggle(self, env, pos):  # FIXME: hmm logic seems sus/incomplete?
-        # If the player has the right key to open the door
-        if self.is_locked:
-            if isinstance(env.carrying, Key) and env.carrying.color == self.color:
-                self.is_locked = False
-                return True
-            return False
+    def toggle(self, env, pos):
         return False
     
 

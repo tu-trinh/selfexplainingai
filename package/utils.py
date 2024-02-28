@@ -466,8 +466,11 @@ def debug(*strs):
     else:
         print("[DEBUG]", " ".join([str(s) for s in strs]))
 
-def xor(*args):
-    boolean_arr = [arg is not None for arg in args]
+def xor(*args, none_check = True):
+    if none_check:
+        boolean_arr = [arg is not None for arg in args]
+    else:
+        boolean_arr = [arg for arg in args]
     return np.count_nonzero(boolean_arr) == 1
 
 def make_clusters(arr, num_clusters):

@@ -1,4 +1,5 @@
 from package.constants import *
+from package.utils import *
 
 import openai
 import llmengine
@@ -182,7 +183,31 @@ class LLM:
         return ". ".join(differences)
     
     def get_skill_description(self, obs_act_seq):
-        prompt = GET_SKILL_NAME_QUESTION.format(obs_act_seq = obs_act_seq)
+        with open("package/configs/skills.txt", "r") as f:
+            skill_choices = [skill.strip() for skill in f.readlines()]
+        prompt = GET_SKILL_NAME_QUESTION.format(obs_act_seq = obs_act_seq, skill_choices = "\n".join(skill_choices)).strip()
+        debug("PROMPT")
+        debug(prompt)
+        debug("ANSWER")
+        if self.query_source == "openai":
+            try:
+                response_obj = openai.ChatCompletion.create(
+                    model = self.model,
+                    messages = [{"role": "user", "content": prompt}],
+                    temperature = TEMPERATURE
+                )
+                response = response_obj["choices"][0]["message"]["content"]
+                debug(response)
+            except Exception as e:
+                print("Could not complete LLM request due to", e)
+                response = None
+            return response
+    
+
+    def get_new_plan_based_on_skills(self, task, obs_act_seq, skills):
+        prompt = GET_NEW_PLAN_BASED_ON_SKILLS_QUESTION.format(task = task, obs_act_seq = obs_act_seq, skill_choices = "\n".join(skills)).strip()
+        debug("prompt")
+        debug(prompt)
         if self.query_source == "openai":
             try:
                 response_obj = openai.ChatCompletion.create(

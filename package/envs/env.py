@@ -131,7 +131,7 @@ class Environment(MiniGridEnv):
         for r in range(len(obs)):
             for c in range(len(obs[0])):
                 cell = obs[r][c]
-                obj_idx, color_idx, _ = cell[0], cell[1], cell[2]
+                obj_idx, color_idx, state = cell[0], cell[1], cell[2]
                 obj, color = IDX_TO_OBJECT[obj_idx], IDX_TO_COLOR[color_idx]
                 if obj in ["wall", "lava"]:
                     skills.setdefault(f"go_to_{obj}", go_to_color_object_hof(color, obj))
@@ -141,7 +141,12 @@ class Environment(MiniGridEnv):
                     skills.setdefault(f"open_{color}_{obj}", open_color_object_hof(color, obj))
                     if obj == "door":
                         skills.setdefault(f"close_{color}_{obj}", close_color_door_hof(color))
-                        skills.setdefault(f"unlock_{color}_{obj}", unlock_color_door_hof(color))
+                        if state == 2:
+                            for obj, _ in self.keys:
+                                if obj.color == color:
+                                    key_pos = obj.init_pos
+                                    break
+                            skills.setdefault(f"unlock_{color}_{obj}", unlock_color_door_hof(color, key_pos))
                     elif obj == "box":
                         can_pickup_and_drop = True
                         skills.setdefault(f"pickup_{color}_{obj}", pickup_color_object_hof(color, obj))
@@ -441,6 +446,7 @@ class Environment(MiniGridEnv):
         for i in range(len(self.walls)):
             wall, wall_pos = self.walls[i]
             self.grid.set(wall_pos[0], wall_pos[1], wall)
+            wall.init_pos = wall_pos
         wall_positions = [wall[1] for wall in self.walls]
         # Set objects
         for i in range(len(self.objs)):
@@ -460,11 +466,13 @@ class Environment(MiniGridEnv):
             door, door_pos = self.doors[i]
             assert door_pos in wall_positions, "Door can only be for going through walls"
             self.grid.set(door_pos[0], door_pos[1], door)
+            door.init_pos = door_pos
         # Set keys
         for i in range(len(self.keys)):
             key, key_pos = self.keys[i]
             assert key_pos not in wall_positions, "Key cannot be inside a wall"
             self.grid.set(key_pos[0], key_pos[1], key)
+            key.init_pos = key_pos
         # Place agent
         if self.agent_start_pos not in wall_positions:
             self.agent_pos = self.agent_start_pos

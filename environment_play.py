@@ -1,7 +1,4 @@
-from package.constants import *
-from package.enums import *
-from package.builder import *
-from package.utils import *
+# ...
 
 from minigrid.manual_control import ManualControl
 

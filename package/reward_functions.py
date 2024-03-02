@@ -1,17 +1,16 @@
-from package.utils import *
-from package.constants import *
-from package.enums import *
+from package.enums import Task
+from package.infrastructure.env_constants import OBJ_NAME_MAPPING
+from package.infrastructure.basic_utils import debug, compare_world_obj
 
 from minigrid.core.world_object import WorldObj
-
-import gymnasium
+from minigrid.minigrid_env import MiniGridEnv
 
 
 """
 Basic reward functions
 """
 
-def reward_reach_object_hof(world_model: gymnasium.Env, amt = 1):
+def reward_reach_object_hof(world_model: MiniGridEnv, amt = 1):
     """
     Reward for reaching an object
     Most applicable to GOTO task, perhaps PUT task
@@ -26,7 +25,8 @@ def reward_reach_object_hof(world_model: gymnasium.Env, amt = 1):
     else:
         raise AssertionError(f"Rewarding reaching an object is not appropriate for the {task.value} task")
 
-    def reward(env_state: gymnasium.Env, action: int):
+    # def reward(env_state: MiniGridEnv, action: int):  # TODO: don't think we need to take in an action?
+    def reward(env_state: MiniGridEnv):
         ax, ay = env_state.agent_pos
         tx, ty = target_obj_pos
         if obj_name == "goal":
@@ -43,7 +43,7 @@ def reward_reach_object_hof(world_model: gymnasium.Env, amt = 1):
     return reward
 
 
-def reward_carry_object_hof(world_model: gymnasium.Env, amt = 1):
+def reward_carry_object_hof(world_model: MiniGridEnv, amt = 1):
     """
     Reward for carrying an object
     Most applicable to PICKUP task, perhaps PUT task
@@ -56,8 +56,12 @@ def reward_carry_object_hof(world_model: gymnasium.Env, amt = 1):
     else:
         raise AssertionError(f"Rewarding carrying an object is not appropriate for the {task.value} task")
 
-    def reward(env_state: gymnasium.Env, action: int):
-        if action == env_state.actions.pickup and env_state.carrying and env_state.carrying == target_obj:
+    # def reward(env_state: MiniGridEnv, action: int):
+        # if action == env_state.actions.pickup and env_state.carrying and env_state.carrying == target_obj:
+            # return amt
+        # return 0
+    def reward(env_state: MiniGridEnv):
+        if env_state.carrying and compare_world_obj(env_state.carrying, target_obj):
             return amt
         return 0
     
@@ -65,7 +69,7 @@ def reward_carry_object_hof(world_model: gymnasium.Env, amt = 1):
     return reward
 
 
-def reward_adjacent_object_hof(world_model: gymnasium.Env, amt = 1):
+def reward_adjacent_object_hof(world_model: MiniGridEnv, amt = 1):
     """
     Reward for objects being adjacent to one another
     Most applicable to PUT, COLLECT, and CLUSTER tasks
@@ -92,7 +96,7 @@ def reward_adjacent_object_hof(world_model: gymnasium.Env, amt = 1):
         remaining_positions = positions[1:]
         return _find_path(start_pos, remaining_positions)
 
-    def reward(env_state: gymnasium.Env, action: int):
+    def reward(env_state: MiniGridEnv, action: int):
         for i in range(len(obj_groups)):
             obj_group = obj_groups[i]
             obj_positions = []
@@ -114,10 +118,10 @@ Advanced reward functions
 """
 # Prevent agent from being in or close to a region
 # TODO: radial? specific far aways?
-def reward_far_away_from_region_hof(world_model: gymnasium.Env, *cells, amt = 1, region_name = "region"):
+def reward_far_away_from_region_hof(world_model: MiniGridEnv, *cells, amt = 1, region_name = "region"):
     assert cells, "At least one cell position must be passed in"
 
-    def reward(env_state: gymnasium.Env, action: int):
+    def reward(env_state: MiniGridEnv, action: int):
         return amt if env_state.agent_pos not in cells else 0
     
     reward.__name__ = "reward_far_away_from_{region_name}"
@@ -126,10 +130,10 @@ def reward_far_away_from_region_hof(world_model: gymnasium.Env, *cells, amt = 1,
 
 # Encourage agent to go in or near a region
 # TODO: radial? specific close tos?
-def reward_close_to_region_hof(world_model: gymnasium.Env, *cells, amt = 1, region_name = "region"):
+def reward_close_to_region_hof(world_model: MiniGridEnv, *cells, amt = 1, region_name = "region"):
     assert cells, "At least one cell position must be passed in"
 
-    def reward(env_state: gymnasium.Env, action: int):
+    def reward(env_state: MiniGridEnv, action: int):
         return amt if env_state.agent_pos in cells else 0
     
     reward.__name__ = "reward_close_to_{region_name}"
@@ -137,10 +141,10 @@ def reward_close_to_region_hof(world_model: gymnasium.Env, *cells, amt = 1, regi
 
 
 # Prefer agent to interact with one object (A) over another (B) of the same type
-def reward_objectA_over_objectB(world_model: gymnasium.Env, objA: WorldObj, objB: WorldObj, amt = 1):
+def reward_objectA_over_objectB(world_model: MiniGridEnv, objA: WorldObj, objB: WorldObj, amt = 1):
     assert type(objA) is type(objB), "Objects must be of the same type"
 
-    def reward(env_state: gymnasium.Env, action: int):
+    def reward(env_state: MiniGridEnv, action: int):
         if action == 3:  # pickup
             if env_state.carrying and env_state.carrying in [objA, objB]:
                 return amt if env_state.carrying == objA else 0

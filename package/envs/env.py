@@ -1,14 +1,13 @@
-from package.constants import *
-from package.enums import *
-from package.utils import *
-from package.skills import *
+from package.enums import Task, Level
 from package.envs.tasks import *
 from package.envs.levels import *
+from package.skills import *
+from package.infrastructure.env_constants import IDX_TO_OBJECT, IDX_TO_COLOR
+from package.infrastructure.basic_utils import debug
 
 from minigrid.minigrid_env import MiniGridEnv
 from minigrid.core.grid import Grid
 from minigrid.wrappers import FullyObsWrapper
-from minigrid.core.constants import IDX_TO_OBJECT, IDX_TO_COLOR
 from minigrid.core.world_object import Wall, Box, WorldObj, Door
 
 from typing import Dict, Any
@@ -365,7 +364,7 @@ class Environment(MiniGridEnv):
         assert self.task != Task.CLUSTER, "CLUSTER tasks do not have a singular target color to change"
         if not new_color1:
             old_color = self.target_obj.color if hasattr(self, "target_obj") else self.target_objs[0].color
-            new_color1 = random.choice(list(set(OBJECT_COLOR_NAMES) - set([old_color])))
+            new_color1 = random.choice(list(set(COLOR_NAMES) - set([old_color])))
         if hasattr(self, "target_obj"):
             self.target_obj.color = new_color1
         else:
@@ -382,7 +381,7 @@ class Environment(MiniGridEnv):
     def hide_targets(self):
         if self.task in [Task.GOTO, Task.PICKUP]:
             if type(self.target_obj) != Box:
-                box = Box(color = random.choice(OBJECT_COLOR_NAMES))
+                box = Box(color = random.choice(COLOR_NAMES))
                 box.contains = self.target_obj
                 self.objs.remove((self.target_obj, self.target_obj_pos))
                 self.objs.append((box, self.target_obj_pos))
@@ -391,7 +390,7 @@ class Environment(MiniGridEnv):
             target_objs_pos = flatten_list(self.target_objs_pos)
             for to, top in zip(target_objs, target_objs_pos):
                 if type(to) != Box:
-                    box = Box(color = random.choice(OBJECT_COLOR_NAMES))
+                    box = Box(color = random.choice(COLOR_NAMES))
                     box.contains = to
                     self.objs.remove((to, top))
                     self.objs.append((box, top))
@@ -403,7 +402,7 @@ class Environment(MiniGridEnv):
             warnings.warn("Cannot hide keys in environment without keys")
             return
         for key, pos in self.keys:
-            box = Box(color = random.choice(OBJECT_COLOR_NAMES))
+            box = Box(color = random.choice(COLOR_NAMES))
             box.contains = key
             self.keys.remove((key, pos))
             self.objs.append((box, pos))

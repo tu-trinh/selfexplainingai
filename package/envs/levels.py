@@ -1,7 +1,5 @@
-from package.constants import *
-from package.enums import *
-from package.utils import *
-from package.envs.modifications import *
+from package.enums import Variant, Task
+from package.infrastructure.env_constants import TANGIBLE_OBJS, PLAYABLE_OBJS, DISTRACTOR_OBJS, COLOR_NAMES
 
 from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Box
 from minigrid.wrappers import NoDeath
@@ -54,9 +52,9 @@ class BaseLevel(ABC):
                 index = self.env_seed % len(TANGIBLE_OBJS)
                 self.target_obj_type = TANGIBLE_OBJS[index]
         if Variant.COLOR in self.disallowed:
-            color = random.choice(list(set(OBJECT_COLOR_NAMES) - set([self.disallowed[Variant.COLOR]])))
+            color = random.choice(list(set(COLOR_NAMES) - set([self.disallowed[Variant.COLOR]])))
         else:
-            color = random.choice(OBJECT_COLOR_NAMES)
+            color = random.choice(COLOR_NAMES)
         if self.target_obj_type == Goal:
             self.target_obj = Goal()
             self.target_obj.color = color
@@ -70,7 +68,7 @@ class BaseLevel(ABC):
                 disallowed_color = self.disallowed[Variant.COLOR]
             else:
                 disallowed_color = ""
-            allowed_colors = [color for color in OBJECT_COLOR_NAMES if color != disallowed_color]
+            allowed_colors = [color for color in COLOR_NAMES if color != disallowed_color]
             if self.task == Task.PUT:
                 idx1 = self.env_seed % len(TANGIBLE_OBJS)
                 idx2 = (self.env_seed + 1) % len(PLAYABLE_OBJS)
@@ -120,12 +118,12 @@ class BaseLevel(ABC):
                 pos_idx = 0
                 for obj_cluster in self.target_obj_types:
                     this_cluster = []
-                    this_cluster.extend([obj(color = random.choice(OBJECT_COLOR_NAMES)) for obj in obj_cluster])
+                    this_cluster.extend([obj(color = random.choice(COLOR_NAMES)) for obj in obj_cluster])
                     self.target_objs.append(this_cluster)
                     self.target_objs_pos.append(reference[pos_idx : pos_idx + len(this_cluster)])
                     pos_idx += len(this_cluster)
             else:
-                self.target_objs.extend([obj(color = random.choice(OBJECT_COLOR_NAMES)) for obj in self.target_obj_types])
+                self.target_objs.extend([obj(color = random.choice(COLOR_NAMES)) for obj in self.target_obj_types])
 
 
     def _set_agent_start_position(self, allowed_positions: set = None) -> None:
@@ -268,7 +266,7 @@ class BaseLevel(ABC):
             disallowed_blocker_obj, disallowed_blocker_color = self.disallowed[Variant.OBJECTS][0][-1]
             disallowed_blocker_obj_config.add((disallowed_blocker_obj, disallowed_blocker_color))
         while (type(blocker_obj), blocker_obj.color) in disallowed_blocker_obj_config:
-            blocker_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(OBJECT_COLOR_NAMES))
+            blocker_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(COLOR_NAMES))
         self.objs.append((blocker_obj, blocker_obj_pos))
 
 
@@ -308,7 +306,7 @@ class BaseLevel(ABC):
             self._rearrange_objects(wall_positions)
 
         # Establish doors
-        self.doors = [(Door(is_locked = self.level in [Level.UNLOCK_DOOR, Level.HIDDEN_KEY], color = random.choice(OBJECT_COLOR_NAMES)), random.choice(wall_positions))]
+        self.doors = [(Door(is_locked = self.level in [Level.UNLOCK_DOOR, Level.HIDDEN_KEY], color = random.choice(COLOR_NAMES)), random.choice(wall_positions))]
 
         # Return for future calculations
         return other_side_x_lb, other_side_x_ub, other_side_y_lb, other_side_y_ub
@@ -360,7 +358,7 @@ class BaseLevel(ABC):
         self.all_possible_pos -= set(wall_positions)
 
         # Establish doors
-        self.doors = [(Door(color = random.choice(OBJECT_COLOR_NAMES)), random.choice(wall_positions))]
+        self.doors = [(Door(color = random.choice(COLOR_NAMES)), random.choice(wall_positions))]
 
         # Return for future calculations
         return return_tuple
@@ -379,7 +377,7 @@ class BaseLevel(ABC):
                 for to in flatten_list(self.target_objs):
                     if type(to) == Box:
                         disallowed_box_colors.add(to.color)
-            box = Box(color = random.choice(list(set(OBJECT_COLOR_NAMES) - disallowed_box_colors)))
+            box = Box(color = random.choice(list(set(COLOR_NAMES) - disallowed_box_colors)))
             box.contains = key
             self.objs.append((box, key_pos))
         else:
@@ -566,7 +564,7 @@ class BaseLevel(ABC):
                 temp = flatten_list(self.target_objs)
                 dist_obj = temp[0]
             while (type(dist_obj), dist_obj.color) in self.disallowed_obj_config:
-                dist_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(OBJECT_COLOR_NAMES))
+                dist_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(COLOR_NAMES))
             if Variant.OBJECTS in self.disallowed and self.required_obj_positions[i] in self.all_possible_pos and (additional_allowable_pos is None or (self.required_obj_positions[i] in additional_allowable_pos)):
                 dist_obj_pos = self.required_obj_positions[i]
             else:
@@ -753,7 +751,7 @@ class MultipleRoomsLevel(BaseLevel):
         self._determine_num_rooms()
         room_walls, room_doors, room_cells = self._gen_multiple_rooms()
         self.walls.extend([(Wall(), pos) for pos in room_walls + room_doors])
-        self.doors.extend([(Door(is_locked = False, color = random.choice(OBJECT_COLOR_NAMES)), pos) for pos in room_doors])
+        self.doors.extend([(Door(is_locked = False, color = random.choice(COLOR_NAMES)), pos) for pos in room_doors])
         self.all_possible_pos -= set(room_walls)
         self.all_possible_pos -= set(room_doors)
 
@@ -780,7 +778,7 @@ class RoomDoorKeyLevel(BaseLevel):
         # Generate rectangular room and door
         self.inner_cells, self.outer_cells = self._generate_rectangular_section(True)
         door_pos = random.choice([pos for _, pos in self.walls])
-        self.doors.append((Door(is_locked = True, color = random.choice(OBJECT_COLOR_NAMES)), door_pos))
+        self.doors.append((Door(is_locked = True, color = random.choice(COLOR_NAMES)), door_pos))
 
         # Place agent and key outside of the room, target inside the room
         self._set_agent_start_position(self.outer_cells)
@@ -811,7 +809,7 @@ class RoomDoorKeyLevel(BaseLevel):
         available_openings = set([pos for _, pos in self.walls]) - set([pos for _, pos in self.doors])
         opening_pos = random.choice(list(available_openings))
         if is_door:
-            self.doors.append((Door(is_locked = False, color = random.choice(OBJECT_COLOR_NAMES)), opening_pos))
+            self.doors.append((Door(is_locked = False, color = random.choice(COLOR_NAMES)), opening_pos))
         else:
             for i in range(len(self.walls)):
                 if self.walls[i][1] == opening_pos:
@@ -847,7 +845,7 @@ class RoomDoorKeyLevel(BaseLevel):
                     blocker_obj = flatten_list(self.target_objs)[0]
                 disallowed_blocker_obj_config = set([(type(blocker_obj), blocker_obj.color)])
                 while (type(blocker_obj), blocker_obj.color) in disallowed_blocker_obj_config:
-                    blocker_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(OBJECT_COLOR_NAMES))
+                    blocker_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(COLOR_NAMES))
                 self.objs.append((blocker_obj, blocker_pos))
         self._gen_grid(self.room_size, self.room_size)
         if failed:
@@ -936,7 +934,7 @@ class BossLevel(BaseLevel):
         locked_doors = 0
         for room_door_pos in room_doors:
             is_locked = random.choice([True, False])
-            door = Door(is_locked = is_locked and locked_doors < MAX_NUM_LOCKED_DOORS, color = random.choice(OBJECT_COLOR_NAMES))
+            door = Door(is_locked = is_locked and locked_doors < MAX_NUM_LOCKED_DOORS, color = random.choice(COLOR_NAMES))
             if is_locked:
                 necessary_key_colors.append(door.color)
                 locked_doors += 1
@@ -991,7 +989,7 @@ class BossLevel(BaseLevel):
                 else:
                     dist_obj = flatten_list(self.target_objs)[0]
                 while (type(dist_obj), dist_obj.color) in self.disallowed_obj_config:
-                    dist_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(OBJECT_COLOR_NAMES))
+                    dist_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(COLOR_NAMES))
                 if Variant.OBJECTS in self.disallowed and self.required_obj_positions[i] in self.all_possible_pos:
                     dist_obj_pos = self.required_obj_positions[i]
                 else:

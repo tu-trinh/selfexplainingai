@@ -1,4 +1,5 @@
-from package.constants import *
+from package.infrastructure.env_constants import *
+from package.infrastructure.llm_constants import *
 from package.enums import Task
 
 from minigrid.core.mission import MissionSpace
@@ -91,5 +92,5 @@ class ClusterTask(BaseTask):
     
     mission_space = MissionSpace(
         mission_func = _gen_mission,
-        ordered_placeholders = [OBJECT_COLOR_NAMES, TANGIBLE_OBJS]
+        ordered_placeholders = [COLOR_NAMES, TANGIBLE_OBJS]
     )

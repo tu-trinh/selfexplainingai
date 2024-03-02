@@ -1,9 +1,9 @@
-from package.builder import *
-from environment_play import *
-from package.message import *
-from package.constants import *
+from package.infrastructure.basic_utils import xor, debug
+from package.builder import make_agents
+from package.game import Game
 
 import argparse
+import time
 
 
 def yaml_builder(args):
@@ -23,20 +23,28 @@ def yaml_builder(args):
 
 
 if __name__ == "__main__":
-    print(OBJECT_TO_IDX)
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("--belief_mismatch", "-b", action = "store_true")
-    # parser.add_argument("--intention_mismatch", "-i", action = "store_true")
-    # parser.add_argument("--reward_mismatch", "-r", action = "store_true")
-    # parser.add_argument("--speaker_task", "-s", action = "store_true")
-    # parser.add_argument("--listener_task", "-l", action = "store_true")
-    # parser.add_argument("--difficulty", "-d", type = int, required = True, choices = [1, 2, 3])
-    # args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--belief_mismatch", "-b", action = "store_true")
+    parser.add_argument("--intention_mismatch", "-i", action = "store_true")
+    parser.add_argument("--reward_mismatch", "-r", action = "store_true")
+    parser.add_argument("--speaker_task", "-s", action = "store_true")
+    parser.add_argument("--listener_task", "-l", action = "store_true")
+    parser.add_argument("--difficulty", "-d", type = int, required = True, choices = [1, 2, 3])
+    args = parser.parse_args()
 
-    # assert xor(args.belief_mismatch, args.intention_mismatch, args.reward_mismatch, none_check = False), "Exactly one type of mismatch needed"
-    # assert xor(args.speaker_task, args.listener_task, none_check = False), "Exactly one type of task needed"
+    assert xor(args.belief_mismatch, args.intention_mismatch, args.reward_mismatch, none_check = False), "Exactly one type of mismatch needed"
+    assert xor(args.speaker_task, args.listener_task, none_check = False), "Exactly one type of task needed"
 
-    # principal, attendant = make_agents(f"./package/configs/{yaml_builder(args)}")
+    principal, attendant = make_agents(f"./package/configs/{yaml_builder(args)}")
+    # time.sleep(5)
+    s = time.time()
+    policy = attendant._find_optimal_policy()
+    e = time.time()
+    debug(policy)
+    debug("Finding optimal solution took", round((e - s) / 60, 3), "minutes")
+    # game = Game(principal, attendant)
+    # game.run("i", "a")
+    # game.evaluate("a", "p")
     # attendant.world_model.render()
     # time.sleep(5)
     # attendant.generate_skill_descriptions()

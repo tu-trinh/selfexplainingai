@@ -47,7 +47,7 @@ This applies to the `env_specs` field in the YAML. There are three required subf
 There are two "optional" subfields for configuring the attendant's world model ("optional" in that you must define at least one). You should only define one or the other (though if you REALLY want to, you can have both).
 - `attendant_level`: This should be a member of the `Level` enum that you want the attendant's world model to be
 - `attendant_variants`: This should be a list containing members of the `Variant` enum that you want the attendant's world model to have
-- `principal_render_mode` and `attendant_render_mode`: These should be one of the render modes defined [here](https://gymnasium.farama.org/api/env/#gymnasium.Env.render). By default they are `None`
+- `principal_render_mode` and `attendant_render_mode`: These should be one of the render modes defined [here](https://gymnasium.farama.org/api/env/#MiniGridEnv.render). By default they are `None`
 
 When you call `make_agents` from `builder.py`, it will automatically create the world models and attach them to the agents.
 

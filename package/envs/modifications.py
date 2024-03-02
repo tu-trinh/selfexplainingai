@@ -1,3 +1,8 @@
+import sys
+sys.path.append("/Users/tutrinh/Work/CHAI/selfexplainingai")
+
+from package.infrastructure.env_constants import OBJECT_TO_IDX, COLOR_TO_IDX, COLORS  # must keep import to pass object creation assertions
+
 from minigrid.core.world_object import Door, WorldObj
 from minigrid.utils.rendering import fill_coords, point_in_line, point_in_rect
 
@@ -20,27 +25,22 @@ class HeavyDoor(Door):
         return False
     
 
-class Bridge(WorldObj):  # have to change the minigrid constants themselves for color, type, etc.
-    # FIXME: currently placeholder for bridge is a purple box
+class Bridge(WorldObj):
     """
     Wooden bridge to cross lava or other dangers
     """
     def __init__(self):
-        super().__init__("box", "purple")
+        super().__init__("bridge", "brown")
 
     def can_overlap(self):
         return True
 
     def render(self, img):
-        c = (87, 51, 15)
+        c = tuple(COLORS["brown"])
         fill_coords(img, point_in_rect(0, 1, 0, 1), c)
-        for i in range(3):
-            xlo = 0.3 + 0.2 * i
-            xhi = 0.4 + 0.2 * i
-            # fill_coords(img, point_in_line(xlo, 0.1, xhi, 0.3, xhi, r = 0.03), c)
-            # fill_coords(img, point_in_line(xlo, 0.3, xhi, 0.5, xhi, r = 0.03), c)
-            # fill_coords(img, point_in_line(xlo, 0.5, xhi, 0.7, xhi, r = 0.03), c)
-            # fill_coords(img, point_in_line(xlo, 0.7, xhi, 0.9, xhi, r = 0.03), c)
+        cc = (146, 102, 57)
+        fill_coords(img, point_in_line(0.33, 0.1, 0.33, 0.9, r = 0.03), cc)
+        fill_coords(img, point_in_line(0.67, 0.1, 0.67, 0.9, r = 0.03), cc)
 
 
 class FireproofShoes(WorldObj):  # have to control the lava here somehow?? also must be able to carry AND wear shoes???

@@ -1,21 +1,3 @@
-from package.enums import *
-
-from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box
-
-
-#################
-#  Access Keys  #
-#################
-OPENAI_KEY = "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"  # BERKELEY ONE
-# OPENAI_KEY = "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"  # GMAIL ONE
-SCALE_KEY = "cll08l8da0af41asy4ukcbhpn"
-HUGGINGFACE_KEY = "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"
-
-
-##################
-#  LLM Querying  #
-##################
-RANDOM_SEED = 420
 TEMPERATURE = 0.1
 MAX_NEW_TOKENS = 100
 NUM_ACTIONS_GENERATED = 1
@@ -28,58 +10,6 @@ CONTEXT_WINDOWS = {
 
 MAX_TRIES = 2
 
-
-#######################
-#  Environment Setup  #
-#######################
-PLAYABLE_OBJS = [Goal, Box, Ball]
-TANGIBLE_OBJS = [Ball, Box]
-DISTRACTOR_OBJS = [Box, Ball, Key]
-DOOR_KEY_COLOR_NAMES = ["blue", "purple", "yellow", "red", "green", "grey"]
-OBJECT_COLOR_NAMES = ["red", "green", "blue", "purple", "yellow"]
-ALL_COLOR_NAMES = OBJECT_COLOR_NAMES + ["grey"]
-
-OBJ_NAME_MAPPING = {
-    Goal: "goal",
-    Ball: "ball",
-    Box: "box",
-    Key: "key",
-    Door: "door",
-    Wall: "wall",
-    Lava: "lava"
-}
-NAME_OBJ_MAPPING = {v: k for k, v in OBJ_NAME_MAPPING.items()}
-OBJ_PLURAL_MAPPING = {
-    Goal: "goals",
-    Ball: "balls",
-    Box: "boxes",
-    Key: "keys"
-}
-
-AGENT_VIEW_SIZE = 5
-MIN_VIEW_SIZE = 3
-MAX_VIEW_SIZE = 9
-MIN_ROOM_SIZE = 7
-MAX_ROOM_SIZE = 12
-MAX_NUM_LOCKED_DOORS = 3
-UNIVERSAL_VARIANTS = [Variant.COLOR, Variant.ROOM_SIZE, Variant.ORIENTATION]
-ALLOWABLE_VARIANTS = {
-    Level.EMPTY: UNIVERSAL_VARIANTS,
-    Level.DEATH: UNIVERSAL_VARIANTS,
-    Level.DIST: UNIVERSAL_VARIANTS + [Variant.NUM_OBJECTS, Variant.OBJECTS],
-    Level.OPEN_DOOR: UNIVERSAL_VARIANTS,
-    Level.BLOCKED_DOOR: UNIVERSAL_VARIANTS,
-    Level.UNLOCK_DOOR: UNIVERSAL_VARIANTS,
-    Level.HIDDEN_KEY: UNIVERSAL_VARIANTS,
-    Level.GO_AROUND: UNIVERSAL_VARIANTS,
-    Level.MULT_ROOMS: UNIVERSAL_VARIANTS + [Variant.NUM_ROOMS],
-    Level.BOSS: UNIVERSAL_VARIANTS + [Variant.NUM_OBJECTS, Variant.OBJECTS, Variant.NUM_ROOMS]
-}
-
-
-#########################
-#  Prompting Templates  #
-#########################
 # TODO: physics "reminders": can only unlock door with same key, when you open a box it will disappear, can only hold one thing at a time (must drop before picking up something else), pickup and putting down require empty cell in front??
 SETTING_DESCRIPTION = """You are an agent who is trying to complete a task in an unknown, grid-like environment. Keep in mind that in this environment, you can only unlock a locked door with a key of the same color, you can only carry one object at a time, and you can only put an object down in a cell that has no other object.
 """

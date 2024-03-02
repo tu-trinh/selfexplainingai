@@ -1,72 +1,15 @@
-from package.constants import *
-from package.enums import *
+from package.infrastructure.env_constants import IDX_TO_OBJECT, IDX_TO_COLOR, IDX_TO_STATE, IDX_TO_DIR, AGENT_VIEW_SIZE, NUM_TO_WORD, NUM_TO_ORDERING
 
-from minigrid.core.constants import IDX_TO_COLOR, IDX_TO_OBJECT, STATE_TO_IDX
+from minigrid.minigrid_env import MiniGridEnv
 
 import numpy as np
-from enum import Enum
-from typing import Union, List
-import gymnasium
+from typing import Union, List, Dict
 
 
-IDX_TO_STATE = {
-    0: "open",
-    1: "closed",
-    2: "locked"
-}
-IDX_TO_DIR = {
-    0: "east",
-    1: "south",
-    2: "west",
-    3: "north"
-}
-ACTION_TO_IDX = {
-    "left": 0,
-    "right": 1, 
-    "forward": 2,
-    "pickup": 3, 
-    "drop": 4,
-    "toggle": 5
-}
-IDX_TO_ACTION = {
-    0: "turn left",
-    1: "turn right",
-    2: "go forward",
-    3: "pick up",
-    4: "drop",
-    5: "toggle"
-}
-CUSTOM_ACTION_TO_TRUE_ACTION = {
-    1: 2,
-    2: 0,
-    3: 1,
-    4: 3,
-    5: 4,
-    6: 5,
-    7: 5,
-    8: 5
-}
-NUM_TO_WORD = {
-    1: "one",
-    2: "two",
-    3: "three",
-    4: "four",
-    5: "five"
-}
-NUM_TO_ORDERING = {
-    1: "First",
-    2: "Second",
-    3: "Third",
-    4: "Fourth",
-    5: "Fifth",
-    6: "Sxith",
-    7: "Seventh",
-    8: "Eighth",
-    9: "Ninth",
-    10: "Tenth"
-}
-
-def get_unit_desc(cell):
+def get_unit_desc(cell: Union[np.ndarray, List]) -> str:
+    """
+    Gets descriptor phrase for a singular cell
+    """
     obj = IDX_TO_OBJECT[cell[0]]
     color = IDX_TO_COLOR[cell[1]]
     if obj == "door":
@@ -83,7 +26,11 @@ def get_unit_desc(cell):
         desc = "a " + color + " " + obj
     return desc
 
-def get_unit_location_desc(desc, img_row, img_col, left = False, backwards = False, right = False):
+
+def get_unit_location_desc(desc: str, img_row: int, img_col: int, left: bool = False, backwards: bool = False, right: bool = False) -> str:
+    """
+    Gets location-grounded descriptor phrase for a singular cell
+    """
     loc_desc = desc
     if left:
         x_diff = 4 - img_col
@@ -142,10 +89,12 @@ def get_unit_location_desc(desc, img_row, img_col, left = False, backwards = Fal
                 loc_desc += f" {x_diff} cells left"
     return loc_desc
 
-def get_obs_desc(obs, left_obs = None, backwards_obs = None, right_obs = None, detail = 3):
+
+def get_obs_desc(obs: Dict, left_obs: Dict = None, backwards_obs: Dict = None, right_obs: Dict = None, detail: int = 3) -> str:
     """
     Detail levels:
-    1 - list objects in the field of vision
+    0 - TODO: list objects in the field of vision, grouped
+    1 - list objects in the field of vision, individually
     2 - list objects in the 360 field of vision and their location
     3 - list what is in the field of vision row-by-row and directly at front/left/right
     4 - list everything cell by cell
@@ -292,7 +241,11 @@ def get_obs_desc(obs, left_obs = None, backwards_obs = None, right_obs = None, d
         
         return description
 
-def get_babyai_desc(env: gymnasium.Env, image: np.ndarray):
+
+def get_babyai_desc(env: MiniGridEnv, image: np.ndarray) -> str:
+    """
+    Get BabyAI-Text style environment description
+    """
     list_textual_descriptions = []
     if env.carrying is not None:
         list_textual_descriptions.append("You carry a {} {}".format(env.carrying.color, env.carrying.type))
@@ -394,7 +347,11 @@ def get_babyai_desc(env: gymnasium.Env, image: np.ndarray):
                 list_textual_descriptions.append(description)
     return ". ".join(list_textual_descriptions) + "."
 
-def get_full_env_desc(full_obs):
+
+def get_full_env_desc(full_obs: np.ndarray) -> str:
+    """
+    Describe full environment
+    """
     actual_room_size = full_obs.shape[0] - 2
     description = f"The environment is a {actual_room_size}x{actual_room_size} square. From top to bottom, it has the following:\n"
     for row in range(1, actual_room_size + 1):
@@ -407,77 +364,3 @@ def get_full_env_desc(full_obs):
                 row_objs.append(obj_desc)
         description += ", ".join(row_objs) + "\n"
     return description.strip()
-
-def list_available_actions(scenario):
-    if scenario == 1:
-        actions = """6. Go to key (only if you have seen one).\n7. Go to door (only if you have seen one).\n8. Go to goal (only if you have seen one).\n9. Pick up key (only if you have seen one).\n10. Open door (only if you have seen one)."""
-    elif scenario == 2:
-        actions = """6. Go to goal (only if you have seen one)."""
-    elif scenario == 3:
-        actions = """6. Go to goal (only if you have seen one)."""
-    elif scenario == 4:
-        actions = """6. Go to door (only if you have seen one).\n7. Go to goal (only if you have seen one).\n8. Open door (only if you have seen one)."""
-    return actions
-
-def convert_response_to_action(resp, additional_actions):
-    return resp
-
-    # Only needed for automation
-    # if "forward" in resp or "1" in resp:
-    #     return 1
-    # if "left" in resp or "2" in resp:
-    #     return 2
-    # if "right" in resp or "3" in resp:
-    #     return 3
-    # if "pick" in resp or "4" in resp:
-    #     return 4
-    # if "put" in resp or "5" in resp:
-    #     return 5
-    # if "unlock" in resp or "6" in resp:
-    #     return 6
-    # if "open" in resp or "7" in resp:
-    #     return 7
-    # if "close" in resp or "8" in resp:
-    #     return 8
-    # return None
-
-def format_seconds(seconds):
-    hours, remainder = divmod(seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    return "{:02}:{:02}:{:02}".format(int(hours), int(minutes), int(seconds))
-
-def manhattan_distance(p1, p2):
-    x1, y1 = p1
-    x2, y2 = p2
-    return abs(x2 - x1) + abs(y2 - y1)
-
-def get_adjacent_cells(cell):
-    x, y = cell
-    return set([(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)])
-
-def convert_to_enum(enum: Enum, value: Union[List, str]):
-    if isinstance(value, str):
-        return enum[value]
-    return [enum[val] for val in value]
-    
-def debug(*strs):
-    if not strs:
-        print()
-    else:
-        print("[DEBUG]", " ".join([str(s) for s in strs]))
-
-def xor(*args, none_check = True):
-    if none_check:
-        boolean_arr = [arg is not None for arg in args]
-    else:
-        boolean_arr = [arg for arg in args]
-    return np.count_nonzero(boolean_arr) == 1
-
-def make_clusters(arr, num_clusters):
-    clusters = [[] for _ in range(num_clusters)]
-    for i, elem in enumerate(arr):
-        clusters[i % num_clusters].append(elem)
-    return clusters
-
-def flatten_list(nested_list):
-    return [item for sublist in nested_list for item in (sublist if isinstance(sublist, list) else [sublist])]

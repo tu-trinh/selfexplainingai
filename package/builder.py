@@ -1,16 +1,15 @@
 import sys
 sys.path.append("/Users/tutrinh/Work/CHAI/selfexplainingai")
 
-from package.constants import *
-from package.utils import *
-from package.enums import *
+from package.infrastructure.basic_utils import xor, convert_to_enum
+from package.infrastructure.env_constants import ALLOWABLE_VARIANTS
+from package.enums import Task, Level, Variant
 from package.envs.env import *
-from package.envs.tasks import *
-from package.envs.levels import *
-from package.agents import Agent, Principal, Attendant
+from package.agents import *
 import package.reward_functions as REWARD_FUNCTIONS
 
 from minigrid.manual_control import ManualControl
+from minigrid.minigrid_env import MiniGridEnv
 
 from typing import List, Dict, Any
 import yaml
@@ -45,7 +44,7 @@ def make_envs(task: Task,
               attendant_render_mode: str = None):
     assert Task.has_value(task), "Env type is not valid"
     assert Level.has_value(principal_level), "Teacher level is not valid"
-    assert xor(attendant_level, attendant_variants, attendant_edits), "Must have only one of `attendant_level`, `attendant_variants`, or `attendant_edits`"
+    assert xor(attendant_level, attendant_variants, attendant_edits) or (not attendant_level and not attendant_variants and not attendant_edits), "Must have only one of `attendant_level`, `attendant_variants`, or `attendant_edits` or none at all"
     if attendant_level:
         assert Level.has_value(attendant_level), "Attendant level is not valid"
     if attendant_variants:
@@ -101,6 +100,8 @@ def make_envs(task: Task,
     elif attendant_edits:
         attendant_env = copy.deepcopy(principal_env)
         apply_edits(attendant_env, attendant_edits)
+    else:
+        attendant_env = copy.deepcopy(principal_env)
 
     return principal_env, attendant_env
 
@@ -133,7 +134,7 @@ def _custom_init(self,
     level_cls.assert_successful_creation(self)
 
 
-def apply_edits(env: gymnasium.Env, edits: List[Dict]) -> None:
+def apply_edits(env: MiniGridEnv, edits: List[Dict]) -> None:
     for parent_class in env.__class__.mro():
         if issubclass(parent_class, BaseLevel) and parent_class is not BaseLevel:
             level_class = parent_class
@@ -151,7 +152,7 @@ def apply_edits(env: gymnasium.Env, edits: List[Dict]) -> None:
 
 
 def make_agent(is_principal: bool,
-               world_model: gymnasium.Env,
+               world_model: MiniGridEnv,
                name: str = None,
                query_source: str = None,
                model_source: str = None,

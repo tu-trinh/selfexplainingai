@@ -1,8 +1,4 @@
-from package.constants import *
-from package.utils import *
-from package.search import *
-
-from minigrid.core.constants import DIR_TO_VEC
+from package.infrastructure.env_constants import DIR_TO_VEC, MAX_ROOM_SIZE, COLOR_NAMES, OBJ_NAME_MAPPING
 
 from typing import Tuple
 from gymnasium import Env
@@ -57,7 +53,7 @@ def move_direction_n_steps_hof(direction: str, n: int):
 Going to an object
 """
 def go_to_color_object_hof(color: str, obj: str):
-    assert color in ALL_COLOR_NAMES
+    assert color in COLOR_NAMES
     assert obj in OBJ_NAME_MAPPING.values()
 
     def go_to_color_object(env: Env, object_pos: Tuple[int, int]):
@@ -72,7 +68,7 @@ def go_to_color_object_hof(color: str, obj: str):
 Picking up an object
 """
 def pickup_color_object_hof(color: str, obj: str):
-    assert color in OBJECT_COLOR_NAMES
+    assert color in COLOR_NAMES
     assert obj in OBJ_NAME_MAPPING.values()
 
     def pickup_color_object(env: Env, object_pos: Tuple[int, int]):
@@ -87,7 +83,7 @@ def pickup_color_object_hof(color: str, obj: str):
 Putting down an object
 """
 def put_down_color_object_hof(color: str, obj: str):
-    assert color in OBJECT_COLOR_NAMES
+    assert color in COLOR_NAMES
     assert obj in OBJ_NAME_MAPPING.values()
 
     def put_down_color_object():
@@ -100,7 +96,7 @@ def put_down_color_object_hof(color: str, obj: str):
 Opening an object
 """
 def open_color_object_hof(color: str, obj: str):
-    assert color in OBJECT_COLOR_NAMES
+    assert color in COLOR_NAMES
     assert obj in ["door", "box"]
 
     def open_color_object(env: Env, object_pos: Tuple[int, int]):
@@ -115,7 +111,7 @@ def open_color_object_hof(color: str, obj: str):
 Unlocking a door
 """
 def unlock_color_door_hof(color: str, necessary_key_pos: Tuple[int, int]):
-    assert color in OBJECT_COLOR_NAMES
+    assert color in COLOR_NAMES
 
     def unlock_color_door(env: Env, door_pos: Tuple[int, int]):
         actions = []
@@ -133,7 +129,7 @@ def unlock_color_door_hof(color: str, necessary_key_pos: Tuple[int, int]):
 Closing a door
 """
 def close_color_door_hof(color: str):
-    assert color in OBJECT_COLOR_NAMES
+    assert color in COLOR_NAMES
 
     def close_color_door(env: Env, door_pos: Tuple[int, int]):
         actions = []
@@ -162,7 +158,7 @@ def _find_path(master_env: Env, object_pos: Tuple[int, int], action_type: str, c
     elif action_type == "pickup":
         def goal_check(state: State):
             return manhattan_distance(state.loc, object_pos) == 1 and state.carrying == state.grid.get(*object_pos)
-    search_problem = Search("bfs", env, goal_check)
+    search_problem = Search("bfs", env, goal_check, "s")
     actions = search_problem.search()
     if actions is None:  # TODO: idk
         return [0]

@@ -256,9 +256,7 @@ attendant:
 
 env_specs:
   task: PICKUP
-  principal_level: TREASURE_ISLAND
-  attendant_edits:
-    - { name: "change_target_color" }
+  principal_level: ROOM_DOOR_KEY
   seed: 16
   # principal_render_mode: human
   # attendant_render_mode: human

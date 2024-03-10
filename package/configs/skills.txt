@@ -1,5 +1,5 @@
-turn_left
-turn_right
+left
+right
 forward
 pickup
 drop

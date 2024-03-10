@@ -157,10 +157,11 @@ class Environment(MiniGridEnv):
                         skills.setdefault(f"pickup_{color}_{obj}", pickup_color_object_hof(color, obj))
                         skills.setdefault(f"put_down_{color}_{obj}", put_down_color_object_hof(color, obj))
         
-        # Primitive Minigrid skills
-        skills["turn_left"] = turn_left
-        skills["turn_right"] = turn_right
+        # Primitive Minigrid skills + backward
+        skills["left"] = left
+        skills["right"] = right
         skills["forward"] = forward
+        skills["backward"] = backward
         if can_pickup_and_drop:
             skills["pickup"] = pickup
             skills["drop"] = drop

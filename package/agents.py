@@ -5,6 +5,9 @@ from package.search import Search
 from package.llm import LLM
 import package.reward_functions as REWARD_FUNCTIONS
 from package.infrastructure.basic_utils import debug
+from package.infrastructure.env_utils import get_obs_desc
+from package.infrastructure.env_constants import IDX_TO_ACTION, OBJ_NAME_MAPPING
+from package.task_tree import TaskNode
 
 from minigrid.wrappers import FullyObsWrapper
 from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box, WorldObj
@@ -13,6 +16,7 @@ from minigrid.minigrid_env import MiniGridEnv
 from typing import Callable, Dict, List, Tuple, Any, Union
 import time
 import numpy as np
+import copy
 
 
 class Agent:
@@ -22,6 +26,7 @@ class Agent:
         self.rewards_and_weights = []
         self.policy = None
         self.task = None
+        self.task_tree = None
 
         self.llm = LLM(query_source, model_source)
         self.tokens = 0
@@ -94,61 +99,217 @@ class Agent:
         return total_reward > 0
 
 
-    def generate_skill_descriptions(self):
+    def generate_skill_descriptions(self) -> List[str]:
         skill_descs = []
         skill_subset = self._get_subset_of_skills()
         # TODO: figure out how to select skills for description
         for skill in skill_subset:
+            debug("Current skill:", skill)
             actions = self._retrieve_actions_from_skill_func(skill)
             skill_descs.append(skill)
             obs_act_seq = self._generate_obs_act_sequence(actions)
             skill_desc = self.llm.get_skill_description(obs_act_seq)
+            debug("LLM called it:", skill_desc)
             skill_descs.append(skill_desc)
         return skill_descs
 
 
-    def _find_optimal_policy(self):
+    def _find_optimal_policy(self) -> List[int]:
         def goal_check(env: MiniGridEnv):
             return self.calculate_reward(env)
+        # TODO: do the high level planning here. probably can group into "if door" "if no door" and handle each case here
+        # each case will have its own goal check
+        # concatenate all actions at the end
         search_problem = Search("bfs", self.world_model, goal_check, "e")
         actions = search_problem.search()
-        debug("FOUND ACTION SEQUENCE")
-        debug(actions)
+        self.policy = actions
         return actions
     
 
+    def _build_task_tree(self) -> None:
+        # Zeroth pass: creating task nodes for every action
+        tree_builder = []
+        for i in range(len(self.policy)):
+            tree_builder.append(TaskNode(IDX_TO_ACTION[self.policy[i]]))
+        # First pass: handling the move_dir_n_steps skills and turning backwards
+        i = 0
+        temp_tree_builder = []
+        while i < len(tree_builder):
+            if self.policy[i] in [0, 1]:
+                node = TaskNode()
+                node.add_child(tree_builder[i])
+                is_backwards = False
+                j = i + 1
+                if self.policy[j] == self.policy[i]:  # backwards turn
+                    is_backwards = True
+                    node.add_child(tree_builder[j])
+                    j += 1
+                while self.policy[j] == 2:
+                    node.add_child(tree_builder[j])
+                    j += 1
+                # if j is still in the same spot, it's just a solo left/right/backwards action
+                if is_backwards and j == i + 2:
+                    node.update_name("backward")
+                    temp_tree_builder.append(node)
+                elif not is_backwards and j == i + 1:
+                    temp_tree_builder.append(tree_builder[i])
+                else:
+                    if is_backwards:
+                        direction = "backward"
+                    else:
+                        direction = "left" if self.policy[i] == 0 else "right"
+                    distance = j - i - 2 if is_backwards else j - i - 1
+                    node.update_name(f"move_{direction}_{distance}_steps")
+                    temp_tree_builder.append(node)
+                i = j
+            elif self.policy[i] == 2:
+                node = TaskNode()
+                node.add_child(tree_builder[i])
+                j = i + 1
+                while self.policy[j] == 2:
+                    node.add_child(tree_builder[j])
+                    j += 1
+                if j == i + 1:  # if in same spot, solo move forward node
+                    temp_tree_builder.append(tree_builder[i])
+                else:
+                    distance = j - i
+                    node.update_name(f"move_forward_{distance}_steps")
+                    temp_tree_builder.append(node)
+                i = j
+            else:
+                temp_tree_builder.append(tree_builder[i])
+                i += 1
+        tree_builder = temp_tree_builder
+        # Second pass: handling the go-to actions
+        i = 0
+        temp_tree_builder = []
+        env_copy = copy.deepcopy(self.world_model)
+        env_copy.reset()
+        while i < len(tree_builder):
+            name = tree_builder[i].name
+            if "move" in name:
+                node = TaskNode()
+                node.add_child(tree_builder[i])
+                j = i + 1
+                next_name = tree_builder[j].name
+                while "move" in next_name or "left" in next_name or "right" in next_name or "backward" in next_name:
+                    node.add_child(tree_builder[j])
+                    j += 1
+                    next_name = tree_builder[j].name
+                if j == i + 1:  # if j is in the same spot, it is just a solo move action
+                    temp_tree_builder.append(tree_builder[i])
+                    tree_builder[i].execute(env_copy)  # keep the actions moving
+                else:
+                    obj_in_front = node.execute(env_copy)
+                    obj_type = OBJ_NAME_MAPPING[type(obj_in_front)]
+                    if obj_type in ["wall", "lava"]:
+                        node.update_name(f"go_to_{obj_type}")
+                    else:
+                        node.update_name(f"go_to_{obj_in_front.color}_{obj_type}")
+                    temp_tree_builder.append(node)
+                i = j
+            else:
+                temp_tree_builder.append(tree_builder[i])
+                tree_builder[i].execute(env_copy)  # just to move the actions along
+                i += 1
+        tree_builder = temp_tree_builder
+        # Third pass: higher level pick up/put down/open/close/unlock actions
+        i = 0
+        temp_tree_builder = []
+        env_copy = copy.deepcopy(self.world_model)
+        env_copy.reset()
+        while i < len(tree_builder):
+            name = tree_builder[i].name
+            if name in ["pickup", "drop", "toggle"]:  # encountered if solo pickup/drop/toggle action right off the bat
+                tree_builder[i].execute(env_copy)
+                temp_tree_builder.append(tree_builder[i])
+                i += 1
+            else:
+                node = TaskNode()
+                node.add_child(tree_builder[i])
+                j = i + 1
+                next_name = tree_builder[j].name
+                while not ("pickup" in next_name or "drop" in next_name or "toggle" in next_name):
+                    node.add_child(tree_builder[j])
+                    j += 1
+                    next_name = tree_builder[j].name
+                obj_in_front_before = node.execute(env_copy)
+                node.add_child(tree_builder[j])  # last child is always the pickup/drop/toggle primitive action
+                obj_in_front_after = tree_builder[j].execute(env_copy)
+                if next_name == "pickup":
+                    obj_type = OBJ_NAME_MAPPING[type(obj_in_front_before)]
+                    obj_color = obj_in_front_before.color
+                    node.update_name(f"pickup_{obj_color}_{obj_type}")
+                elif next_name == "drop":
+                    obj_type = OBJ_NAME_MAPPING[type(obj_in_front_after)]
+                    obj_color = obj_in_front_after.color
+                    node.update_name(f"put_down_{obj_color}_{obj_type}")
+                elif next_name == "toggle":
+                    obj_type = OBJ_NAME_MAPPING[type(obj_in_front_before)]
+                    obj_color = obj_in_front_before.color
+                    if obj_type == "door":
+                        if obj_in_front_before.is_locked and not obj_in_front_after.is_locked:
+                            node.update_name(f"unlock_{obj_color}_door")
+                        elif obj_in_front_after.is_open:
+                            node.update_name(f"open_{obj_color}_door")  # FIXME: why not 'unlock' but 'open'?
+                        elif not obj_in_front_after.is_open:
+                            node.update_name(f"close_{obj_color}_door")
+                    else:  # this means we opened a box and box disappeared from cell (cannot close boxes)
+                        node.update_name(f"open_{obj_color}_box")
+                temp_tree_builder.append(node)
+                i = j + 1
+        tree_builder = temp_tree_builder
+        # Last pass: combine everything under the main task umbrella
+        task_tree = TaskNode(self.task)
+        for i in range(len(tree_builder)):
+            task_tree.add_child(tree_builder[i])
+        self.task_tree = task_tree
+    
+
     def generate_modified_policy(self, skill_descs: List[str]) -> str:
-        self.policy = [2, 2, 2, 0, 2, 3, 0, 2, 2, 2, 1, 5, 1, 4, 0, 2, 3]  # FIXME: BFS TAKES FOREVERRR
-        obs_act_seq = self._generate_obs_act_sequence(self.policy)
+        if self.task_tree is None:
+            if self.policy is None:
+                self._find_optimal_policy()
+            self._build_task_tree()
+        obs_act_seq = self._generate_obs_act_sequence(self.task_tree)
         policy_desc = self.llm.get_new_plan_based_on_skills(self.task, obs_act_seq, skill_descs)
         return policy_desc
 
 
-    def _get_subset_of_skills(self):
+    def _get_subset_of_skills(self) -> List[str]:
         # TODO: hmmmmm
-        return ["move_forward_3_steps", "go_to_blue_ball", "pickup_green_key", "unlock_purple_door"]
+        return self.skills
     
     
-    def _generate_obs_act_sequence(self, action_sequence: List[int]) -> str:
+    def _generate_obs_act_sequence(self, action_sequence: Union[List[int], TaskNode]) -> str:
+        if isinstance(action_sequence, list):
+            sequence = action_sequence
+        else:
+            sequence = action_sequence.children  # highest level skills, whatever those may be
         obs_act_seq = ""
-        obs, _ = self.world_model.reset()
+        env_copy = copy.deepcopy(self.world_model)
+        obs, _ = env_copy.reset()
         idx = 0
-        while idx < len(action_sequence):
+        while idx < len(sequence):
             obs_act_seq += f"Obs {idx + 1}: "
             obs_act_seq += get_obs_desc(obs, detail = 3)
             obs_act_seq += "\n"
             obs_act_seq += f"Act {idx + 1}: "
-            obs_act_seq += IDX_TO_ACTION[action_sequence[idx]]
+            if isinstance(action_sequence, list):
+                obs_act_seq += IDX_TO_ACTION[sequence[idx]]
+                obs, _, _, _, _ = env_copy.step(action_sequence[idx])
+            else:
+                obs_act_seq += sequence[idx].name
+                sequence[idx].execute(env_copy)
+                obs = env_copy.gen_obs()
             obs_act_seq += "\n"
-            obs, _, _, _, _ = self.world_model.step(action_sequence[idx])
             idx += 1
         obs_act_seq += "Final obs: "
         obs_act_seq += get_obs_desc(obs, detail = 3)
         return obs_act_seq
     
 
-    def _retrieve_actions_from_skill_func(self, skill: str):
-        debug(skill)
+    def _retrieve_actions_from_skill_func(self, skill: str) -> List[int]:
         skill_func = self.world_model.allowable_skills[skill]
         basic_skill = True
         prefixes = ["go_to_", "pickup_", "open_", "unlock_", "close_"]
@@ -158,12 +319,9 @@ class Agent:
                 basic_skill = False
                 break
         if basic_skill:  # covers primitive MiniGrid skills, `move` skills, and `put_down` skills
-            debug("basic skill")
             actions = skill_func()
         else:
             # TODO: what if there are multiple objects that match color and target type? most obvious example is wall
-            debug("intended color and target")
-            debug(color, target)
             if target == Door:
                 search_list = self.world_model.doors
             elif target == Key:
@@ -175,8 +333,6 @@ class Agent:
                     target_pos = obj.cur_pos if obj.cur_pos is not None else obj.init_pos
                     break
             actions = skill_func(self.world_model, target_pos)
-            debug("resulting actions")
-            debug(actions)
         return actions
     
 
@@ -208,8 +364,6 @@ class Principal(Agent):
     def listen(self, message: Message) -> Message:
         if message.type == MessageType.SKILL_DESC:
             new_plan = self.generate_modified_policy(message.content)
-            debug("NEW PLAN")
-            debug(new_plan)
             return Message(MessageType.LANGUAGE_PLAN, new_plan)
         # TODO: add other listens
 

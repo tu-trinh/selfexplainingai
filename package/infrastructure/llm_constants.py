@@ -1,3 +1,6 @@
+from package.infrastructure.env_constants import MAX_ROOM_SIZE, COLOR_NAMES, OBJ_NAME_MAPPING
+
+
 TEMPERATURE = 0.1
 MAX_NEW_TOKENS = 100
 NUM_ACTIONS_GENERATED = 1
@@ -27,6 +30,8 @@ Observation 5: You are facing right. Your field of vision is a 3x3 square in whi
 Chosen action 5: 7. Pick up the yellow ball.
 [SUCCESS]
 """
+TASK_PROLOGUE = "\nYOUR TASK IS: "
+INSTRUCTION_PROLOGUE = " To do so, follow these steps exactly: "
 PROMPT_FORMAT_INSTRUCTION = """Below are previous observations you've seen in trying to achieve your task and your chosen action for each.\n"""
 INQUIRY = """\nWhat action do you want to take in this timestep? Choose from the following list.
 1. Explore what is around.
@@ -42,8 +47,6 @@ INQUIRY = """\nWhat action do you want to take in this timestep? Choose from the
 11. Close the [COLOR] [OBJECT].
 Note that only a subset of these actions will be valid given the observation you're currently seeing; use your best judgment. Your response should ONLY be EXACTLY ONE of the choices, such as \"1. Explore what is around.\", or \"6. Go to the blue box.\" (note that you must fill in the [COLOR] and [OBJECT] brackets in such cases). If none of the actions seem feasible, say \"I'm stumped.\""""
 # INQUIRY = """\nWhat action do you want to take in this timestep? Choose ONE ACTION from the list you are given. Format your response concisely, EXACTLY like in the example trajectory above; for example, if you want to explore, say \"1. Explore what is around.\" If you see a blue box and you want to go to it, say \"6. Go to the blue box.\" (note that you must fill in the \"[COLOR]\" and \"[OBJECT]\" brackets in such cases) If none of the actions seem feasible, say, \"I'm stumped.\""""
-TASK_PROLOGUE = "\nYOUR TASK IS: "
-INSTRUCTION_PROLOGUE = " To do so, follow these steps exactly: "
 
 DIFFERENCES_MAPPING = {
     "A": "Environment two is smaller",
@@ -76,10 +79,67 @@ Skill choices:
 """
 
 GET_NEW_PLAN_BASED_ON_SKILLS_QUESTION = """
-Below is a sequence of observations and corresponding actions taken by AI agent 1 in executing the following task: {task}. The observations should be interpreted as environment descriptions told to agent 1. Now there is another AI agent, agent 2, who has a (potentially) different set of skills but who also wants to achieve the same task. Given agent 1's sequence and agent 2's skills, please come up with a sequence of skills agent 2 should execute that will help it achieve the task in as few steps as possible. Your answer should just be comma-separated skills chosen from the list; don't say anything else.
+Below you will be given a sequence of observations and corresponding actions taken by agent 1 in executing the following task: {task}. The observations should be interpreted as environment descriptions told to agent 1. There is a second agent, agent 2, who has a (potentially) different set of skills compared to agent 1 but who also wants to achieve the same task. Given agent 1's trajectory and agent 2's skills, please come up with a skill sequence for agent 2 that will help it achieve the task in as few steps as possible. Your answer should just be comma-separated skills chosen from the list; don't say anything else.
 Agent 1 sequence of observations (obs) and actions (act):
 {obs_act_seq}
 
 Agent 2 skills:
 {skill_choices}
+"""
+
+SKILL_CLASSIFICATION = {
+    0: ["left", "right", "forward", "pickup", "drop", "toggle"],
+    1: [f"move_{dir}_{n}_steps" for dir in ["left", "right", "forward", "backward"] for n in range(1, MAX_ROOM_SIZE - 2)] + ["backward"],
+    2: [f"go_to_{color}_{obj}" for color in COLOR_NAMES for obj in OBJ_NAME_MAPPING.values()],
+    3: [f"pickup_{color}_{obj}" for color in COLOR_NAMES for obj in OBJ_NAME_MAPPING.values()] + [f"open_{color}_{obj}" for color in COLOR_NAMES for obj in ["door", "box"]] + [f"unlock_{color}_door" for color in COLOR_NAMES] + [f"close_{color}_door" for color in COLOR_NAMES]
+}
+BUILD_SKILL_TREE_PROMPT = """
+Below you will be given a sequence of observations and corresponding actions ('obs-act sequence') taken by an AI agent in executing this task: {task}. Please help me group this sequence of actions into increasingly higher levels of abstract actions. Action names and the levels they belong to are here:
+{skill_classification}
+
+You will see that the actions provided in the obs-act sequence are all at the lowest level of abstraction. Some of them can be grouped into actions at the next higher level. Here are some examples of what I mean:
+- Three 'forward' actions (level 0) can be grouped into a 'move_forward_3_steps' action (level 1).
+- If the agent finds itself facing a blue ball after taking a 'move_forward_3_steps' action and a 'move_left_4_steps' action (both level 1), then they can both be grouped into a `go_to_blue_ball` action (level 2).
+- If the agent goes towards a yellow box and then picks it up, this can be grouped into the 'pickup_yellow_box' action (level 3), which directly consists of a 'go_to_yellow_box' action (level 2) and a 'pickup' action (level 0).
+You can start to see how these actions can be grouped hierarchically together in a tree-like structure.
+
+Given the obs-act sequence below, please respond with the grouped actions in nested JSON format, where each key is a number indicating the action number/order and each value is a dictionary with two fields: 'name', indicating the action name, and 'children', a list of similarly-formatted JSONs of the constituent lower level actions. If the action is already level 0, this list should be empty. Do not mix up action numbering between abstraction levels—each abstraction level has its own action counter. As an example, here is how you might format your response if the agent has the simple task of picking up a yellow box (using my previous example):
+{
+	"0":{
+		"name":"pickup_yellow_box",
+		"children":[
+			{
+				"0":{
+					"name":"go_to_yellow_box",
+					"children":[
+						{
+							"0":{
+								"name":"move_right_2_steps",
+								"children":[
+									{
+										"0":{
+											"name":"right",
+											"children":[]
+										},
+										"1":{
+											"name":"right",
+											"children":[]
+										}
+									}
+								]
+							}
+						}
+					]
+				},
+				"1":{
+					"name":"pickup",
+					"children":[]
+				}
+			}
+		]
+	}
+}
+
+Now it is your turn! Here is the sequence of observations (obs) and actions (act). (Observations should be interpreted as environment descriptions told to the agent.):
+{obs_act_seq}
 """

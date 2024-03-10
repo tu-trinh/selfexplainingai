@@ -6,12 +6,12 @@ import copy
 
 
 """
-Primitive Minigrid Actions
+(Extended) Primitive Minigrid Actions
 """
-def turn_left():
+def left():
     return [0]
 
-def turn_right():
+def right():
     return [1]
 
 def forward():
@@ -30,6 +30,9 @@ def toggle():
 """
 Basic directional movement
 """
+def backward():
+    return [0, 0]
+
 def move_direction_n_steps_hof(direction: str, n: int):
     assert direction in ["left", "right", "forward", "backward"]
     assert 1 <= n <= MAX_ROOM_SIZE - 3
@@ -138,6 +141,12 @@ def close_color_door_hof(color: str):
         return actions
     
     return close_color_door
+
+
+# TODO? Even higher level skills?
+# - Unblock door
+# - Put on fireproof shoes
+# ...?
 
 
 """

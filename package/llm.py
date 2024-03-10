@@ -1,4 +1,6 @@
 from package.infrastructure.access_tokens import *
+from package.infrastructure.llm_constants import *
+from package.infrastructure.basic_utils import debug
 
 import openai
 import llmengine
@@ -185,9 +187,6 @@ class LLM:
         with open("package/configs/skills.txt", "r") as f:
             skill_choices = [skill.strip() for skill in f.readlines()]
         prompt = GET_SKILL_NAME_QUESTION.format(obs_act_seq = obs_act_seq, skill_choices = "\n".join(skill_choices)).strip()
-        debug("PROMPT")
-        debug(prompt)
-        debug("ANSWER")
         if self.query_source == "openai":
             try:
                 response_obj = openai.ChatCompletion.create(
@@ -196,7 +195,6 @@ class LLM:
                     temperature = TEMPERATURE
                 )
                 response = response_obj["choices"][0]["message"]["content"]
-                debug(response)
             except Exception as e:
                 print("Could not complete LLM request due to", e)
                 response = None
@@ -205,7 +203,7 @@ class LLM:
 
     def get_new_plan_based_on_skills(self, task, obs_act_seq, skills):
         prompt = GET_NEW_PLAN_BASED_ON_SKILLS_QUESTION.format(task = task, obs_act_seq = obs_act_seq, skill_choices = "\n".join(skills)).strip()
-        debug("prompt")
+        debug("Asked the model:")
         debug(prompt)
         if self.query_source == "openai":
             try:

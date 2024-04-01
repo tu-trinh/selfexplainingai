@@ -39,16 +39,7 @@ if __name__ == "__main__":
     assert xor(args.speaker_task, args.listener_task, none_check = False), "Exactly one type of task needed"
 
     principal, attendant = make_agents(f"./package/configs/{yaml_builder(args)}")
-    # time.sleep(5)
-    # s = time.time()
-    policy = [0, 3, 1, 2, 2, 2, 4, 0, 2, 3, 0, 2, 2, 2, 1, 5, 1, 4, 0, 2, 3]
-    principal.policy = policy
-    principal._build_task_tree()
-    debug(principal.task_tree)
-    # message = principal.listen(Message(MessageType.SKILL_DESC, attendant.skills))
-    # debug(message)
-    # e = time.time()
     # debug("Finding optimal solution took", round((e - s) / 60, 3), "minutes")
-    # game = Game(principal, attendant)
-    # game.run("i", "a")
+    game = Game(principal, attendant)
+    game.run("i", "a")
     # game.evaluate("a", "p")

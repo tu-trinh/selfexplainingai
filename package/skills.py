@@ -1,6 +1,10 @@
 from package.infrastructure.env_constants import DIR_TO_VEC, MAX_ROOM_SIZE, COLOR_NAMES, OBJ_NAME_MAPPING
+from package.search import Search, State
+from package.infrastructure.basic_utils import manhattan_distance, debug
 
-from typing import Tuple
+from minigrid.core.world_object import Wall
+
+from typing import Tuple, List
 from gymnasium import Env
 import copy
 
@@ -150,9 +154,9 @@ def close_color_door_hof(color: str):
 
 
 """
-Helper skills
+Helper methods
 """
-def _find_path(master_env: Env, object_pos: Tuple[int, int], action_type: str, can_overlap: bool = False, reset: bool = True):
+def _find_path(master_env: Env, object_pos: Tuple[int, int], action_type: str, forbidden_actions: List[int] = [], can_overlap: bool = False, reset: bool = True):
     env = copy.deepcopy(master_env)
     if reset:
         env.reset()
@@ -167,8 +171,36 @@ def _find_path(master_env: Env, object_pos: Tuple[int, int], action_type: str, c
     elif action_type == "pickup":
         def goal_check(state: State):
             return manhattan_distance(state.loc, object_pos) == 1 and state.carrying == state.grid.get(*object_pos)
-    search_problem = Search("bfs", env, goal_check, "s")
+    elif action_type == "putdown":
+        def goal_check(state: State):  # object_pos here is the door which should not have objects blocking it
+            clear_door, _ = _check_clear_door(state.loc, object_pos, state.grid)
+            return state.carrying is None and clear_door
+    search_problem = Search("bfs", env, goal_check, "s", forbidden_actions)
     actions = search_problem.search()
     if actions is None:  # TODO: idk
         return [0]
     return actions
+
+
+def _check_clear_door(agent_pos, door_pos, grid):
+    dir_to_agent = (agent_pos[0] - door_pos[0], agent_pos[1] - door_pos[1])
+    agent_dir_locs = [False, False, False, False]  # right, below, left, above
+    if dir_to_agent[0] < 0:
+        agent_dir_locs[2] = True
+    elif dir_to_agent[0] > 0:
+        agent_dir_locs[0] = True
+    if dir_to_agent[1] < 0:
+        agent_dir_locs[3] = True
+    elif dir_to_agent[1] > 0:
+        agent_dir_locs[1] = True
+    clear_door = True
+    blocker_obj = None
+    for i, adl in enumerate(agent_dir_locs):
+        if adl:
+            dir_vec = DIR_TO_VEC[i]
+            adj_obj = grid.get(door_pos[0] + dir_vec[0], door_pos[1] + dir_vec[1])
+            if not (adj_obj is None or type(adj_obj) == Wall):
+                clear_door = False
+                blocker_obj = adj_obj
+                break
+    return clear_door, blocker_obj

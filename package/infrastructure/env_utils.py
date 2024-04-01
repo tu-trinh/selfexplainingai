@@ -97,7 +97,7 @@ def get_obs_desc(obs: Dict, left_obs: Dict = None, backwards_obs: Dict = None, r
     1 - list objects in the field of vision, individually
     2 - list objects in the 360 field of vision and their location
     3 - list what is in the field of vision row-by-row and directly at front/left/right
-    4 - list everything cell by cell
+    4 - TODO: list everything cell by cell
     """
     if detail == 1:
         description = f"You are facing {IDX_TO_DIR[obs['direction']]}. Your field of vision is a {AGENT_VIEW_SIZE}x{AGENT_VIEW_SIZE} square in which you are located at the bottom middle. "

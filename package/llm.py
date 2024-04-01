@@ -13,12 +13,12 @@ import requests
 AVAILABLE_QUERY_SOURCES = ["openai", "huggingface", "scale"]
 AVAILABLE_MODEL_SOURCES = ["gpt", "mistral"]
 MODEL_MAPPING = {
-    "gpt": {"openai": "gpt-3.5-turbo"},
+    "gpt": {"openai": "gpt-4-1106-preview"},
     "mistral": {"scale": "mistral-7b-instruct", "huggingface": "mistralai/Mistral-7B-Instruct-v0.2"},
     "mixtral": {"scale": "mixtral-8x7b-instruct", "huggingface": "mistralai/Mixtral-8x7B-Instruct-v0.1"}
 }
 TOKENIZER_MAPPING = {
-    "gpt": "gpt-3.5-turbo",
+    "gpt": "gpt-4-1106-preview",
     "mistral": "mistralai/Mistral-7B-Instruct-v0.1",
     "mixtral": "mistralai/Mixtral-8x7B-Instruct-v0.1"
 }
@@ -183,10 +183,11 @@ class LLM:
             differences.append(DIFFERENCES_MAPPING[diff_letter])
         return ". ".join(differences)
     
-    def get_skill_description(self, obs_act_seq):
+    def get_skill_description(self, obs_act_seq, available_skills):
         with open("package/configs/skills.txt", "r") as f:
             skill_choices = [skill.strip() for skill in f.readlines()]
-        prompt = GET_SKILL_NAME_QUESTION.format(obs_act_seq = obs_act_seq, skill_choices = "\n".join(skill_choices)).strip()
+        prompt = GET_SKILL_NAME_QUESTION.format(obs_act_seq = obs_act_seq, skill_choices = "\n".join(available_skills)).strip()
+        debug(prompt)
         if self.query_source == "openai":
             try:
                 response_obj = openai.ChatCompletion.create(

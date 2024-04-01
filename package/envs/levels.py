@@ -1,4 +1,5 @@
 from package.enums import Variant, Task
+from package.envs.modifications import HeavyDoor, Bridge, FireproofShoes
 from package.infrastructure.env_constants import TANGIBLE_OBJS, PLAYABLE_OBJS, DISTRACTOR_OBJS, COLOR_NAMES
 
 from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Box
@@ -51,10 +52,12 @@ class BaseLevel(ABC):
             elif self.task == Task.PICKUP:
                 index = self.env_seed % len(TANGIBLE_OBJS)
                 self.target_obj_type = TANGIBLE_OBJS[index]
+        object_colors = [cn for cn in COLOR_NAMES if cn != "grey"]
+        index = self.env_seed % len(object_colors)
         if Variant.COLOR in self.disallowed:
-            color = random.choice(list(set(COLOR_NAMES) - set([self.disallowed[Variant.COLOR]])))
+            color = list(set(COLOR_NAMES) - set([self.disallowed[Variant.COLOR]]))[index]
         else:
-            color = random.choice(COLOR_NAMES)
+            color = object_colors[index]
         if self.target_obj_type == Goal:
             self.target_obj = Goal()
             self.target_obj.color = color
@@ -72,9 +75,9 @@ class BaseLevel(ABC):
             if self.task == Task.PUT:
                 idx1 = self.env_seed % len(TANGIBLE_OBJS)
                 idx2 = (self.env_seed + 1) % len(PLAYABLE_OBJS)
-                color1 = random.choice(allowed_colors)
+                color1 = allowed_colors[(self.env_seed + 2) % len(allowed_colors)]
                 allowed_colors.remove(color1)
-                color2 = random.choice(allowed_colors)
+                color2 = allowed_colors[(self.env_seed + 3) % len(allowed_colors)]
                 pickup_obj = TANGIBLE_OBJS[idx1](color = color1)
                 target_obj = PLAYABLE_OBJS[idx2]
                 if target_obj == Goal:
@@ -85,8 +88,8 @@ class BaseLevel(ABC):
                 self.target_objs = [pickup_obj, target_obj]
             elif self.task == Task.COLLECT:
                 collectible_obj = TANGIBLE_OBJS[self.env_seed % len(TANGIBLE_OBJS)]
-                color = random.choice(allowed_colors)
-                for _ in range(len(self.target_objs_pos)):
+                for i in range(len(self.target_objs_pos)):
+                    color = allowed_colors[(self.env_seed + 4 + i) % len(allowed_colors)]
                     self.target_objs.append(collectible_obj(color = color))
             elif self.task == Task.CLUSTER:
                 if len(self.target_objs) <= 5:
@@ -94,36 +97,49 @@ class BaseLevel(ABC):
                 else:
                     num_clusters = random.choice([2, 3])
                 clustered_pos = make_clusters(self.target_objs_pos, num_clusters)
-                if self.env_seed % 2 == 1:
-                    target_color = random.choice(allowed_colors)
+                if self.env_seed % 2 == 1:  # group X-colored objects by type
+                    target_color = allowed_colors[(self.env_seed + 5) % len(allowed_colors)]
                     for i in range(num_clusters):
                         this_cluster = []
+                        this_cluster_type = TANGIBLE_OBJS[(self.env_seed + 6 + i) % len(TANGIBLE_OBJS)]
                         for _ in range(len(clustered_pos[i])):
-                            random_obj = random.choice(TANGIBLE_OBJS)
-                            this_cluster.append(random_obj(color = target_color))
+                            this_cluster.append(this_cluster_type(color = target_color))
                         self.target_objs.append(this_cluster)
-                else:
+                else:  # group X-typed objects by color
                     target_obj = TANGIBLE_OBJS[self.env_seed % len(TANGIBLE_OBJS)]
                     for i in range(num_clusters):
                         this_cluster = []
+                        this_cluster_color = allowed_colors[(self.env_seed + 6 + i) % len(allowed_colors)]
                         for _ in range(len(clustered_pos[i])):
-                            random_obj = target_obj(color = random.choice(allowed_colors))
+                            random_obj = target_obj(color = this_cluster_color)
                             this_cluster.append(random_obj)
                         self.target_objs.append(this_cluster)
                 self.target_objs_pos = clustered_pos
         else:
-            if self.task == Task.CLUSTER:
+            if self.task == Task.PUT:
+                color1 = allowed_colors[(self.env_seed + 3) % len(allowed_colors)]
+                allowed_colors.remove(color1)
+                color2 = allowed_colors[(self.env_seed + 4) % len(allowed_colors)]
+                self.target_objs.append(self.target_obj_types[0](color = color1))
+                self.target_objs.append(self.target_obj_types[1](color = color2))
+            elif self.task == Task.COLLECT:
+                color = allowed_colors[(self.env_seed + 5 + i) % len(allowed_colors)]
+                self.target_objs.extend([obj(color = color) for obj in self.target_obj_types])
+            elif self.task == Task.CLUSTER:
                 reference = copy.deepcopy(self.target_objs_pos)
                 self.target_objs_pos = []
                 pos_idx = 0
-                for obj_cluster in self.target_obj_types:
+                for i, obj_cluster in enumerate(self.target_obj_types):
                     this_cluster = []
-                    this_cluster.extend([obj(color = random.choice(COLOR_NAMES)) for obj in obj_cluster])
+                    if self.env_seed % 2 == 1:  # group X-colored objects by type
+                        all_object_color = allowed_colors[(self.env_seed + 7) % len(allowed_colors)]
+                        this_cluster.extend([obj(color = all_object_color) for obj in obj_cluster])
+                    else:  # group X-typed objects by color
+                        this_cluster_color = allowed_colors[(self.env_seed + 7 + i) % len(allowed_colors)]
+                        this_cluster.extend([obj(color = this_cluster_color) for obj in obj_cluster])
                     self.target_objs.append(this_cluster)
                     self.target_objs_pos.append(reference[pos_idx : pos_idx + len(this_cluster)])
                     pos_idx += len(this_cluster)
-            else:
-                self.target_objs.extend([obj(color = random.choice(COLOR_NAMES)) for obj in self.target_obj_types])
 
 
     def _set_agent_start_position(self, allowed_positions: set = None) -> None:
@@ -265,9 +281,12 @@ class BaseLevel(ABC):
         if Variant.OBJECTS in self.disallowed:
             disallowed_blocker_obj, disallowed_blocker_color = self.disallowed[Variant.OBJECTS][0][-1]
             disallowed_blocker_obj_config.add((disallowed_blocker_obj, disallowed_blocker_color))
+        for existing_obj, _ in self.objs:
+            disallowed_blocker_obj_config.add((type(existing_obj), existing_obj.color))
         while (type(blocker_obj), blocker_obj.color) in disallowed_blocker_obj_config:
             blocker_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(COLOR_NAMES))
         self.objs.append((blocker_obj, blocker_obj_pos))
+        self.blocker_obj = blocker_obj
 
 
     def _build_walls_and_doors_based_on_target(self) -> Tuple[int, int, int, int]:
@@ -571,6 +590,7 @@ class BaseLevel(ABC):
                 dist_obj_pos = random.choice(list(self.all_possible_pos))
             self.all_possible_pos -= set([dist_obj_pos])
             self.objs.append((dist_obj, dist_obj_pos))
+            self.disallowed_obj_config.add((type(dist_obj), dist_obj.color))
 
 
     def _determine_num_distractors(self, lb: int, ub: int) -> None:
@@ -651,6 +671,8 @@ class DistractorsLevel(BaseLevel):
             self.disallowed_obj_config = set([(type(self.target_obj), self.target_obj.color)])
         else:
             self.disallowed_obj_config = set([(type(to), to.color) for to in flatten_list(self.target_objs)])
+        for existing_obj, _ in self.objs:
+            self.disallowed_obj_config.add((type(existing_obj), existing_obj.color))
         if Variant.OBJECTS in self.disallowed:
             self.disallowed_obj_config.update(self.disallowed[Variant.OBJECTS][0])
         self._determine_num_distractors(1, self.room_size - 3)
@@ -801,6 +823,8 @@ class RoomDoorKeyLevel(BaseLevel):
             self.disallowed_obj_config = set([(type(to), to.color) for to in flatten_list(self.target_objs)])
         if Variant.OBJECTS in self.disallowed:
             self.disallowed_obj_config.update(self.disallowed[Variant.OBJECTS][0])
+        for existing_obj, _ in self.objs:
+            self.disallowed_obj_config.add((type(existing_obj), existing_obj.color))
         self._determine_num_distractors(1, self.room_size - 3)
         self._make_distractor_objects(self.inner_cells)
     
@@ -881,6 +905,8 @@ class TreasureIslandLevel(BaseLevel):
             self.disallowed_obj_config = set([(type(to), to.color) for to in flatten_list(self.target_objs)])
         if Variant.OBJECTS in self.disallowed:
             self.disallowed_obj_config.update(self.disallowed[Variant.OBJECTS][0])
+        for existing_obj, _ in self.objs:
+            self.disallowed_obj_config.add((type(existing_obj), existing_obj.color))
         self._make_distractor_objects(self.inner_cells)
     
 
@@ -970,6 +996,8 @@ class BossLevel(BaseLevel):
             self.disallowed_obj_config = set([(type(obj), obj.color) for obj in flatten_list(self.target_objs)])
         if Variant.OBJECTS in self.disallowed:
             self.disallowed_obj_config.update(self.disallowed[Variant.OBJECTS][0])
+        for existing_obj, _ in self.objs:
+            self.disallowed_obj_config.add((type(existing_obj), existing_obj.color))
         for i in range(self.num_distractors):
             actually_lava = random.choice([True, False])
             if actually_lava:

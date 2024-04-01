@@ -82,5 +82,14 @@ class TaskNode:
         while not subset:
             alpha += 0.1
             subset = helper(self)
+        max_move_dists = {"right": 0, "backward": 0, "left": 0, "forward": 0}
+        for skill in subset:
+            if skill.startswith("move"):
+                direction = skill.split("_")[1]
+                dist = int(skill.split("_")[2])
+                max_move_dists[direction] = max(max_move_dists[direction], dist)
+        for direction in max_move_dists:
+            for d in range(1, max_move_dists[direction]):
+                subset.append(f"move_{direction}_{d}_steps")
         return list(set(subset))
     

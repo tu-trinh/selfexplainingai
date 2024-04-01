@@ -1,13 +1,15 @@
 from package.trajectories import Trajectory
 from package.message import Message
-from package.enums import MessageType
+from package.enums import MessageType, Task
 from package.search import Search
 from package.llm import LLM
 import package.reward_functions as REWARD_FUNCTIONS
+from package.skills import _find_path, _check_clear_door
 from package.infrastructure.basic_utils import debug
 from package.infrastructure.env_utils import get_obs_desc
 from package.infrastructure.env_constants import IDX_TO_ACTION, OBJ_NAME_MAPPING
 from package.task_tree import TaskNode
+from package.envs.modifications import Bridge
 
 from minigrid.wrappers import FullyObsWrapper
 from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box, WorldObj
@@ -70,18 +72,14 @@ class Agent:
         return items
 
 
-    def execute_actions(self, actions: List[int]) -> Trajectory:
-        traj = Trajectory()
-        obs, _ = self.world_model.reset()
+    def execute_actions(self, actions: List[int], env_copy: MiniGridEnv = None) -> None:
+        if env_copy is None:
+            env = self.world_model
+            self.world_model.reset()
+        else:
+            env = env_copy
         for action in actions:
-            next_obs, reward, terminated, truncated, info = self.act(action)
-            trans = Transition(obs, action, reward, next_obs, terminated, truncated, info)
-            traj.add_transition(trans)
-            if not terminated:
-                obs = next_obs
-            else:
-                break
-        return traj
+            env.step(action)
 
 
     def speak(self, *args, **kwargs):
@@ -100,30 +98,105 @@ class Agent:
 
 
     def generate_skill_descriptions(self) -> List[str]:
+        return self.skills
         skill_descs = []
         skill_subset = self._get_subset_of_skills()
-        # TODO: figure out how to select skills for description
         for skill in skill_subset:
             debug("Current skill:", skill)
             actions = self._retrieve_actions_from_skill_func(skill)
-            skill_descs.append(skill)
             obs_act_seq = self._generate_obs_act_sequence(actions)
-            skill_desc = self.llm.get_skill_description(obs_act_seq)
+            skill_desc = self.llm.get_skill_description(obs_act_seq, self.skills)
             debug("LLM called it:", skill_desc)
             skill_descs.append(skill_desc)
+            debug()
         return skill_descs
 
 
     def _find_optimal_policy(self) -> List[int]:
-        def goal_check(env: MiniGridEnv):
-            return self.calculate_reward(env)
-        # TODO: do the high level planning here. probably can group into "if door" "if no door" and handle each case here
-        # each case will have its own goal check
-        # concatenate all actions at the end
-        search_problem = Search("bfs", self.world_model, goal_check, "e")
-        actions = search_problem.search()
-        self.policy = actions
-        return actions
+        # def goal_check(env: MiniGridEnv):
+            # return self.calculate_reward(env)
+        # search_problem = Search("bfs", self.world_model, goal_check, "e")
+        # actions = search_problem.search()
+        # START ANEW!!! #
+        # FIXME: must handle multiple target objects :')
+        all_actions = []
+        world_model_copy = copy.deepcopy(self.world_model)
+        world_model_copy.reset()
+        if len(world_model_copy.doors) != 0:  # some door to handle here
+            # FIXME: must handle mult rooms and boss levels where there are multiple doors
+            door, door_pos = self.world_model.doors[0]
+            clear_door, blocker_obj = _check_clear_door(world_model_copy.agent_start_pos, door_pos, world_model_copy.grid)
+            if hasattr(self.world_model, "blocker_obj") or not clear_door:
+                # go to and pick up the blocking object
+                if blocker_obj is None:
+                    blocker_obj = self.world_model.blocker_obj
+                actions = _find_path(world_model_copy, blocker_obj.init_pos, "goto", reset = False, forbidden_actions = [3, 4, 5]) + [3]
+                self.execute_actions(actions, world_model_copy)
+                all_actions.extend(actions)
+                debug("PICKING UP BLOCKING OBJECT")
+                debug(actions)
+                # put down the object somewhere
+                actions = _find_path(world_model_copy, door_pos, "putdown", reset = False, forbidden_actions = [3, 5])
+                self.execute_actions(actions, world_model_copy)
+                all_actions.extend(actions)
+                debug("PUTTING DOWN BLOCKING OBJECT")
+                debug(actions)
+            door_initially_locked = door.is_locked
+            if door_initially_locked:
+                if len(self.world_model.keys) == 0:  # hidden key
+                    for obj, pos in self.world_model.objs:
+                        if type(obj) == Box:
+                            box_pos = pos
+                            break
+                    # find and open the box and get the key inside
+                    actions = _find_path(world_model_copy, box_pos, "goto", reset = False, forbidden_actions = [3, 4, 5]) + [5, 3]
+                    self.execute_actions(actions, world_model_copy)
+                    all_actions.extend(actions)
+                    debug("OPENING BOX TO GET KEY")
+                    debug(actions)
+                else:  # normal key lying around
+                    for key, pos in self.world_model.keys:
+                        if key.color == door.color:
+                            key_pos = pos
+                            break
+                    actions = _find_path(world_model_copy, key_pos, "goto", reset = False, forbidden_actions = [3, 4, 5]) + [3]
+                    self.execute_actions(actions, world_model_copy)
+                    all_actions.extend(actions)
+                    debug("PICKING UP THE KEY")
+                    debug(actions)
+            # go to and open the door
+            actions = _find_path(world_model_copy, door_pos, "goto", reset = False, forbidden_actions = [3, 4, 5]) + [5]
+            self.execute_actions(actions, world_model_copy)
+            all_actions.extend(actions)
+            debug("OPENING THE DOOR")
+            debug(actions)
+            if door_initially_locked:  # must put down key that was used to unlock the door
+                actions = _find_path(world_model_copy, door_pos, "putdown", reset = False, forbidden_actions = [3, 5])
+                self.execute_actions(actions, world_model_copy)
+                all_actions.extend(actions)
+                debug("PUTTING DOWN UNLOCKING KEY")
+                debug(actions)
+        else:
+            bridge_pos = None
+            for obj, pos in self.world_model.objs:
+                if type(obj) == Bridge:
+                    bridge_pos = pos
+                    break
+            if bridge_pos:  # must go to bridge first before object
+                actions = _find_path(world_model_copy, bridge_pos, "goto", can_overlap = True, reset = False, forbidden_actions = [3, 4, 5])
+                self.execute_actions(actions, world_model_copy)
+                all_actions.extend(actions)
+                debug("GOING TO BRIDGE")
+                debug(actions)
+        # if all clear / finally, just go to the object
+        actions = _find_path(world_model_copy, self.world_model.target_obj_pos, "goto", can_overlap = type(self.world_model.target_obj) == Goal, reset = False, forbidden_actions = [3, 4, 5])
+        if self.world_model.task == Task.PICKUP:
+            actions += [3]
+        all_actions.extend(actions)
+        debug("GOING TO OBJECT")
+        debug(actions)
+        self.policy = all_actions
+        return all_actions
     
 
     def _build_task_tree(self) -> None:
@@ -282,6 +355,7 @@ class Agent:
     
     
     def _generate_obs_act_sequence(self, action_sequence: Union[List[int], TaskNode]) -> str:
+        detail_level = 1
         if isinstance(action_sequence, list):
             sequence = action_sequence
         else:
@@ -292,7 +366,7 @@ class Agent:
         idx = 0
         while idx < len(sequence):
             obs_act_seq += f"Obs {idx + 1}: "
-            obs_act_seq += get_obs_desc(obs, detail = 3)
+            obs_act_seq += get_obs_desc(obs, detail = detail_level)
             obs_act_seq += "\n"
             obs_act_seq += f"Act {idx + 1}: "
             if isinstance(action_sequence, list):
@@ -305,7 +379,7 @@ class Agent:
             obs_act_seq += "\n"
             idx += 1
         obs_act_seq += "Final obs: "
-        obs_act_seq += get_obs_desc(obs, detail = 3)
+        obs_act_seq += get_obs_desc(obs, detail = detail_level)
         return obs_act_seq
     
 

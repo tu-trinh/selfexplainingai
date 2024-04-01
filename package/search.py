@@ -48,7 +48,7 @@ class State:
         grid_components = tuple(self.hash_helper(obj) for obj in self.grid.grid)
         return hash((agent_components, carrying_components, grid_components))
     
-    def get_available_actions(self):
+    def get_available_actions(self, forbidden_actions = []):
         actions = [0, 1, 2]
         dir_vec = DIR_TO_VEC[self.dir]
         in_front = self.grid.get(self.loc[0] + dir_vec[0], self.loc[1] + dir_vec[1])
@@ -66,6 +66,11 @@ class State:
                 actions.append(5)
         if (in_front is not None) and (not type(in_front) in [Goal]) and not (type(in_front) == Door and in_front.is_open):  # can't move forward
             actions.remove(2)
+        for action in forbidden_actions:
+            try:
+                actions.remove(action)
+            except Exception:
+                pass
         return actions
 
 
@@ -77,12 +82,13 @@ class StateWrapper:
 
 
 class Search:
-    def __init__(self, type: str, env: Env, goal_check: Callable[[Union[State, MiniGridEnv]], bool], check_unit: str):
+    def __init__(self, type: str, env: Env, goal_check: Callable[[Union[State, MiniGridEnv]], bool], check_unit: str, forbidden_actions: List[int]):
         self.type = type
         if self.type == "bfs":
             self.fringe = deque()
         self.goal_check = goal_check
         self.check_unit = check_unit  # does goal check take in "s" state or "e" environment
+        self.forbidden_actions = forbidden_actions
         start_state_wrapper = StateWrapper(env, [])
         self.add_to_fringe(start_state_wrapper)
     
@@ -158,7 +164,7 @@ class Search:
                 # else:
                     # debug("ACTIONS NEEDED TO REACH BELOW STATE")
                     # debug([IDX_TO_ACTION[act] for act in action_path])
-                available_actions = state.get_available_actions()
+                available_actions = state.get_available_actions(self.forbidden_actions)
                 for aa in available_actions:
                     env_copy = copy.deepcopy(state_wrapper.env_copy)
                     env_copy.step(aa)

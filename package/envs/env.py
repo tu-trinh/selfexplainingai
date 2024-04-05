@@ -1,6 +1,7 @@
 from package.enums import Task, Level
 from package.envs.tasks import *
 from package.envs.levels import *
+from package.envs.env_wrapper import EnvironmentWrapper
 from package.skills import *
 from package.infrastructure.env_constants import IDX_TO_OBJECT, IDX_TO_COLOR
 from package.infrastructure.basic_utils import debug
@@ -111,6 +112,24 @@ class Environment(MiniGridEnv):
     def step(self, action: int):
         obs, reward, terminated, truncated, info = super().step(action)
         return obs, 0, terminated, truncated, info
+    
+
+    def bind_wrapper(self, wrapper: EnvironmentWrapper):
+        self.env_wrapper = wrapper
+    
+    
+    def reset(self, seed: int = None, **kwargs):
+        if not seed:
+            debug("no seed")
+            return super().reset()
+        else:
+            debug("yes seed")
+            obs, info = self.env_wrapper.reset(seed)
+            if info is None:
+                info = {"new_inst": self.env_wrapper.retrieve_seeded_env(seed)}
+            else:
+                info["new_inst"] = self.env_wrapper.retrieve_seeded_env(seed)
+            return obs, info
     
 
     def set_allowable_skills(self):

@@ -20,5 +20,5 @@ env_specs:
   task: PICKUP
   principal_level: ROOM_DOOR_KEY
   seed: 16
-  # principal_render_mode: human
-  # attendant_render_mode: human
+  principal_render_mode: human
+  attendant_render_mode: human

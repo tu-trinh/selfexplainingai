@@ -1,12 +1,13 @@
 import sys
 sys.path.append("/Users/tutrinh/Work/CHAI/selfexplainingai")
 
-from package.infrastructure.basic_utils import xor, convert_to_enum
+from package.infrastructure.basic_utils import xor, convert_to_enum, flatten_list
 from package.infrastructure.env_constants import ALLOWABLE_VARIANTS
 from package.enums import Task, Level, Variant
 from package.envs.env import *
 from package.agents import *
 import package.reward_functions as REWARD_FUNCTIONS
+from package.envs.env_wrapper import EnvironmentWrapper
 
 from minigrid.manual_control import ManualControl
 from minigrid.minigrid_env import MiniGridEnv
@@ -42,6 +43,7 @@ def make_envs(task: Task,
               seed: int = None,
               principal_render_mode: str = None,
               attendant_render_mode: str = None):
+    # Some asserts
     assert Task.has_value(task), "Env type is not valid"
     assert Level.has_value(principal_level), "Teacher level is not valid"
     assert xor(attendant_level, attendant_variants, attendant_edits) or (not attendant_level and not attendant_variants and not attendant_edits), "Must have only one of `attendant_level`, `attendant_variants`, or `attendant_edits` or none at all"
@@ -51,6 +53,7 @@ def make_envs(task: Task,
         for sv in attendant_variants:
             assert Variant.has_value(sv), f"Attendant variant \"{sv}\" is not valid"
 
+    # Converting things to enums
     task = convert_to_enum(Task, task)
     principal_level = convert_to_enum(Level, principal_level)
     if attendant_level is not None:
@@ -58,11 +61,13 @@ def make_envs(task: Task,
     if attendant_variants is not None:
         attendant_variants = convert_to_enum(Variant, attendant_variants)
 
+    # Making principal env first
     seed = random.randint(0, 10000) if not seed else seed
     p_env_cls = create_env_class(task, principal_level)
     principal_env = p_env_cls(seed, task, principal_level, render_mode = principal_render_mode)
     # time.sleep(10)
     
+    # Creating the disallowed dictionary for variants
     if attendant_variants is not None:
         disallowed = {}  # FIXME: just revisit some of these
         if Variant.COLOR in attendant_variants:
@@ -84,7 +89,10 @@ def make_envs(task: Task,
             disallowed[Variant.NUM_ROOMS] = principal_env.num_rooms if hasattr(principal_env, "num_rooms") else None
         if Variant.ORIENTATION in attendant_variants:
             disallowed[Variant.ORIENTATION] = principal_env
+    else:
+        disallowed = None
 
+    # Making the attendant env
     target_obj_kwargs = {}
     if task in [Task.GOTO, Task.PICKUP]:
         target_obj_kwargs["target_obj"] = type(principal_env.target_obj)
@@ -103,6 +111,16 @@ def make_envs(task: Task,
     else:
         attendant_env = copy.deepcopy(principal_env)
 
+    # Making environment wrappers
+    p_wrapper = EnvironmentWrapper({
+        "task": task, "level": principal_level, "render_mode": principal_render_mode
+    }, principal_env)
+    principal_env.bind_wrapper(p_wrapper)
+    a_wrapper = EnvironmentWrapper({
+        "task": task, "level": attendant_level, **target_obj_kwargs, "disallowed": disallowed, "render_mode": attendant_render_mode
+    }, attendant_env)
+    attendant_env.bind_wrapper(a_wrapper)
+    
     return principal_env, attendant_env
 
 
@@ -131,6 +149,7 @@ def _custom_init(self,
     self.initialize_level()
     self._gen_grid(self.room_size, self.room_size)
     self.set_mission()
+    # self.set_allowable_skills()
     level_cls.assert_successful_creation(self)
 
 

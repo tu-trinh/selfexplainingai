@@ -120,10 +120,8 @@ class Environment(MiniGridEnv):
     
     def reset(self, seed: int = None, **kwargs):
         if not seed:
-            debug("no seed")
             return super().reset()
         else:
-            debug("yes seed")
             obs, info = self.env_wrapper.reset(seed)
             if info is None:
                 info = {"new_inst": self.env_wrapper.retrieve_seeded_env(seed)}
@@ -160,10 +158,17 @@ class Environment(MiniGridEnv):
                     if obj == "door":
                         skills.setdefault(f"close_{color}_{obj}", close_color_door_hof(color))
                         if state == 2:
+                            key_pos = None
                             for obj, _ in self.keys:
                                 if obj.color == color:
                                     key_pos = obj.init_pos
                                     break
+                            if key_pos is None:  # it's hidden inside a box!
+                                for obj, _ in self.objs:
+                                    if type(obj) == Box and obj.contains is not None and obj.contains.color == color:
+                                        key_pos = obj.init_pos
+                                        skills.setdefault(f"put_down_{color}_key", put_down_color_object_hof(color, "key"))
+                                        break
                             skills.setdefault(f"unlock_{color}_{obj}", unlock_color_door_hof(color, key_pos))
                     elif obj == "box":
                         can_pickup_and_drop = True

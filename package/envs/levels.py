@@ -1,6 +1,7 @@
-from package.enums import Variant, Task
+from package.enums import Variant, Task, Level
 from package.envs.modifications import HeavyDoor, Bridge, FireproofShoes
-from package.infrastructure.env_constants import TANGIBLE_OBJS, PLAYABLE_OBJS, DISTRACTOR_OBJS, COLOR_NAMES
+from package.infrastructure.env_constants import TANGIBLE_OBJS, PLAYABLE_OBJS, DISTRACTOR_OBJS, COLOR_NAMES, MAX_NUM_LOCKED_DOORS
+from package.infrastructure.basic_utils import flatten_list
 
 from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Box
 from minigrid.wrappers import NoDeath
@@ -968,6 +969,7 @@ class BossLevel(BaseLevel):
         self._set_agent_start_position()
         for i in range(len(room_cells)):
             if self.agent_start_pos in room_cells[i]:
+                room_cells[i].remove(self.agent_start_pos)
                 for key_color in necessary_key_colors:
                     key_pos = random.choice(list(room_cells[i]))
                     room_cells[i].remove(key_pos)

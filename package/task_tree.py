@@ -4,7 +4,7 @@ from package.infrastructure.env_constants import ACTION_TO_IDX
 from package.infrastructure.basic_utils import debug
 
 from minigrid.minigrid_env import MiniGridEnv
-from minigrid.core.world_object import WorldObj
+from minigrid.core.world_object import WorldObj, Wall
 
 import copy
 from collections import deque
@@ -40,6 +40,8 @@ class TaskNode:
         agent_pos = env.agent_pos
         dir_vec = env.dir_vec
         facing_obj = env.grid.get(agent_pos[0] + dir_vec[0], agent_pos[1] + dir_vec[1])
+        if facing_obj is None or type(facing_obj) == Wall:  # if end of trajectory and agent is facing nothing or a wall, check if it's on a goal
+            facing_obj = env.grid.get(agent_pos[0], agent_pos[1])
         return facing_obj
     
     def __str__(self):
@@ -70,7 +72,7 @@ class TaskNode:
                 if len(node.children) == 0:
                     subset.append(node.name)
                 else:
-                    traverse_further = random.random() < alpha
+                    traverse_further = random.random() < alpha  # higher alpha = higher chance of low level skills
                     if traverse_further:
                         for child in node.children[::-1]:  # so that skills are visited in order
                             stack.append(child)
@@ -79,7 +81,7 @@ class TaskNode:
             return [subtask for subtask in subset if " " not in subtask]  # make sure to not include main task in skill list
         subset = []
         alpha -= 0.1
-        while not subset:
+        while not subset and alpha < 1.0:
             alpha += 0.1
             subset = helper(self)
         max_move_dists = {"right": 0, "backward": 0, "left": 0, "forward": 0}
@@ -89,7 +91,8 @@ class TaskNode:
                 dist = int(skill.split("_")[2])
                 max_move_dists[direction] = max(max_move_dists[direction], dist)
         for direction in max_move_dists:
-            for d in range(1, max_move_dists[direction]):
-                subset.append(f"move_{direction}_{d}_steps")
+            if max_move_dists[direction] > 0:
+                for d in range(1, max_move_dists[direction]):
+                    subset.append(f"move_{direction}_{d}_steps")
         return list(set(subset))
     

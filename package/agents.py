@@ -7,7 +7,7 @@ import package.reward_functions as REWARD_FUNCTIONS
 from package.skills import _find_path, _check_clear_door
 from package.infrastructure.basic_utils import debug
 from package.infrastructure.env_utils import get_obs_desc
-from package.infrastructure.env_constants import IDX_TO_ACTION, OBJ_NAME_MAPPING
+from package.infrastructure.env_constants import IDX_TO_ACTION, OBJ_NAME_MAPPING, NAME_OBJ_MAPPING
 from package.task_tree import TaskNode
 from package.envs.modifications import Bridge
 
@@ -103,7 +103,7 @@ class Agent:
         skill_subset = self._get_subset_of_skills()
         for skill in skill_subset:
             debug("Current skill:", skill)
-            actions = self._retrieve_actions_from_skill_func(skill)
+            setup_actions, actions = self._retrieve_actions_from_skill_func(skill)
             obs_act_seq = self._generate_obs_act_sequence(actions)
             skill_desc = self.llm.get_skill_description(obs_act_seq, self.skills)
             debug("LLM called it:", skill_desc)
@@ -145,7 +145,7 @@ class Agent:
             if door_initially_locked:
                 if len(self.world_model.keys) == 0:  # hidden key
                     for obj, pos in self.world_model.objs:
-                        if type(obj) == Box:
+                        if type(obj) == Box and obj.contains is not None:
                             box_pos = pos
                             break
                     # find and open the box and get the key inside
@@ -207,39 +207,49 @@ class Agent:
         # First pass: handling the move_dir_n_steps skills and turning backwards
         i = 0
         temp_tree_builder = []
+        # debug("FULL POLICY")
+        # debug(list(enumerate(self.policy)))
         while i < len(tree_builder):
             if self.policy[i] in [0, 1]:
+                # debug("Caught", i)
                 node = TaskNode()
                 node.add_child(tree_builder[i])
                 is_backwards = False
                 j = i + 1
-                if self.policy[j] == self.policy[i]:  # backwards turn
-                    is_backwards = True
-                    node.add_child(tree_builder[j])
-                    j += 1
-                while self.policy[j] == 2:
-                    node.add_child(tree_builder[j])
-                    j += 1
-                # if j is still in the same spot, it's just a solo left/right/backwards action
-                if is_backwards and j == i + 2:
-                    node.update_name("backward")
-                    temp_tree_builder.append(node)
-                elif not is_backwards and j == i + 1:
-                    temp_tree_builder.append(tree_builder[i])
-                else:
-                    if is_backwards:
-                        direction = "backward"
+                if j < len(tree_builder):
+                    # debug("j =", j)
+                    if self.policy[j] == self.policy[i]:  # backwards turn
+                        is_backwards = True
+                        node.add_child(tree_builder[j])
+                        j += 1
+                    # debug("j =", j, "(if same then not backwards turn)")
+                    while j < len(tree_builder) and self.policy[j] == 2:
+                        node.add_child(tree_builder[j])
+                        j += 1
+                        # debug("j =", j)
+                    # if j is still in the same spot, it's just a solo left/right/backwards action
+                    if is_backwards and j == i + 2:
+                        node.update_name("backward")
+                        temp_tree_builder.append(node)
+                    elif not is_backwards and j == i + 1:
+                        temp_tree_builder.append(tree_builder[i])
                     else:
-                        direction = "left" if self.policy[i] == 0 else "right"
-                    distance = j - i - 2 if is_backwards else j - i - 1
-                    node.update_name(f"move_{direction}_{distance}_steps")
-                    temp_tree_builder.append(node)
-                i = j
+                        if is_backwards:
+                            direction = "backward"
+                        else:
+                            direction = "left" if self.policy[i] == 0 else "right"
+                        distance = j - i - 2 if is_backwards else j - i - 1
+                        node.update_name(f"move_{direction}_{distance}_steps")
+                        temp_tree_builder.append(node)
+                    i = j
+                else:
+                    temp_tree_builder.append(tree_builder[i])
+                    i += 1
             elif self.policy[i] == 2:
                 node = TaskNode()
                 node.add_child(tree_builder[i])
                 j = i + 1
-                while self.policy[j] == 2:
+                while j < len(self.policy) and self.policy[j] == 2:
                     node.add_child(tree_builder[j])
                     j += 1
                 if j == i + 1:  # if in same spot, solo move forward node
@@ -253,44 +263,62 @@ class Agent:
                 temp_tree_builder.append(tree_builder[i])
                 i += 1
         tree_builder = temp_tree_builder
+        # debug("END OF FIRST PASS")
+        # print([str(t) for t in tree_builder])
         # Second pass: handling the go-to actions
         i = 0
         temp_tree_builder = []
         env_copy = copy.deepcopy(self.world_model)
         env_copy.reset()
+        # debug("FULL TREE BUILDER")
+        # debug(list(enumerate([t.name for t in tree_builder])))
         while i < len(tree_builder):
             name = tree_builder[i].name
-            if "move" in name:
-                node = TaskNode()
-                node.add_child(tree_builder[i])
+            if "move" in name or name == "forward":
+                # debug("Caught", i)
                 j = i + 1
-                next_name = tree_builder[j].name
-                while "move" in next_name or "left" in next_name or "right" in next_name or "backward" in next_name:
-                    node.add_child(tree_builder[j])
-                    j += 1
+                if j < len(tree_builder):
+                    node = TaskNode()
+                    node.add_child(tree_builder[i])
                     next_name = tree_builder[j].name
-                if j == i + 1:  # if j is in the same spot, it is just a solo move action
-                    temp_tree_builder.append(tree_builder[i])
-                    tree_builder[i].execute(env_copy)  # keep the actions moving
-                else:
-                    obj_in_front = node.execute(env_copy)
-                    obj_type = OBJ_NAME_MAPPING[type(obj_in_front)]
-                    if obj_type in ["wall", "lava"]:
-                        node.update_name(f"go_to_{obj_type}")
+                    while "move" in next_name or "left" in next_name or "right" in next_name or "backward" in next_name:
+                        # debug(j)
+                        node.add_child(tree_builder[j])
+                        j += 1
+                        if j >= len(tree_builder):
+                            break
+                        else:
+                            next_name = tree_builder[j].name
+                    if j == i + 1:  # if j is in the same spot, it is just a solo move action
+                        temp_tree_builder.append(tree_builder[i])
+                        tree_builder[i].execute(env_copy)  # keep the actions moving
                     else:
-                        node.update_name(f"go_to_{obj_in_front.color}_{obj_type}")
-                    temp_tree_builder.append(node)
-                i = j
+                        obj_in_front = node.execute(env_copy)
+                        obj_name = OBJ_NAME_MAPPING[type(obj_in_front)]
+                        if obj_name in ["wall", "lava"]:
+                            node.update_name(f"go_to_{obj_name}")
+                        else:
+                            node.update_name(f"go_to_{obj_in_front.color}_{obj_name}")
+                        temp_tree_builder.append(node)
+                    i = j
+                else:
+                    temp_tree_builder.append(tree_builder[i])
+                    tree_builder[i].execute(env_copy)  # just to move the actions along
+                    i += 1
             else:
                 temp_tree_builder.append(tree_builder[i])
                 tree_builder[i].execute(env_copy)  # just to move the actions along
                 i += 1
         tree_builder = temp_tree_builder
+        # debug("END OF SECOND PASS")
+        # print([str(t) for t in tree_builder])
         # Third pass: higher level pick up/put down/open/close/unlock actions
         i = 0
         temp_tree_builder = []
         env_copy = copy.deepcopy(self.world_model)
         env_copy.reset()
+        # debug("FULL TREE BUILDER")
+        # debug(list(enumerate([t.name for t in tree_builder])))
         while i < len(tree_builder):
             name = tree_builder[i].name
             if name in ["pickup", "drop", "toggle"]:  # encountered if solo pickup/drop/toggle action right off the bat
@@ -298,44 +326,56 @@ class Agent:
                 temp_tree_builder.append(tree_builder[i])
                 i += 1
             else:
-                node = TaskNode()
-                node.add_child(tree_builder[i])
                 j = i + 1
-                next_name = tree_builder[j].name
-                while not ("pickup" in next_name or "drop" in next_name or "toggle" in next_name):
-                    node.add_child(tree_builder[j])
-                    j += 1
+                if j < len(tree_builder):
+                    node = TaskNode()
+                    node.add_child(tree_builder[i])
                     next_name = tree_builder[j].name
-                obj_in_front_before = node.execute(env_copy)
-                node.add_child(tree_builder[j])  # last child is always the pickup/drop/toggle primitive action
-                obj_in_front_after = tree_builder[j].execute(env_copy)
-                if next_name == "pickup":
-                    obj_type = OBJ_NAME_MAPPING[type(obj_in_front_before)]
-                    obj_color = obj_in_front_before.color
-                    node.update_name(f"pickup_{obj_color}_{obj_type}")
-                elif next_name == "drop":
-                    obj_type = OBJ_NAME_MAPPING[type(obj_in_front_after)]
-                    obj_color = obj_in_front_after.color
-                    node.update_name(f"put_down_{obj_color}_{obj_type}")
-                elif next_name == "toggle":
-                    obj_type = OBJ_NAME_MAPPING[type(obj_in_front_before)]
-                    obj_color = obj_in_front_before.color
-                    if obj_type == "door":
-                        if obj_in_front_before.is_locked and not obj_in_front_after.is_locked:
-                            node.update_name(f"unlock_{obj_color}_door")
-                        elif obj_in_front_after.is_open:
-                            node.update_name(f"open_{obj_color}_door")  # FIXME: why not 'unlock' but 'open'?
-                        elif not obj_in_front_after.is_open:
-                            node.update_name(f"close_{obj_color}_door")
-                    else:  # this means we opened a box and box disappeared from cell (cannot close boxes)
-                        node.update_name(f"open_{obj_color}_box")
-                temp_tree_builder.append(node)
-                i = j + 1
+                    while not ("pickup" in next_name or "drop" in next_name or "toggle" in next_name):
+                        node.add_child(tree_builder[j])
+                        j += 1
+                        if j >= len(tree_builder):
+                            break
+                        else:
+                            next_name = tree_builder[j].name
+                    obj_in_front_before = node.execute(env_copy)
+                    node.add_child(tree_builder[j])  # last child is the primitive pickup/drop/toggle action
+                    obj_in_front_after = tree_builder[j].execute(env_copy)
+                    if next_name == "pickup":
+                        obj_type = OBJ_NAME_MAPPING[type(obj_in_front_before)]
+                        obj_color = obj_in_front_before.color
+                        node.update_name(f"pickup_{obj_color}_{obj_type}")
+                    elif next_name == "drop":
+                        obj_type = OBJ_NAME_MAPPING[type(obj_in_front_after)]
+                        obj_color = obj_in_front_after.color
+                        node.update_name(f"put_down_{obj_color}_{obj_type}")
+                    elif next_name == "toggle":
+                        obj_type = OBJ_NAME_MAPPING[type(obj_in_front_before)]
+                        obj_color = obj_in_front_before.color
+                        if obj_type == "door":
+                            if obj_in_front_before.is_locked and not obj_in_front_after.is_locked:
+                                node.update_name(f"unlock_{obj_color}_door")
+                            elif obj_in_front_after.is_open:
+                                node.update_name(f"open_{obj_color}_door")  # FIXME: why not 'unlock' but 'open'?
+                            elif not obj_in_front_after.is_open:
+                                node.update_name(f"close_{obj_color}_door")
+                        else:  # this means we opened a box and box disappeared from cell (cannot close boxes)
+                            node.update_name(f"open_{obj_color}_box")
+                    temp_tree_builder.append(node)
+                    i = j + 1
+                else:
+                    tree_builder[i].execute(env_copy)
+                    temp_tree_builder.append(tree_builder[i])
+                    i += 1
         tree_builder = temp_tree_builder
+        # debug("END OF THIRD PASS")
+        # print([str(t) for t in tree_builder])
         # Last pass: combine everything under the main task umbrella
         task_tree = TaskNode(self.task)
         for i in range(len(tree_builder)):
             task_tree.add_child(tree_builder[i])
+        # debug("FULL TASK TREE")
+        # debug(task_tree)
         self.task_tree = task_tree
     
 
@@ -386,13 +426,15 @@ class Agent:
     def _retrieve_actions_from_skill_func(self, skill: str) -> List[int]:
         skill_func = self.world_model.allowable_skills[skill]
         basic_skill = True
-        prefixes = ["go_to_", "pickup_", "open_", "unlock_", "close_"]
+        prefixes = ["go_to_", "pickup_", "put_down", "open_", "unlock_", "close_"]
         for prefix in prefixes:
             if prefix in skill:
                 color, target = self._retrieve_color_and_target_components_from_skill(prefix, skill)
+                skill_type = prefix
                 basic_skill = False
                 break
         if basic_skill:  # covers primitive MiniGrid skills, `move` skills, and `put_down` skills
+            setup_actions = []
             actions = skill_func()
         else:
             # TODO: what if there are multiple objects that match color and target type? most obvious example is wall
@@ -406,14 +448,26 @@ class Agent:
                 if type(obj) == target and obj.color == color:
                     target_pos = obj.cur_pos if obj.cur_pos is not None else obj.init_pos
                     break
+            if skill_type == "put_down":
+                pass
+            elif skill_type == "open_":
+                pass
+            elif skill_type == "unlock_":
+                pass
+            elif skill_type == "close_":
+                pass
+            else:
+                setup_actions = []
             actions = skill_func(self.world_model, target_pos)
-        return actions
+        return setup_actions, actions
     
 
     def _retrieve_color_and_target_components_from_skill(self, prefix: str, skill: str) -> Tuple[str, WorldObj]:
         components = skill.replace(prefix, "").split("_")
         if "wall" in components:
             color, target = "grey", "wall"
+        elif "lava" in components:
+            color, target = "red", "lava"
         else:
             color, target = components[0], components[1]
         return color, NAME_OBJ_MAPPING[target]

@@ -45,7 +45,7 @@ def make_envs(task: Task,
               attendant_render_mode: str = None):
     # Some asserts
     assert Task.has_value(task), "Env type is not valid"
-    assert Level.has_value(principal_level), "Teacher level is not valid"
+    assert Level.has_value(principal_level), "Principal level is not valid"
     assert xor(attendant_level, attendant_variants, attendant_edits) or (not attendant_level and not attendant_variants and not attendant_edits), "Must have only one of `attendant_level`, `attendant_variants`, or `attendant_edits` or none at all"
     if attendant_level:
         assert Level.has_value(attendant_level), "Attendant level is not valid"
@@ -65,7 +65,6 @@ def make_envs(task: Task,
     seed = random.randint(0, 10000) if not seed else seed
     p_env_cls = create_env_class(task, principal_level)
     principal_env = p_env_cls(seed, task, principal_level, render_mode = principal_render_mode)
-    # time.sleep(10)
     
     # Creating the disallowed dictionary for variants
     if attendant_variants is not None:
@@ -263,11 +262,3 @@ if __name__ == "__main__":
                                          seed = 400)
     mc = ManualControl(attendant_env)
     mc.start()
-
-    # while True:
-    #     principal_env.reset()
-    #     time.sleep(1)
-    #     principal_env.step(1)
-    #     time.sleep(1)
-    #     principal_env.step(2)
-    #     time.sleep(1)

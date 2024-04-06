@@ -28,19 +28,19 @@ assert all([src in MODEL_MAPPING for src in AVAILABLE_MODEL_SOURCES]), "Missing 
 class LLM:
     def __init__(self, query_source, model_source):
         self.query_source = query_source if query_source else "openai"
-        self.model_source = model_source if query_source else "gpt"
+        self.model_source = model_source if model_source else "gpt"
         try:
-            self.model = MODEL_MAPPING[model_source][query_source]
+            self.model = MODEL_MAPPING[self.model_source][self.query_source]
         except:
             raise AssertionError("No matching model name for model source and query source combo")
         if self.query_source == "openai":
             openai.api_key = OPENAI_KEY
-            self.tokenizer = tiktoken.encoding_for_model(TOKENIZER_MAPPING[model_source])
+            self.tokenizer = tiktoken.encoding_for_model(TOKENIZER_MAPPING[self.model_source])
         elif self.query_source == "scale":
             llmengine.api_engine.api_key = SCALE_KEY
-            self.tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_MAPPING[model_source])
+            self.tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_MAPPING[self.model_source])
         elif self.query_source == "huggingface":
-            self.tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_MAPPING[model_source])
+            self.tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_MAPPING[self.model_source])
         
         self.system_message = None
         self.prompts = deque()

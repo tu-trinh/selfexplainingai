@@ -17,16 +17,16 @@ class Level(Enum):
     EMPTY = "Empty"
     DEATH = "Death"
     DIST = "Dist"
-    OPEN_DOOR = "OpenDoor"
-    BLOCKED_DOOR = "BlockedDoor"
-    UNLOCK_DOOR = "UnlockDoor"
-    HIDDEN_KEY = "HiddenKey"
-    GO_AROUND = "GoAround"
-    MULT_ROOMS = "MultRooms"
+    OPEN_DOOR = "Open_Door"
+    BLOCKED_DOOR = "Blocked_Door"
+    UNLOCK_DOOR = "Unlock_Door"
+    HIDDEN_KEY = "Hidden_Key"
+    GO_AROUND = "Go_Around"
+    MULT_ROOMS = "Mult_Rooms"
     BOSS = "Boss"
 
-    ROOM_DOOR_KEY = "RoomDoorKey"
-    TREASURE_ISLAND = "TreasureIsland"
+    ROOM_DOOR_KEY = "Room_Door_Key"
+    TREASURE_ISLAND = "Treasure_Island"
 
     @classmethod
     def has_value(cls, value):

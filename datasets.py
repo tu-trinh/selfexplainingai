@@ -1,12 +1,15 @@
 from package.enums import Task, Level
+from package.builder import make_agents
+from package.infrastructure.basic_utils import debug
+
+import yaml
+import time
+import pickle
 
 
 """
 Belief Mismatch Dataset
 """
-# Tasks: go to, pick up, etc.
-# Levels: empty, death, etc
-# Skills: every agent has . . .
 
 
 """
@@ -22,20 +25,108 @@ C3 C4  D3 D4 / diff layout, same skills
 ------------
 E1 E2  F5 F6 \
 E3 E4  F7 F8 / diff layout, diff skills
+
+For odd skillsets: A has narrower skillset than P (higher alpha)
+skillset   alpha_P   alpha_A
+----------------------------
+    1        0.0       1.0
+    3        0.3       0.5
+    5        0.5       0.7
+    7        0.7       0.9
+For even skillsets: A has broader skillset than P (lower alpha)
+skillset   alpha_P   alpha_A
+----------------------------
+    2        0.5       0.3
+    4        0.7       0.5
+    6        0.9       0.7
+    8        1.0       0.0
 """
-INTENTION_TRAIN = {}
-INTENTION_TEST = {}
-# make_envs(task: Task,
-#               principal_level: Level,
-#               attendant_level: Level = None,
-#               attendant_variants: List[Variant] = None,
-#               attendant_edits: List[str] = None,
-#               seed: int = None,
-#               principal_render_mode: str = None,
-#               attendant_render_mode: str = None):
-for task in Task:
-    for level in Level:
-        pass
+INTENTION_COLUMNS = ["config", "mission", "skill", "setup_actions", "trajectory"]
+INTENTION_TRAIN = {col: [] for col in INTENTION_COLUMNS}
+INTENTION_TEST = {col: [] for col in INTENTION_COLUMNS}
+INTENTION_DATASET = {"train": INTENTION_TRAIN, "test": INTENTION_TEST}
+
+task_to_pref_mapping = {
+    Task.GOTO: "reward_reach_object_hof",
+    Task.PICKUP: "reward_carry_object_hof",
+    Task.PUT: "reward_adjacent_object_hof",
+    Task.COLLECT: "reward_adjacent_object_hof",
+    Task.CLUSTER: "reward_adjacent_object_hof"
+}
+seed_alpha_sets = {  # holds each block of four. see reference above. for example, A1 corresponds to seed A = 1 and skillset 1 (aka alpha_p = 0 and alpha_a = 1)
+    "train": [
+        (1, 0, 1), (1, 0.5, 0.3), (2, 0, 1), (2, 0.5, 0.3),
+        (3, 0, 1), (3, 0.5, 0.3), (3, 0.3, 0.5), (3, 0.7, 0.5),
+        (5, 0, 1), (5, 0.5, 0.3), (5, 0.3, 0.5), (5, 0.7, 0.5)
+    ],
+    "test": [
+        (1, 0.3, 0.5), (1, 0.7, 0.5), (2, 0.3, 0.5), (2, 0.7, 0.5),
+        (4, 0, 1), (4, 0.5, 0.3), (4, 0.3, 0.5), (4, 0.7, 0.5),
+        (6, 0.5, 0.7), (6, 0.9, 0.7), (6, 0.7, 0.9), (6, 1, 0)
+    ]
+}
+
+debug_render = False
+greenlight = lambda t, l, k, s, ap, aa: (l == Level.HIDDEN_KEY) or (t == Task.PICKUP and l in [Level.BOSS, Level.ROOM_DOOR_KEY, Level.TREASURE_ISLAND, Level.GO_AROUND, Level.HIDDEN_KEY, Level.MULT_ROOMS])
+# greenlight = lambda t, l, k, s, ap, aa: (t == Task.GOTO) and (l == Level.BOSS) and (s == 5) and (ap == 0) and (aa == 1)
+testing = False
+
+def create_datasets(mismatch):  # loose upper bound: 5 tasks x 10 levels x 2 train/test x 12 sets x 4 secs = 80 min
+    for task in Task:
+        for level in Level:
+            for key in seed_alpha_sets:
+                temp_dataset = {col: [] for col in INTENTION_COLUMNS}
+                for seed, alpha_p, alpha_a in seed_alpha_sets[key]:
+                    if greenlight(task, level, key, seed, alpha_p, alpha_a):
+                        print(f"Starting {task.value} - {level.value} - {key} - {(seed, alpha_p, alpha_a)}")
+                        # start = time.time()
+                        env_dict = {
+                            "task": task.value.upper(),
+                            "principal_level": level.value.upper(),
+                            "seed": seed
+                        }
+                        p_dict = {
+                            "query_source": "openai",
+                            "basic_reward_functions": [{"name": task_to_pref_mapping[task]}],
+                            "basic_reward_weights": [1],
+                            "skills": [""]
+                        }
+                        a_dict = {
+                            "query_source": "openai",
+                            "model_source": "gpt",
+                            "basic_reward_functions": [{"name": task_to_pref_mapping[task]}],
+                            "basic_reward_weights": [1],
+                            "skills": [""]
+                        }
+                        yaml_obj = {"principal": p_dict, "attendant": a_dict, "env_specs": env_dict}
+                        p, a = make_agents(config = yaml_obj)
+                        if debug_render:
+                            p.world_model.render_mode = "human"
+                            p.world_model.render()
+                            time.sleep(5)
+                        p._find_optimal_policy()
+                        p._build_task_tree()
+                        # p_skills = p.task_tree.get_skill_subset(alpha_p)
+                        a_skills = p.task_tree.get_skill_subset(alpha_a)
+                        # yaml_obj["principal"]["skills"] = p_skills
+                        yaml_obj["attendant"]["skills"] = a_skills
+                        yaml_str = yaml.dump(yaml_obj)
+                        for skill in a_skills:
+                            setup_actions, actions = a._retrieve_actions_from_skill_func(skill)
+                            temp_dataset["config"] = yaml_str
+                            temp_dataset["mission"] = p.world_model.mission
+                            temp_dataset["skill"] = skill
+                            temp_dataset["setup_actions"] = setup_actions
+                            temp_dataset["trajectory"] = actions
+                        print("Finished")
+                        if testing:
+                            return
+                        # end = time.time()
+                        # print(round((end - start) / 60, 3))
+                with open(f"./datasets/{mismatch}/{task.value}_{level.value}_{key}.pkl", "wb") as f:
+                    pickle.dump(temp_dataset, f)
+
+create_datasets("intention")
 
 
 """

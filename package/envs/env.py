@@ -167,6 +167,7 @@ class Environment(MiniGridEnv):
                                 for obj, _ in self.objs:
                                     if type(obj) == Box and obj.contains is not None and obj.contains.color == color:
                                         key_pos = obj.init_pos
+                                        skills.setdefault(f"pickup_{color}_key", pickup_color_object_hof(color, "key"))
                                         skills.setdefault(f"put_down_{color}_key", put_down_color_object_hof(color, "key"))
                                         break
                             skills.setdefault(f"unlock_{color}_{obj}", unlock_color_door_hof(color, key_pos))

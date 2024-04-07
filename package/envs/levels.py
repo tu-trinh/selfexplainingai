@@ -503,11 +503,12 @@ class BaseLevel(ABC):
         return walls, door
     
     
-    def _gen_multiple_rooms(self) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]], List[set[Tuple[int, int]]]]:
+    def _gen_multiple_rooms(self) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]], List[set[Tuple[int, int]]], List[bool]]:
         walls = []
         doors = []
         partitions = [(1, self.room_size - 2, 1, self.room_size - 2)]  # Initial partition covering the whole room
         partition_cells = []
+        partition_entryways = []
         while len(partitions) < self.num_rooms:
             # Randomly select a partition to split
             partition_to_split = random.choice(partitions)
@@ -534,8 +535,17 @@ class BaseLevel(ABC):
         for partition in partitions:
             start_x, end_x, start_y, end_y = partition
             cells = self._get_cells_in_partition(start_x, end_x, start_y, end_y)
-            partition_cells.append(set([cell for cell in cells if cell not in walls or cell in doors]))
-        return walls, doors, partition_cells
+            this_partition_cells = set()
+            partition_has_door = False
+            for cell in cells:
+                if cell not in walls:
+                    if cell in doors:
+                        partition_has_door = True
+                    else:
+                        this_partition_cells.add(cell)
+            partition_entryways.append(partition_has_door)
+            partition_cells.append(this_partition_cells)
+        return walls, doors, partition_cells, partition_entryways
 
 
     def _generate_rectangular_section(self, is_walls: bool) -> Tuple[set[Tuple[int, int]], set[Tuple[int, int]]]:
@@ -772,9 +782,13 @@ class MultipleRoomsLevel(BaseLevel):
     def initialize_level(self):
         # Determine number of rooms and then make rooms and doors
         self._determine_num_rooms()
-        room_walls, room_doors, room_cells = self._gen_multiple_rooms()
+        room_walls, room_doors, room_cells, door_markers = self._gen_multiple_rooms()
         self.walls.extend([(Wall(), pos) for pos in room_walls + room_doors])
-        self.doors.extend([(Door(is_locked = False, color = random.choice(COLOR_NAMES)), pos) for pos in room_doors])
+        available_door_colors = copy.deepcopy(COLOR_NAMES)
+        for pos in room_doors:
+            chosen_color = random.choice(available_door_colors)
+            self.doors.append((Door(is_locked = False, color = chosen_color), pos))
+            available_door_colors.remove(chosen_color)
         self.all_possible_pos -= set(room_walls)
         self.all_possible_pos -= set(room_doors)
 
@@ -951,7 +965,7 @@ class BossLevel(BaseLevel):
     def initialize_level(self):
         # Handling MULT_ROOMS characteristics
         self._determine_num_rooms()
-        room_walls, room_doors, room_cells = self._gen_multiple_rooms()
+        room_walls, room_doors, room_cells, door_markers = self._gen_multiple_rooms()
         self.walls.extend([(Wall(), pos) for pos in room_walls + room_doors])
         self.all_possible_pos -= set(room_walls)
         self.all_possible_pos -= set(room_doors)
@@ -959,11 +973,14 @@ class BossLevel(BaseLevel):
         # Handle UNLOCK_DOOR characteristics
         necessary_key_colors = []
         locked_doors = 0
+        available_door_colors = copy.deepcopy(COLOR_NAMES)
         for room_door_pos in room_doors:
             is_locked = random.choice([True, False])
-            door = Door(is_locked = is_locked and locked_doors < MAX_NUM_LOCKED_DOORS, color = random.choice(COLOR_NAMES))
+            chosen_color = random.choice(COLOR_NAMES)
+            available_door_colors.remove(chosen_color)
+            door = Door(is_locked = is_locked and locked_doors < MAX_NUM_LOCKED_DOORS, color = chosen_color)
             if is_locked:
-                necessary_key_colors.append(door.color)
+                necessary_key_colors.append(chosen_color)
                 locked_doors += 1
             self.doors.append((door, room_door_pos))
         self._set_agent_start_position()

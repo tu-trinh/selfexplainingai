@@ -1,4 +1,4 @@
-# ...
+from package.infrastructure.llm_constants import MAX_MSG_TOKENS
 
 from minigrid.manual_control import ManualControl
 

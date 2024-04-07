@@ -5,6 +5,7 @@ from package.infrastructure.basic_utils import debug
 import yaml
 import time
 import pickle
+import copy
 
 
 """
@@ -67,12 +68,12 @@ seed_alpha_sets = {  # holds each block of four. see reference above. for exampl
 }
 
 debug_render = False
-greenlight = lambda t, l, k, s, ap, aa: (l == Level.HIDDEN_KEY) or (t == Task.PICKUP and l in [Level.BOSS, Level.ROOM_DOOR_KEY, Level.TREASURE_ISLAND, Level.GO_AROUND, Level.HIDDEN_KEY, Level.MULT_ROOMS])
-# greenlight = lambda t, l, k, s, ap, aa: (t == Task.GOTO) and (l == Level.BOSS) and (s == 5) and (ap == 0) and (aa == 1)
+greenlight = lambda t, l, k, s, ap, aa: l not in [Level.BOSS]
+# greenlight = lambda t, l, k, s, ap, aa: (t == Task.GOTO) and (l == Level.BLOCKED_DOOR) and (s == 5) and (ap == 0.5) and (aa == 0.3)
 testing = False
 
-def create_datasets(mismatch):  # loose upper bound: 5 tasks x 10 levels x 2 train/test x 12 sets x 4 secs = 80 min
-    for task in Task:
+def create_datasets(mismatch):  # loose upper bound: 5 tasks x 12 levels x 2 train/test x 12 sets x 2 secs = 48 min
+    for task in [Task.GOTO, Task.PICKUP]:
         for level in Level:
             for key in seed_alpha_sets:
                 temp_dataset = {col: [] for col in INTENTION_COLUMNS}
@@ -99,11 +100,11 @@ def create_datasets(mismatch):  # loose upper bound: 5 tasks x 10 levels x 2 tra
                             "skills": [""]
                         }
                         yaml_obj = {"principal": p_dict, "attendant": a_dict, "env_specs": env_dict}
-                        p, a = make_agents(config = yaml_obj)
+                        p, a = make_agents(config = copy.deepcopy(yaml_obj))
                         if debug_render:
                             p.world_model.render_mode = "human"
                             p.world_model.render()
-                            time.sleep(5)
+                            time.sleep(100)
                         p._find_optimal_policy()
                         p._build_task_tree()
                         # p_skills = p.task_tree.get_skill_subset(alpha_p)
@@ -113,11 +114,11 @@ def create_datasets(mismatch):  # loose upper bound: 5 tasks x 10 levels x 2 tra
                         yaml_str = yaml.dump(yaml_obj)
                         for skill in a_skills:
                             setup_actions, actions = a._retrieve_actions_from_skill_func(skill)
-                            temp_dataset["config"] = yaml_str
-                            temp_dataset["mission"] = p.world_model.mission
-                            temp_dataset["skill"] = skill
-                            temp_dataset["setup_actions"] = setup_actions
-                            temp_dataset["trajectory"] = actions
+                            temp_dataset["config"].append(yaml_str)
+                            temp_dataset["mission"].append(p.world_model.mission)
+                            temp_dataset["skill"].append(skill)
+                            temp_dataset["setup_actions"].append(setup_actions)
+                            temp_dataset["trajectory"].append(actions)
                         print("Finished")
                         if testing:
                             return

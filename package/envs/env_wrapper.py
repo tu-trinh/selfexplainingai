@@ -15,7 +15,7 @@ class EnvironmentWrapper:
     def reset(self, seed: int):
         for s, e in self.seeds_and_envs.items():
             if seed == s:
-                return e
+                return e.reset()
         sprout = self.custom_env_type(seed, **self.arguments)
         sprout.set_allowable_skills()
         sprout.bind_wrapper(self)

@@ -1,11 +1,11 @@
 from package.trajectories import Trajectory
 from package.message import Message
-from package.enums import MessageType, Task
+from package.enums import MessageType, Task, Level
 from package.search import Search
 from package.llm import LLM
 import package.reward_functions as REWARD_FUNCTIONS
 from package.skills import _find_path, _check_clear_door
-from package.infrastructure.basic_utils import debug
+from package.infrastructure.basic_utils import debug, get_adjacent_cells
 from package.infrastructure.env_utils import get_obs_desc
 from package.infrastructure.env_constants import IDX_TO_ACTION, OBJ_NAME_MAPPING, NAME_OBJ_MAPPING
 from package.task_tree import TaskNode
@@ -117,13 +117,40 @@ class Agent:
             # return self.calculate_reward(env)
         # search_problem = Search("bfs", self.world_model, goal_check, "e")
         # actions = search_problem.search()
+
         # START ANEW!!! #
-        # FIXME: must handle multiple target objects :')
+        if self.world_model.is_single_target:
+            return self._find_optimal_policy_single_target()
+        elif self.world_model.task == Task.PUT:
+            return self._find_optimal_policy_put()
+    
+
+    def _find_optimal_policy_put(self, world_model_copy: MiniGridEnv = None, interm_target_pos: Tuple[int, int] = None, set_policy: bool = True) -> List[int]:
         all_actions = []
-        world_model_copy = copy.deepcopy(self.world_model)
-        world_model_copy.reset()
-        if len(world_model_copy.doors) != 0:  # some door to handle here
-            # FIXME: must handle mult rooms and boss levels where there are multiple doors
+        if world_model_copy is None:
+            world_model_copy = copy.deepcopy(self.world_model)
+            world_model_copy.reset()
+        # if all clear, go to each object one by one
+        debug("PICKING UP FIRST OBJECT")
+        pickup_obj_one = self._find_optimal_policy_single_target(world_model_copy, self.world_model.target_objs[0], False) + [3]
+        self.execute_actions(pickup_obj_one, world_model_copy)
+        putting_places = get_adjacent_cells(self.world_model.target_objs[1].init_pos)
+        valid_putting_places = [pp for pp in putting_places if self.world_model.grid.get(*pp) is None]
+        debug("PUTTING NEXT TO SECOND OBJECT")
+        putnext_obj_two = self._find_optimal_policy_single_target(world_model_copy, valid_putting_places[0], False) + [4]
+        all_actions.extend(pickup_obj_one)
+        all_actions.extend(putnext_obj_two)
+        if set_policy:
+            self.policy = all_actions
+        return all_actions
+    
+    
+    def _find_optimal_policy_single_target(self, world_model_copy: MiniGridEnv = None, interm_target_pos: Tuple[int, int] = None, set_policy: bool = True) -> List[int]:
+        all_actions = []
+        if world_model_copy is None:
+            world_model_copy = copy.deepcopy(self.world_model)
+            world_model_copy.reset()
+        if len(world_model_copy.doors) != 0 and self.world_model.level != Level.MULT_ROOMS:  # some door to handle here (but if mult rooms, just BFS everywhere)
             door, door_pos = self.world_model.doors[0]
             clear_door, blocker_obj = _check_clear_door(world_model_copy.agent_start_pos, door_pos, world_model_copy.grid)
             if hasattr(self.world_model, "blocker_obj") or not clear_door:
@@ -176,7 +203,7 @@ class Agent:
                 all_actions.extend(actions)
                 debug("PUTTING DOWN UNLOCKING KEY")
                 debug(actions)
-        else:
+        elif len(world_model_copy.doors) == 0:
             bridge_pos = None
             for obj, pos in self.world_model.objs:
                 if type(obj) == Bridge:
@@ -188,16 +215,17 @@ class Agent:
                 all_actions.extend(actions)
                 debug("GOING TO BRIDGE")
                 debug(actions)
-        # if all clear / finally, just go to the object
-        actions = _find_path(world_model_copy, self.world_model.target_obj_pos, "goto", can_overlap = type(self.world_model.target_obj) == Goal, reset = False, forbidden_actions = [3, 4, 5])
+        # if all clear / finally, OR if mult rooms level, just go to the object
+        actions = _find_path(world_model_copy, self.world_model.target_obj_pos if not interm_target_pos else interm_target_pos, "goto", can_overlap = type(self.world_model.target_obj) == Goal, reset = False, forbidden_actions = [3, 4] if self.world_model.level == Level.MULT_ROOMS else [3, 4, 5])
         if self.world_model.task == Task.PICKUP:
             actions += [3]
         all_actions.extend(actions)
         debug("GOING TO OBJECT")
         debug(actions)
-        self.policy = all_actions
+        if set_policy:
+            self.policy = all_actions
         return all_actions
-    
+
 
     def _build_task_tree(self) -> None:
         # Zeroth pass: creating task nodes for every action
@@ -426,39 +454,94 @@ class Agent:
     def _retrieve_actions_from_skill_func(self, skill: str) -> List[int]:
         skill_func = self.world_model.allowable_skills[skill]
         basic_skill = True
-        prefixes = ["go_to_", "pickup_", "put_down", "open_", "unlock_", "close_"]
+        prefixes = ["go_to_", "pickup_", "put_down_", "open_", "unlock_", "close_"]
         for prefix in prefixes:
             if prefix in skill:
                 color, target = self._retrieve_color_and_target_components_from_skill(prefix, skill)
                 skill_type = prefix
                 basic_skill = False
                 break
-        if basic_skill:  # covers primitive MiniGrid skills, `move` skills, and `put_down` skills
-            setup_actions = []
+        world_model_copy = copy.deepcopy(self.world_model)
+        world_model_copy.reset()
+        if basic_skill:  # covers primitive MiniGrid skills and `move` skills
+            setup_actions = []  # no set up necessary, not even to find object to pick up or pick up object for put down, because we want to demonstrate the primitive skill
             actions = skill_func()
         else:
             # TODO: what if there are multiple objects that match color and target type? most obvious example is wall
+            setup_actions = []
             if target == Door:
                 search_list = self.world_model.doors
             elif target == Key:
-                search_list = self.world_model.keys
+                if self.world_model.level == Level.HIDDEN_KEY:
+                    search_list = self.world_model.objs
+                else:
+                    search_list = self.world_model.keys + self.world_model.objs
             else:
                 search_list = self.world_model.objs
             for obj, _ in search_list:
-                if type(obj) == target and obj.color == color:
-                    target_pos = obj.cur_pos if obj.cur_pos is not None else obj.init_pos
-                    break
-            if skill_type == "put_down":
+                if self.world_model.level == Level.HIDDEN_KEY:
+                    if type(obj) == Box and obj.contains is not None and obj.contains.color == color:
+                        target_pos = obj.cur_pos if obj.cur_pos is not None else obj.init_pos
+                        target_obj = obj
+                        break
+                else:
+                    if type(obj) == target and obj.color == color:
+                        target_pos = obj.cur_pos if obj.cur_pos is not None else obj.init_pos
+                        target_obj = obj
+                        break
+            if skill_type == "pickup_":  # special case of hidden key because agent won't be able to pick up the key directly at first
+                if self.world_model.level == Level.HIDDEN_KEY:
+                    setup_actions = _find_path(world_model_copy, target_pos, "goto", forbidden_actions = [3, 4, 5]) + [5]
+                    self.execute_actions(setup_actions, world_model_copy)
+                    additional = _find_path(world_model_copy, self.world_model.agent_start_pos, action_type = "goto", forbidden_actions = [3, 4, 5], can_overlap = True)
+                    setup_actions.extend(additional)
+                    self.execute_actions(additional, world_model_copy)
+            elif skill_type == "put_down_":
+                setup_actions = _find_path(world_model_copy, target_pos, "goto", forbidden_actions = [3, 4, 5])
+                setup_actions += [5, 3] if self.world_model.level == Level.HIDDEN_KEY else [3]
+                self.execute_actions(setup_actions, world_model_copy)
+                target_pos = self.world_model.doors[0][1]  # pick any random door to not be blocked when agent puts down
+                additional = _find_path(world_model_copy, self.world_model.agent_start_pos, action_type = "goto", forbidden_actions = [3, 4, 5], can_overlap = True)
+                setup_actions.extend(additional)
+                self.execute_actions(additional, world_model_copy)
+            elif skill_type == "open_":  # close door if needed then put agent back
+                if target_obj.is_open:
+                    setup_actions = _find_path(world_model_copy, target_pos, "goto", forbidden_actions = [3, 4, 5]) + [5]
+                    self.execute_actions(setup_actions, world_model_copy)
+                    additional = _find_path(world_model_copy, self.world_model.agent_start_pos, action_type = "goto", forbidden_actions = [3, 4, 5], can_overlap = True)
+                    setup_actions.extend(additional)
+                    self.execute_actions(additional, world_model_copy)
+                else:
+                    setup_actions = []
+            elif skill_type == "unlock_":  # door SHOULD always be locked at the start, if unlock is a valid skill
                 pass
-            elif skill_type == "open_":
-                pass
-            elif skill_type == "unlock_":
-                pass
-            elif skill_type == "close_":
-                pass
-            else:
-                setup_actions = []
-            actions = skill_func(self.world_model, target_pos)
+            elif skill_type == "close_":  # open door if needed (unlock it if further needed!) then put agent back
+                if target_obj.is_open:
+                    setup_actions = []
+                else:
+                    if target_obj.is_locked:
+                        for key, pos in self.world_model.keys:
+                            if key.color == target.color:
+                                key_pos = pos
+                                break
+                        setup_actions = _find_path(world_model_copy, key_pos, "goto", reset = False, forbidden_actions = [3, 4, 5]) + [3]
+                        self.execute_actions(setup_actions, world_model_copy)
+                        additional = _find_path(world_model_copy, target_pos, "goto", reset = False, forbidden_actions = [3, 4, 5]) + [5]
+                        setup_actions.extend(additional)
+                        self.execute_actions(additional, world_model_copy)
+                        additional = _find_path(world_model_copy, key_pos, "goto", forbidden_actions = [3, 4, 5]) + [4]  # put key back where it came from
+                        setup_actions.extend(additional)
+                        self.execute_actions(additional, world_model_copy)
+                        additional = _find_path(world_model_copy, self.world_model.agent_start_pos, action_type = "goto", forbidden_actions = [3, 4, 5], can_overlap = True)  # put agent back
+                        setup_actions.extend(additional)
+                        self.execute_actions(additional, world_model_copy)
+                    else:
+                        setup_actions = _find_path(world_model_copy, target_pos, "goto", forbidden_actions = [3, 4, 5]) + [5]
+                        self.execute_actions(setup_actions, world_model_copy)
+                        additional = _find_path(world_model_copy, self.world_model.agent_start_pos, action_type = "goto", forbidden_actions = [3, 4, 5], can_overlap = True)  # put agent back
+                        setup_actions.extend(additional)
+                        self.execute_actions(additional, world_model_copy)
+            actions = skill_func(world_model_copy, target_pos)
         return setup_actions, actions
     
 

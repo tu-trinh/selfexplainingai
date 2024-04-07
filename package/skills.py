@@ -93,8 +93,10 @@ def put_down_color_object_hof(color: str, obj: str):
     assert color in COLOR_NAMES
     assert obj in OBJ_NAME_MAPPING.values()
 
-    def put_down_color_object():
-        actions = [4]
+    def put_down_color_object(env: Env, object_pos: Tuple[int, int]):
+        # object_pos here is the door which should not have objects blocking it
+        actions = []
+        actions.extend(_find_path(env, object_pos, "putdown"))
         return actions
     
     return put_down_color_object
@@ -126,7 +128,7 @@ def unlock_color_door_hof(color: str, necessary_key_pos: Tuple[int, int]):
         new_env = copy.deepcopy(env)
         for action in actions:
             new_env.step(action)
-        actions.extend(_find_path(new_env, door_pos, "goto", reset = False))
+        actions.extend(_find_path(new_env, door_pos, "goto"))
         actions.append(5)
         return actions
     
@@ -156,7 +158,7 @@ def close_color_door_hof(color: str):
 """
 Helper methods
 """
-def _find_path(master_env: Env, object_pos: Tuple[int, int], action_type: str, forbidden_actions: List[int] = [], can_overlap: bool = False, reset: bool = True):
+def _find_path(master_env: Env, object_pos: Tuple[int, int], action_type: str, forbidden_actions: List[int] = [], can_overlap: bool = False, reset: bool = False):
     env = copy.deepcopy(master_env)
     if reset:
         env.reset()

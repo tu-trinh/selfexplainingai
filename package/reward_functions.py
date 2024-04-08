@@ -1,5 +1,5 @@
 from package.enums import Task
-from package.infrastructure.env_constants import OBJ_NAME_MAPPING
+from package.infrastructure.obj_constants import OBJ_NAME_MAPPING
 from package.infrastructure.basic_utils import debug, compare_world_obj
 
 from minigrid.core.world_object import WorldObj

@@ -1,4 +1,5 @@
-from package.infrastructure.env_constants import MAX_ROOM_SIZE, COLOR_NAMES, OBJ_NAME_MAPPING
+from package.infrastructure.env_constants import MAX_ROOM_SIZE, COLOR_NAMES
+from package.infrastructure.obj_constants import OBJ_NAME_MAPPING
 
 
 TEMPERATURE = 0

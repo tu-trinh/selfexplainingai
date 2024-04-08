@@ -40,7 +40,8 @@ class TaskNode:
         agent_pos = env.agent_pos
         dir_vec = env.dir_vec
         facing_obj = env.grid.get(agent_pos[0] + dir_vec[0], agent_pos[1] + dir_vec[1])
-        if facing_obj is None or type(facing_obj) == Wall:  # if end of trajectory and agent is facing nothing or a wall, check if it's on a goal
+        # if end of trajectory and agent is facing nothing or a wall, check if it's on a goal or a bridge
+        if facing_obj is None or type(facing_obj) == Wall:
             facing_obj = env.grid.get(agent_pos[0], agent_pos[1])
         return facing_obj
     

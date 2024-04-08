@@ -1,6 +1,6 @@
 from package.enums import Task, Level
 from package.builder import make_agents
-from package.infrastructure.basic_utils import debug
+from package.infrastructure.basic_utils import debug, format_seconds
 
 import yaml
 import time
@@ -43,9 +43,6 @@ skillset   alpha_P   alpha_A
     8        1.0       0.0
 """
 INTENTION_COLUMNS = ["config", "mission", "skill", "setup_actions", "trajectory"]
-INTENTION_TRAIN = {col: [] for col in INTENTION_COLUMNS}
-INTENTION_TEST = {col: [] for col in INTENTION_COLUMNS}
-INTENTION_DATASET = {"train": INTENTION_TRAIN, "test": INTENTION_TEST}
 
 task_to_pref_mapping = {
     Task.GOTO: "reward_reach_object_hof",
@@ -68,11 +65,12 @@ seed_alpha_sets = {  # holds each block of four. see reference above. for exampl
 }
 
 debug_render = False
-greenlight = lambda t, l, k, s, ap, aa: l not in [Level.BOSS]
-# greenlight = lambda t, l, k, s, ap, aa: (t == Task.GOTO) and (l == Level.BLOCKED_DOOR) and (s == 5) and (ap == 0.5) and (aa == 0.3)
+greenlight = lambda t, l, k, s, ap, aa: l not in [Level.BOSS] and t in [Task.GOTO, Task.PICKUP]
+# greenlight = lambda t, l, k, s, ap, aa: (t == Task.GOTO) and (l == Level.TREASURE_ISLAND) and (s == 1) and (ap == 0) and (aa == 1)
 testing = False
 
 def create_datasets(mismatch):  # loose upper bound: 5 tasks x 12 levels x 2 train/test x 12 sets x 2 secs = 48 min
+    start = time.time()
     for task in [Task.GOTO, Task.PICKUP]:
         for level in Level:
             for key in seed_alpha_sets:
@@ -80,7 +78,6 @@ def create_datasets(mismatch):  # loose upper bound: 5 tasks x 12 levels x 2 tra
                 for seed, alpha_p, alpha_a in seed_alpha_sets[key]:
                     if greenlight(task, level, key, seed, alpha_p, alpha_a):
                         print(f"Starting {task.value} - {level.value} - {key} - {(seed, alpha_p, alpha_a)}")
-                        # start = time.time()
                         env_dict = {
                             "task": task.value.upper(),
                             "principal_level": level.value.upper(),
@@ -122,12 +119,36 @@ def create_datasets(mismatch):  # loose upper bound: 5 tasks x 12 levels x 2 tra
                         print("Finished")
                         if testing:
                             return
-                        # end = time.time()
-                        # print(round((end - start) / 60, 3))
-                with open(f"./datasets/{mismatch}/{task.value}_{level.value}_{key}.pkl", "wb") as f:
-                    pickle.dump(temp_dataset, f)
+                if len(temp_dataset["mission"]) > 0:
+                    with open(f"./datasets/{mismatch}/{task.value}_{level.value}_{key}.pkl", "wb") as f:
+                        pickle.dump(temp_dataset, f)
+    end = time.time()
+    print(format_seconds(end - start))
 
-create_datasets("intention")
+def join_datasets(mismatch):
+    mega_train = {col: [] for col in INTENTION_COLUMNS}
+    mega_test = {col: [] for col in INTENTION_COLUMNS}
+    dataset_dir = f"./datasets/{mismatch}/"
+    for task in Task:
+        for level in Level:
+            for key in seed_alpha_sets:
+                if greenlight(task, level, key, 0, 0, 0):
+                    ds_path = dataset_dir + f"{task.value}_{level.value}_{key}.pkl"
+                    with open(ds_path, "rb") as f:
+                        ds_df = pickle.load(f)
+                        if key == "train":
+                            add_to = mega_train
+                        else:
+                            add_to = mega_test
+                        for col in INTENTION_COLUMNS:
+                            add_to[col].extend(ds_df[col])
+    dataset = {"train": mega_train, "test": mega_test}
+    with open(dataset_dir + f"{mismatch}_dataset.pkl", "wb") as f:
+        pickle.dump(dataset, f)
+    
+
+# create_datasets("intention")
+join_datasets("intention")
 
 
 """

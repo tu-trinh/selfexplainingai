@@ -62,28 +62,6 @@ NUM_TO_ORDERING = {
     10: "Tenth"
 }
 
-PLAYABLE_OBJS = [Goal, Box, Ball]
-TANGIBLE_OBJS = [Ball, Box]
-DISTRACTOR_OBJS = [Box, Ball, Key]
-
-OBJ_NAME_MAPPING = {
-    Goal: "goal",
-    Ball: "ball",
-    Box: "box",
-    Key: "key",
-    Door: "door",
-    Wall: "wall",
-    Lava: "lava",
-    # ...
-}
-NAME_OBJ_MAPPING = {v: k for k, v in OBJ_NAME_MAPPING.items()}
-OBJ_PLURAL_MAPPING = {
-    Goal: "goals",
-    Ball: "balls",
-    Box: "boxes",
-    Key: "keys",
-    # ...
-}
 
 AGENT_VIEW_SIZE = 5
 MIN_VIEW_SIZE = 3

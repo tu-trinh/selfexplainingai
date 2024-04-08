@@ -1,7 +1,8 @@
 from package.enums import Variant, Task, Level
 from package.envs.modifications import HeavyDoor, Bridge, FireproofShoes
-from package.infrastructure.env_constants import TANGIBLE_OBJS, PLAYABLE_OBJS, DISTRACTOR_OBJS, COLOR_NAMES, MAX_NUM_LOCKED_DOORS
-from package.infrastructure.basic_utils import flatten_list
+from package.infrastructure.env_constants import COLOR_NAMES, MAX_NUM_LOCKED_DOORS
+from package.infrastructure.obj_constants import TANGIBLE_OBJS, PLAYABLE_OBJS, DISTRACTOR_OBJS
+from package.infrastructure.basic_utils import flatten_list, debug, get_diagonally_adjacent_cells, get_adjacent_cells
 
 from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Box
 from minigrid.wrappers import NoDeath
@@ -198,11 +199,11 @@ class BaseLevel(ABC):
 
 
     def _set_agent_based_on_walls(self, x_lb: int, x_ub: int, y_lb: int, y_ub: int) -> None:
-            # Important: upper bounds are exclusive!!!
+        # Important: upper bounds are exclusive!!!
+        self.agent_start_pos = (np.random.randint(x_lb, x_ub), np.random.randint(y_lb, y_ub))
+        while self.agent_start_pos not in self.all_possible_pos:
             self.agent_start_pos = (np.random.randint(x_lb, x_ub), np.random.randint(y_lb, y_ub))
-            while self.agent_start_pos not in self.all_possible_pos:
-                self.agent_start_pos = (np.random.randint(x_lb, x_ub), np.random.randint(y_lb, y_ub))
-            self.all_possible_pos -= set([self.agent_start_pos])
+        self.all_possible_pos -= set([self.agent_start_pos])
 
 
     def _set_agent_in_region(self, cell_region: set[Tuple[int, int]]) -> None:
@@ -299,24 +300,38 @@ class BaseLevel(ABC):
         # Figure out wall orientation, length, and positioning
         self.wall_orientation = "vertical" if np.random.random() > 0.5 else "horizontal"
         if self.wall_orientation == "vertical":
-            if ref_pos[0] > self.room_size // 2:
-                wall_col = np.random.choice(list(set(range(2, self.room_size // 2 + 1)) - set([ref_pos[0]])))
+            if self.is_single_target:
+                if ref_pos[0] > self.room_size // 2:
+                    wall_col = np.random.choice(list(set(range(2, self.room_size // 2 + 1)) - set([ref_pos[0]])))
+                    other_side_x_lb, other_side_x_ub = 1, wall_col
+                    other_side_y_lb, other_side_y_ub = 1, self.room_size - 1
+                else:
+                    wall_col = np.random.choice(list(set(range(self.room_size // 2 + 1, self.room_size - 2)) - set([ref_pos[0]])))
+                    other_side_x_lb, other_side_x_ub = wall_col + 1, self.room_size - 1
+                    other_side_y_lb, other_side_y_ub = 1, self.room_size - 1
+            else:  # FIXME: (check FIX NOTES; this probably is only best fit for PUT task) (make sure to do for the go round one too)
+                first_obj_x = self.target_objs_pos[0][0]
+                second_obj_x = self.target_objs_pos[1][0]
+                wall_col = np.random.choice(list(set(range(first_obj_x + 1, second_obj_x))))
                 other_side_x_lb, other_side_x_ub = 1, wall_col
-                other_side_y_lb, other_side_y_ub = 1, self.room_size - 1
-            else:
-                wall_col = np.random.choice(list(set(range(self.room_size // 2 + 1, self.room_size - 2)) - set([ref_pos[0]])))
-                other_side_x_lb, other_side_x_ub = wall_col + 1, self.room_size - 1
                 other_side_y_lb, other_side_y_ub = 1, self.room_size - 1
             self.walls = [(Wall(), (wall_col, y)) for y in range(1, self.room_size - 1)]
         elif self.wall_orientation == "horizontal":
-            if ref_pos[1] > self.room_size // 2:
-                wall_row = np.random.choice(list(set(range(2, self.room_size // 2 + 1)) - set([ref_pos[1]])))
+            if self.is_single_target:
+                if ref_pos[1] > self.room_size // 2:
+                    wall_row = np.random.choice(list(set(range(2, self.room_size // 2 + 1)) - set([ref_pos[1]])))
+                    other_side_x_lb, other_side_x_ub = 1, self.room_size - 1
+                    other_side_y_lb, other_side_y_ub = 1, wall_row
+                else:
+                    wall_row = np.random.choice(list(set(range(self.room_size // 2 + 1, self.room_size - 2)) - set([ref_pos[1]])))
+                    other_side_x_lb, other_side_x_ub = 1, self.room_size - 1
+                    other_side_y_lb, other_side_y_ub = wall_row + 1, self.room_size - 1
+            else:
+                first_obj_y = self.target_objs_pos[0][1]
+                second_obj_y = self.target_objs_pos[1][1]
+                wall_row = np.random.choice(list(set(range(first_obj_y + 1, second_obj_y))))
                 other_side_x_lb, other_side_x_ub = 1, self.room_size - 1
                 other_side_y_lb, other_side_y_ub = 1, wall_row
-            else:
-                wall_row = np.random.choice(list(set(range(self.room_size // 2 + 1, self.room_size - 2)) - set([ref_pos[1]])))
-                other_side_x_lb, other_side_x_ub = 1, self.room_size - 1
-                other_side_y_lb, other_side_y_ub = wall_row + 1, self.room_size - 1
             self.walls = [(Wall(), (x, wall_row)) for x in range(1, self.room_size - 1)]
         wall_positions = [wall[1] for wall in self.walls]
         self.all_possible_pos -= set(wall_positions)
@@ -341,12 +356,18 @@ class BaseLevel(ABC):
         # Figure out wall orientation, length, and positioning
         self.wall_orientation = "vertical" if np.random.random() > 0.5 else "horizontal"
         if self.wall_orientation == "vertical":
-            if ref_pos[0] > self.room_size // 2:
-                wall_col = np.random.choice(list(set(range(2, self.room_size // 2 + 1)) - set([ref_pos[0]])))
-                other_side_x_lb, other_side_x_ub = 1, wall_col
+            if self.is_single_target:
+                if ref_pos[0] > self.room_size // 2:
+                    wall_col = np.random.choice(list(set(range(2, self.room_size // 2 + 1)) - set([ref_pos[0]])))
+                    other_side_x_lb, other_side_x_ub = 1, wall_col
+                else:
+                    wall_col = np.random.choice(list(set(range(self.room_size // 2 + 1, self.room_size - 2)) - set([ref_pos[0]])))
+                    other_side_x_lb, other_side_x_ub = wall_col + 1, self.room_size - 1
             else:
-                wall_col = np.random.choice(list(set(range(self.room_size // 2 + 1, self.room_size - 2)) - set([ref_pos[0]])))
-                other_side_x_lb, other_side_x_ub = wall_col + 1, self.room_size - 1
+                first_obj_x = self.target_objs_pos[0][0]
+                second_obj_x = self.target_objs_pos[1][0]
+                wall_col = np.random.choice(list(set(range(first_obj_x + 1, second_obj_x))))
+                other_side_x_lb, other_side_x_ub = 1, wall_col
             if ref_pos[1] > self.room_size // 2:
                 wall_head = random.choice(range(2, ref_pos[1]))
                 wall_tail = self.room_size - 1
@@ -358,12 +379,18 @@ class BaseLevel(ABC):
             return_tuple = (other_side_x_lb, other_side_x_ub, wall_head, wall_tail)
         
         elif self.wall_orientation == "horizontal":
-            if ref_pos[1] > self.room_size // 2:
-                wall_row = np.random.choice(list(set(range(2, self.room_size // 2 + 1)) - set([ref_pos[1]])))
-                other_side_y_lb, other_side_y_ub = 1, wall_row
+            if self.is_single_target:
+                if ref_pos[1] > self.room_size // 2:
+                    wall_row = np.random.choice(list(set(range(2, self.room_size // 2 + 1)) - set([ref_pos[1]])))
+                    other_side_y_lb, other_side_y_ub = 1, wall_row
+                else:
+                    wall_row = np.random.choice(list(set(range(self.room_size // 2 + 1, self.room_size - 2)) - set([ref_pos[1]])))
+                    other_side_y_lb, other_side_y_ub = wall_row + 1, self.room_size - 1
             else:
-                wall_row = np.random.choice(list(set(range(self.room_size // 2 + 1, self.room_size - 2)) - set([ref_pos[1]])))
-                other_side_y_lb, other_side_y_ub = wall_row + 1, self.room_size - 1
+                first_obj_y = self.target_objs_pos[0][1]
+                second_obj_y = self.target_objs_pos[1][1]
+                wall_row = np.random.choice(list(set(range(first_obj_y + 1, second_obj_y))))
+                other_side_y_lb, other_side_y_ub = 1, wall_row
             if ref_pos[0] > self.room_size // 2:
                 wall_head = random.choice(range(2, ref_pos[0]))
                 wall_tail = self.room_size - 1
@@ -551,8 +578,8 @@ class BaseLevel(ABC):
     def _generate_rectangular_section(self, is_walls: bool) -> Tuple[set[Tuple[int, int]], set[Tuple[int, int]]]:
         on_left = np.random.random() < 0.5
         on_top = np.random.random() < 0.5
-        horizontal_length = np.random.randint(3, self.room_size - 2)
-        vertical_length = np.random.randint(3, self.room_size - 2)
+        horizontal_length = np.random.randint(3, self.room_size - 3)
+        vertical_length = np.random.randint(3, self.room_size - 3)
         if on_top:
             row = vertical_length
             y_lb = 1
@@ -579,7 +606,7 @@ class BaseLevel(ABC):
         inner_cells = set()
         outer_cells = set()
         for x, y in self.all_possible_pos:
-            if x_lb <= x <= x_ub and y_lb <= y <= y_ub:
+            if x_lb <= x < x_ub and y_lb <= y < y_ub:
                 inner_cells.add((x, y))
             else:
                 outer_cells.add((x, y))
@@ -600,6 +627,8 @@ class BaseLevel(ABC):
             else:
                 dist_obj_pos = random.choice(list(self.all_possible_pos))
             self.all_possible_pos -= set([dist_obj_pos])
+            self.all_possible_pos -= get_adjacent_cells(dist_obj_pos)
+            self.all_possible_pos -= get_diagonally_adjacent_cells(dist_obj_pos)
             self.objs.append((dist_obj, dist_obj_pos))
             self.disallowed_obj_config.add((type(dist_obj), dist_obj.color))
 
@@ -814,13 +843,24 @@ class RoomDoorKeyLevel(BaseLevel):
     def initialize_level(self):
         # Generate rectangular room and door
         self.inner_cells, self.outer_cells = self._generate_rectangular_section(True)
-        door_pos = random.choice([pos for _, pos in self.walls])
+        valid_door_pos = []
+        wall_positions = [pos for _, pos in self.walls]
+        for pos in wall_positions:
+            adj_cells = get_adjacent_cells(pos, ret_as_list = True)
+            left, right = adj_cells[1], adj_cells[0]
+            above, below = adj_cells[2], adj_cells[3]
+            if (left in wall_positions and right in wall_positions) or (above in wall_positions and below in wall_positions):
+                valid_door_pos.append(pos)
+        door_pos = random.choice(valid_door_pos)
         self.doors.append((Door(is_locked = True, color = random.choice(COLOR_NAMES)), door_pos))
+        self.all_possible_pos -= get_adjacent_cells(door_pos)  # FIXME: sort of a temporary fix because there's no easy way to tell if door in this environment is blocked but it still works tbh
 
         # Place agent and key outside of the room, target inside the room
         self._set_agent_start_position(self.outer_cells)
         key_pos = random.choice(list(self.outer_cells))
         self.all_possible_pos -= set([key_pos])
+        self.all_possible_pos -= get_adjacent_cells(key_pos)
+        self.all_possible_pos -= get_diagonally_adjacent_cells(key_pos)
         self.keys.append((Key(color = self.doors[0][0].color), key_pos))
         if self.is_single_target:
             self._set_target_start_position(self.inner_cells)
@@ -900,6 +940,17 @@ class TreasureIslandLevel(BaseLevel):
     def initialize_level(self):
         # Generate section blocked off by lava
         self.inner_cells, self.outer_cells = self._generate_rectangular_section(False)
+        valid_bridge_pos = []
+        lava_positions = [pos for obj, pos in self.objs if type(obj) == Lava]
+        for pos in lava_positions:
+            adj_cells = get_adjacent_cells(pos, ret_as_list = True)
+            left, right = adj_cells[1], adj_cells[0]
+            above, below = adj_cells[2], adj_cells[3]
+            if (left in lava_positions and right in lava_positions) or (above in lava_positions and below in lava_positions):
+                valid_bridge_pos.append(pos)
+        bridge_pos = random.choice(valid_bridge_pos)
+        self.objs.append((Bridge(), bridge_pos))
+        self.all_possible_pos -= get_adjacent_cells(bridge_pos)  # FIXME: sort of a temporary fix because there's no easy way to tell if door in this environment is blocked but it still works tbh
 
         # Place agent outside of the section, target inside the section
         self._set_agent_start_position(self.outer_cells)

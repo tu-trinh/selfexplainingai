@@ -1,6 +1,8 @@
-from package.infrastructure.env_constants import DIR_TO_VEC, MAX_ROOM_SIZE, COLOR_NAMES, OBJ_NAME_MAPPING
+from package.infrastructure.env_constants import DIR_TO_VEC, MAX_ROOM_SIZE, COLOR_NAMES
+from package.infrastructure.obj_constants import OBJ_NAME_MAPPING
 from package.search import Search, State
-from package.infrastructure.basic_utils import manhattan_distance, debug
+from package.infrastructure.basic_utils import manhattan_distance, debug, get_adjacent_cells
+from package.envs.modifications import Bridge
 
 from minigrid.core.world_object import Wall
 
@@ -184,8 +186,9 @@ def _find_path(master_env: Env, object_pos: Tuple[int, int], action_type: str, f
     return actions
 
 
-def _check_clear_door(agent_pos, door_pos, grid):
+def _check_clear_door(agent_pos, door_pos, grid, is_bridge = False):
     dir_to_agent = (agent_pos[0] - door_pos[0], agent_pos[1] - door_pos[1])
+    # Finding where the agent is in relation to the door
     agent_dir_locs = [False, False, False, False]  # right, below, left, above
     if dir_to_agent[0] < 0:
         agent_dir_locs[2] = True
@@ -197,12 +200,31 @@ def _check_clear_door(agent_pos, door_pos, grid):
         agent_dir_locs[1] = True
     clear_door = True
     blocker_obj = None
-    for i, adl in enumerate(agent_dir_locs):
-        if adl:
-            dir_vec = DIR_TO_VEC[i]
-            adj_obj = grid.get(door_pos[0] + dir_vec[0], door_pos[1] + dir_vec[1])
-            if not (adj_obj is None or type(adj_obj) == Wall):
+    # Special case where agent is standing inside the doorway
+    # Then no object can be in front of agent, blocking it. There also should not be one behind it since it would have been removed to unblock the door
+    if agent_pos == door_pos:
+        adjacent_cells = get_adjacent_cells(door_pos)
+        for ac in adjacent_cells:
+            adj_obj = grid.get(*ac)
+            if is_bridge:
+                clear_condition = lambda ao: ao is None or type(ao) == Bridge
+            else:
+                clear_condition = lambda ao: ao is None or type(ao) == Wall
+            if not clear_condition:
                 clear_door = False
                 blocker_obj = adj_obj
                 break
+    else:
+        for i, adl in enumerate(agent_dir_locs):
+            if adl:
+                dir_vec = DIR_TO_VEC[i]
+                adj_obj = grid.get(door_pos[0] + dir_vec[0], door_pos[1] + dir_vec[1])
+                if is_bridge:
+                    clear_condition = lambda ao: ao is None or type(ao) == Bridge
+                else:
+                    clear_condition = lambda ao: ao is None or type(ao) == Wall
+                if not clear_condition:
+                    clear_door = False
+                    blocker_obj = adj_obj
+                    break
     return clear_door, blocker_obj

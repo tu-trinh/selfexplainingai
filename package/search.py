@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from package.infrastructure.basic_utils import debug, compare_world_obj
 from package.infrastructure.env_utils import get_obs_desc
-from package.infrastructure.env_constants import OBJ_NAME_MAPPING, IDX_TO_ACTION, DIR_TO_VEC
+from package.infrastructure.env_constants import IDX_TO_ACTION, DIR_TO_VEC
+from package.infrastructure.obj_constants import OBJ_NAME_MAPPING
+from package.envs.modifications import Bridge
 
 from minigrid.core.world_object import Floor, Lava, Goal, Ball, Box, Key, Door, Wall, WorldObj
 from minigrid.core.grid import Grid
@@ -64,7 +66,7 @@ class State:
                     actions.append(5)
             else:
                 actions.append(5)
-        if (in_front is not None) and (not type(in_front) in [Goal]) and not (type(in_front) == Door and in_front.is_open):  # can't move forward
+        if (in_front is not None) and (not type(in_front) in [Goal, Bridge]) and not (type(in_front) == Door and in_front.is_open):  # can't move forward
             actions.remove(2)
         for action in forbidden_actions:
             try:

@@ -15,9 +15,16 @@ def manhattan_distance(p1: Tuple[int, int], p2: Tuple[int, int]) -> int:
     x2, y2 = p2
     return abs(x2 - x1) + abs(y2 - y1)
 
-def get_adjacent_cells(cell: Tuple[int, int]) -> set:
+def get_adjacent_cells(cell: Tuple[int, int], ret_as_list: bool = False) -> Union[set, List]:
     x, y = cell
-    return set([(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)])
+    adj_cells = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+    if ret_as_list:
+        return adj_cells
+    return set(adj_cells)
+
+def get_diagonally_adjacent_cells(cell: Tuple[int, int]) -> set:
+    x, y = cell
+    return set([(x + 1, y + 1), (x + 1, y - 1), (x - 1, y + 1), (x - 1, y - 1)])
 
 def convert_to_enum(enum: Enum, value: Union[List, str]) -> List:
     if isinstance(value, str):

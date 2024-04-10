@@ -4,7 +4,6 @@
 
 ## Installation
 [figure this out for later]
-@Khanh: just git pull
 
 ## Quickstart Example
 Since there are many different tasks of different difficulties that control what the agents can communicate with each other, this is just an example showing one type of task where the principal tries to help the attendant find a plan for the attendant's mismatched environment.

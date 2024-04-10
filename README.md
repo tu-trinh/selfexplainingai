@@ -56,22 +56,26 @@ When you call `make_agents` from `builder.py`, it will automatically create the 
 - Reward functions: If you want to write your own reward function, do so in `reward_functions.py`. Reward functions are encapsulated by higher-order functions (HOF). The inner function that they return defines the logic of the reward function, while the outer HOF is responsible for making sure this logic is applicable to the specific world model it is attached to. Follow this same structure for best results.
 - Skills: If you want to write your own skills, do so in `skills.py`. Like the above, skills are encapsulated by HOFs that define a generic skill inside which then get "personalized" depending on what objects the agent's world model has. After you define a higher-order skill function, make sure you include all possible renditions of that function inside `skills.txt`.
 
-## @Khanh: alina how the heck is this code organized?
-Great question! Inside the `selfexplainingai` directory itself, the only necessary file is `run.py` which is where I setup all the experiments and stuff.
+## Built-in Functionalities
+### Skill Overview
+- MiniGrid primitives: `forward`, `left`, `right`, `pickup`, `drop`, `toggle`
+- Moving skills: `move_X_steps_DIR`. Ex. `move_3_steps_right`, `move_5_steps_backward`
+- `go_to_COLOR_OBJECT`. Valid for all objects
+- `pickup_COLOR_OBJECT`. Valid for `Ball`, `Key`, `Box`.
+- `put_down_COLOR_OBJECT`. Valid for `Ball`, `Key`, `Box`.
+- `open_COLOR_OBJECT`. Valid for `Box`, `Door`.
+- `close_COLOR_OBJECT`. Valid for `Door`.
+- `unlock_COLOR_OBJECT`. Valid for `Door`.
 
-Inside `package` are most of the files I mentioned before. In addition:
-- `configs` directory: meant to hold `skills.txt` and any custom YAML files
-- `envs` directory: holds all the environment making logic.
-    - Each of the five tasks have their own file (e.g. `go_to_task.py`). `GoToTask` and `PickUpTask` extend from `SingleTargetEnv` as they both only have one target object to interact with. `PutNextTask`, `CollectTask`, and `ClusterTask` extend from `MultiTargetEnv` as the agent needs to interact with multiple objects to succeed. Both `Single`- and `Multi-` target envs extend from `PragmaticEnv` just because there's lots of logic that overlaps. Also there is still some repetitive code, apologies, but you probably won't have to touch it. I can also modify anything you want me to
-    - `modifications.py` stores Minigrid-style objects we want to have, right now it just has the door that can't be opened
-    - `register_envs.py` is for registering the environments with gymnasium but I don't think we will use it
-- `agents.py`: defines `Agent`, `Principal`, and `Attendant`. Each has the ability to add skills, add rewards, speak, and listen. `Principal` also additionally has the option to verify if the attendant has succeeded in the task
-- `builder.py`: functions for creating the agents and environments
-- `constants.py`: LLM queries, constants, etc.
-- `enums.py`: enums for everything, including Task, Level, and Variant
-- `llm.py`: handles querying LLMs
-- `trajectories.py`: holds custom classes for Transitions and Trajectories
-- `utils.py`: util functions, also functions to get descriptions of objects and environments
+### Reward Function Overview
+Basic reward functions:
+- `reward_reach_OBJECT`. Best for `Goto` task.
+- `reward_carry_OBJECT`. Best for `Pickup` task.
+- `reward_adjacent_objects`. Best for `Put`, `Collect`, and `Cluster` tasks.
+Advanced reward functions:
+- `reward_far_away_from_region`
+- `reward_close_to_region`
+- `reward_COLOR1_OBJECT1_over_COLOR2_OBJECT2`
 
 
 [bibtex when we have it]

@@ -76,5 +76,25 @@ Advanced reward functions:
 - `reward_close_to_region`
 - `reward_COLOR1_OBJECT1_over_COLOR2_OBJECT2`
 
+### Environment Edit Overview
+- All environments
+  - `change_room_size`
+  - `change_room_orientation`
+  - `change_target_color`
+  - `hide_targets`
+  - `hide_keys`
+  - `remove_keys`
+  - `change_field_of_vision`
+  - `toggle_doors`
+- `Room_Door_Key` level:
+  - `add_opening_to_wall`
+  - `block_door`
+  - `put_agent_in_room`
+- `Treasure_Island` level:
+  - `add_bridge`
+  - `make_lava_safe`
+  - `add_fireproof_shoes`
+  - `put_agent_on_island`
+
 
 [bibtex when we have it]

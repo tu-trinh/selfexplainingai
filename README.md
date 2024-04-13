@@ -87,7 +87,7 @@ Advanced reward functions:
   - `change_field_of_vision`
   - `toggle_doors`
 - `Room_Door_Key` level:
-  - `add_opening_to_wall`
+  - `add_opening_to_wall` (includes parameter for adding door instead of hole)
   - `block_door`
   - `put_agent_in_room`
 - `Treasure_Island` level:

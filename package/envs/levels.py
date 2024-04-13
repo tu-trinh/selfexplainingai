@@ -852,7 +852,8 @@ class RoomDoorKeyLevel(BaseLevel):
             if (left in wall_positions and right in wall_positions) or (above in wall_positions and below in wall_positions):
                 valid_door_pos.append(pos)
         door_pos = random.choice(valid_door_pos)
-        self.doors.append((Door(is_locked = True, color = random.choice(COLOR_NAMES)), door_pos))
+        door_locked = self.env_seed % 2 == 1
+        self.doors.append((Door(is_locked = door_locked, color = random.choice(COLOR_NAMES)), door_pos))
         self.all_possible_pos -= get_adjacent_cells(door_pos)  # FIXME: sort of a temporary fix because there's no easy way to tell if door in this environment is blocked but it still works tbh
 
         # Place agent and key outside of the room, target inside the room
@@ -887,8 +888,15 @@ class RoomDoorKeyLevel(BaseLevel):
     def add_opening_to_wall(self, is_door = True):
         available_openings = set([pos for _, pos in self.walls]) - set([pos for _, pos in self.doors])
         opening_pos = random.choice(list(available_openings))
+        available_outer_pos = self.all_possible_pos.intersection(self.outer_cells)
+        door_locked = np.random.rand() > 0.5 and len(available_outer_pos) > 5  # arbitrary threshold to make sure there's space for a key and to walk around
         if is_door:
-            self.doors.append((Door(is_locked = False, color = random.choice(COLOR_NAMES)), opening_pos))
+            door = Door(is_locked = door_locked, color = random.choice(COLOR_NAMES))
+            self.doors.append((door, opening_pos))
+            if door_locked:
+                key_pos = random.choice(list(available_outer_pos))
+                self.keys.append((Key(color = door.color), key_pos))
+                self.all_possible_pos -= set([key_pos])
         else:
             for i in range(len(self.walls)):
                 if self.walls[i][1] == opening_pos:

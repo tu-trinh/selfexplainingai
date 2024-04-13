@@ -22,3 +22,5 @@ env_specs:
   seed: 16
   principal_render_mode: human
   attendant_render_mode: human
+  principal_setup_actions: [0, 1]
+  attendant_setup_actions: [0, 1]

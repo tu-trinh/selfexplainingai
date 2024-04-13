@@ -42,7 +42,9 @@ def make_envs(task: Task,
               attendant_edits: List[str] = None,
               seed: int = None,
               principal_render_mode: str = None,
-              attendant_render_mode: str = None):
+              attendant_render_mode: str = None,
+              principal_setup_actions: List[int] = None,
+              attendant_setup_actions: List[int] = None):
     # Some asserts
     assert Task.has_value(task), "Env type is not valid"
     assert Level.has_value(principal_level), "Principal level is not valid"
@@ -119,6 +121,14 @@ def make_envs(task: Task,
         "task": task, "level": attendant_level, **target_obj_kwargs, "disallowed": disallowed, "render_mode": attendant_render_mode
     }, attendant_env)
     attendant_env.bind_wrapper(a_wrapper)
+
+    # Executing the setup actions, if any
+    principal_env.reset()
+    for act in principal_setup_actions:
+        principal_env.step(act)
+    attendant_env.reset()
+    for act in attendant_setup_actions:
+        attendant_env.step(act)
     
     return principal_env, attendant_env
 

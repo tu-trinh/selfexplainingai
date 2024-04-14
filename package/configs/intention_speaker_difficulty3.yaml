@@ -14,13 +14,12 @@ attendant:
     - { name: "reward_carry_object_hof" }
   basic_reward_weights:
     - 1
-  # skills: ['drop', 'right', 'toggle', 'move_left_1_steps', 'left', 'pickup', 'forward']
-  skills: ['move_left_1_steps', 'move_backward_2_steps', 'put_down_grey_key', 'pickup_red_box', 'open_grey_door']
+  skills: ['open_blue_box', 'open_yellow_box', 'pickup_yellow_key', 'go_to_blue_ball', 'put_down_yellow_key']
 
 env_specs:
   task: PICKUP
-  principal_level: ROOM_DOOR_KEY
-  seed: 16
+  principal_level: DIST
+  seed: 29
   # principal_render_mode: human
   # attendant_render_mode: human
   principal_setup_actions: [0, 1]

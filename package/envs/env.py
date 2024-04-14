@@ -149,8 +149,8 @@ class Environment(MiniGridEnv):
                 cell = obs[r][c]
                 obj_idx, color_idx, state = cell[0], cell[1], cell[2]
                 obj, color = IDX_TO_OBJECT[obj_idx], IDX_TO_COLOR[color_idx]
-                if obj in ["wall", "lava"]:
-                    skills.setdefault(f"go_to_{obj}", go_to_color_object_hof(color, obj))
+                if obj in ["wall", "lava", "bridge"]:
+                    skills.setdefault(f"go_to_{color}_{obj}", go_to_color_object_hof(color, obj))
                 elif obj in ["door", "box"]:
                     can_toggle = True
                     skills.setdefault(f"go_to_{color}_{obj}", go_to_color_object_hof(color, obj))
@@ -159,14 +159,14 @@ class Environment(MiniGridEnv):
                         skills.setdefault(f"close_{color}_{obj}", close_color_door_hof(color))
                         if state == 2:
                             key_pos = None
-                            for obj, _ in self.keys:
-                                if obj.color == color:
-                                    key_pos = obj.init_pos
+                            for objct, _ in self.keys:
+                                if objct.color == color:
+                                    key_pos = objct.init_pos
                                     break
                             if key_pos is None:  # it's hidden inside a box!
-                                for obj, _ in self.objs:
-                                    if type(obj) == Box and obj.contains is not None and obj.contains.color == color:
-                                        key_pos = obj.init_pos
+                                for objct, _ in self.objs:
+                                    if type(objct) == Box and objct.contains is not None and objct.contains.color == color:
+                                        key_pos = objct.init_pos
                                         skills.setdefault(f"pickup_{color}_key", pickup_color_object_hof(color, "key"))
                                         skills.setdefault(f"put_down_{color}_key", put_down_color_object_hof(color, "key"))
                                         break

@@ -67,7 +67,7 @@ def go_to_color_object_hof(color: str, obj: str):
 
     def go_to_color_object(env: Env, object_pos: Tuple[int, int]):
         actions = []
-        actions.extend(_find_path(env, object_pos, "goto", can_overlap = obj == "goal"))
+        actions.extend(_find_path(env, object_pos, "goto", can_overlap = obj in ["goal", "bridge"]))
         return actions
     
     return go_to_color_object
@@ -173,8 +173,11 @@ def _find_path(master_env: Env, object_pos: Tuple[int, int], action_type: str, f
             in_front = state.grid.get(state.loc[0] + dir_vec[0], state.loc[1] + dir_vec[1])
             return manhattan_distance(state.loc, object_pos) == 1 and in_front == state.grid.get(*object_pos)
     elif action_type == "pickup":
+        obj_to_pick = env.grid.get(*object_pos)
         def goal_check(state: State):
-            return manhattan_distance(state.loc, object_pos) == 1 and state.carrying == state.grid.get(*object_pos)
+            correct_distance_away = manhattan_distance(state.loc, object_pos) == 1
+            carrying = state.carrying is not None and state.carrying.color == obj_to_pick.color and type(state.carrying) == type(obj_to_pick)
+            return correct_distance_away and carrying
     elif action_type == "putdown":
         def goal_check(state: State):  # object_pos here is the door which should not have objects blocking it
             clear_door, _ = _check_clear_door(state.loc, object_pos, state.grid)

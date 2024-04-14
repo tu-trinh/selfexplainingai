@@ -99,13 +99,13 @@ class Agent:
 
 
     def generate_skill_descriptions(self) -> List[str]:
-        return self.skills
+        # return self.skills
         skill_descs = []
         skill_subset = self._get_subset_of_skills()
         for skill in skill_subset:
             debug("Current skill:", skill)
             setup_actions, actions = self._retrieve_actions_from_skill_func(skill)
-            obs_act_seq = self._generate_obs_act_sequence(actions)
+            obs_act_seq = self._generate_obs_act_sequence(actions, setup_actions)
             skill_desc = self.llm.get_skill_description(obs_act_seq, self.skills)
             debug("LLM called it:", skill_desc)
             skill_descs.append(skill_desc)
@@ -504,8 +504,8 @@ class Agent:
         return self.skills
     
     
-    def _generate_obs_act_sequence(self, action_sequence: Union[List[int], TaskNode]) -> str:
-        detail_level = 1
+    def _generate_obs_act_sequence(self, action_sequence: Union[List[int], TaskNode], setup_actions: List[int] = []) -> str:
+        detail_level = 3
         if isinstance(action_sequence, list):
             sequence = action_sequence
         else:
@@ -513,6 +513,8 @@ class Agent:
         obs_act_seq = ""
         env_copy = copy.deepcopy(self.world_model)
         obs, _ = env_copy.reset()
+        for act in setup_actions:
+            obs, _, _, _, _ = env_copy.step(act)
         idx = 0
         while idx < len(sequence):
             obs_act_seq += f"Obs {idx + 1}: "
@@ -571,6 +573,7 @@ class Agent:
                         target_pos = obj.cur_pos if obj.cur_pos is not None else obj.init_pos
                         target_obj = obj
                         break
+            
             if skill_type == "pickup_":  # special case of hidden key because agent won't be able to pick up the key directly at first
                 if self.world_model.level == Level.HIDDEN_KEY:
                     setup_actions = _find_path(world_model_copy, target_pos, "goto", forbidden_actions = [3, 4, 5]) + [5]
@@ -582,7 +585,10 @@ class Agent:
                 setup_actions = _find_path(world_model_copy, target_pos, "goto", forbidden_actions = [3, 4, 5])
                 setup_actions += [5, 3] if self.world_model.level == Level.HIDDEN_KEY else [3]
                 self.execute_actions(setup_actions, world_model_copy)
-                target_pos = self.world_model.doors[0][1]  # pick any random door to not be blocked when agent puts down
+                if len(self.world_model.doors) > 0:
+                    target_pos = self.world_model.doors[0][1]  # pick any random door to not be blocked when agent puts down
+                else:
+                    target_pos = self.world_model.agent_start_pos  # no better default
                 additional = _find_path(world_model_copy, self.world_model.agent_start_pos, action_type = "goto", forbidden_actions = [3, 4, 5], can_overlap = True)
                 setup_actions.extend(additional)
                 self.execute_actions(additional, world_model_copy)
@@ -633,6 +639,8 @@ class Agent:
             color, target = "grey", "wall"
         elif "lava" in components:
             color, target = "red", "lava"
+        elif "bridge" in components:
+            color, target = "brown", "bridge"
         else:
             color, target = components[0], components[1]
         return color, NAME_OBJ_MAPPING[target]

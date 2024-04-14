@@ -59,7 +59,7 @@ When you call `make_agents` from `builder.py`, it will automatically create the 
 ### Skill Overview
 - MiniGrid primitives: `forward`, `left`, `right`, `pickup`, `drop`, `toggle`
 - Moving skills: `move_X_steps_DIR`. Ex. `move_3_steps_right`, `move_5_steps_backward`
-- `go_to_COLOR_OBJECT`. Valid for all objects
+- `go_to_COLOR_OBJECT`. Valid for all objects.
 - `pickup_COLOR_OBJECT`. Valid for `Ball`, `Key`, `Box`.
 - `put_down_COLOR_OBJECT`. Valid for `Ball`, `Key`, `Box`.
 - `open_COLOR_OBJECT`. Valid for `Box`, `Door`.

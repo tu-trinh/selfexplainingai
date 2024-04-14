@@ -2,8 +2,8 @@ from package.infrastructure.env_constants import MAX_ROOM_SIZE, COLOR_NAMES
 from package.infrastructure.obj_constants import OBJ_NAME_MAPPING
 
 
-TEMPERATURE = 0
-MAX_NEW_TOKENS = 100
+TEMPERATURE = 0.01
+MAX_NEW_TOKENS = 150
 NUM_ACTIONS_GENERATED = 1
 PROMPT_HISTORY_LIMIT = 3
 

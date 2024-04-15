@@ -48,6 +48,7 @@ class Environment(MiniGridEnv):
                  target_obj: WorldObj = None,
                  target_objs: List[WorldObj] = None,
                  disallowed: Dict[Variant, Any] = None,
+                 allowed_object_colors: List[str] = COLOR_NAMES,
                  max_steps: int = None,
                  agent_view_size: int = 5,
                  render_mode = None,
@@ -57,6 +58,7 @@ class Environment(MiniGridEnv):
         self.task = task
         self.level = level
         self.disallowed = disallowed if disallowed else {}
+        self.allowed_object_colors = allowed_object_colors
         self.render_mode = render_mode
         self.agent_view_size = agent_view_size
         self.is_single_target = self.task in [Task.GOTO, Task.PICKUP]
@@ -407,7 +409,7 @@ class Environment(MiniGridEnv):
     def hide_targets(self):
         if self.task in [Task.GOTO, Task.PICKUP]:
             if type(self.target_obj) != Box:
-                box = Box(color = random.choice(COLOR_NAMES))
+                box = Box(color = random.choice(self.allowed_object_colors))
                 box.contains = self.target_obj
                 self.objs.remove((self.target_obj, self.target_obj_pos))
                 self.objs.append((box, self.target_obj_pos))
@@ -416,7 +418,7 @@ class Environment(MiniGridEnv):
             target_objs_pos = flatten_list(self.target_objs_pos)
             for to, top in zip(target_objs, target_objs_pos):
                 if type(to) != Box:
-                    box = Box(color = random.choice(COLOR_NAMES))
+                    box = Box(color = random.choice(self.allowed_object_colors))
                     box.contains = to
                     self.objs.remove((to, top))
                     self.objs.append((box, top))
@@ -428,7 +430,7 @@ class Environment(MiniGridEnv):
             warnings.warn("Cannot hide keys in environment without keys")
             return
         for key, pos in self.keys:
-            box = Box(color = random.choice(COLOR_NAMES))
+            box = Box(color = random.choice(self.allowed_object_colors))
             box.contains = key
             self.keys.remove((key, pos))
             self.objs.append((box, pos))

@@ -2,7 +2,7 @@ import sys
 sys.path.append("/Users/tutrinh/Work/CHAI/selfexplainingai")
 
 from package.infrastructure.basic_utils import xor, convert_to_enum, flatten_list
-from package.infrastructure.env_constants import ALLOWABLE_VARIANTS
+from package.infrastructure.env_constants import ALLOWABLE_VARIANTS, COLOR_NAMES
 from package.enums import Task, Level, Variant
 from package.envs.env import *
 from package.agents import *
@@ -41,10 +41,11 @@ def make_envs(task: Task,
               attendant_variants: List[Variant] = None,
               attendant_edits: List[str] = None,
               seed: int = None,
+              allowed_object_colors: Union[List, str] = COLOR_NAMES,
               principal_render_mode: str = None,
               attendant_render_mode: str = None,
-              principal_setup_actions: List[int] = None,
-              attendant_setup_actions: List[int] = None):
+              principal_setup_actions: List[int] = [],
+              attendant_setup_actions: List[int] = []):
     # Some asserts
     assert Task.has_value(task), "Env type is not valid"
     assert Level.has_value(principal_level), "Principal level is not valid"
@@ -66,7 +67,7 @@ def make_envs(task: Task,
     # Making principal env first
     seed = random.randint(0, 10000) if not seed else seed
     p_env_cls = create_env_class(task, principal_level)
-    principal_env = p_env_cls(seed, task, principal_level, render_mode = principal_render_mode)
+    principal_env = p_env_cls(seed, task, principal_level, render_mode = principal_render_mode, allowed_object_colors = allowed_object_colors)
     
     # Creating the disallowed dictionary for variants
     if attendant_variants is not None:
@@ -103,9 +104,9 @@ def make_envs(task: Task,
         target_obj_kwargs["target_objs"] = [type(obj) for obj in principal_env.target_objs]
     if attendant_level:
         a_env_cls = create_env_class(task, attendant_level)
-        attendant_env = a_env_cls(seed, task, attendant_level, **target_obj_kwargs, render_mode = attendant_render_mode)
+        attendant_env = a_env_cls(seed, task, attendant_level, **target_obj_kwargs, render_mode = attendant_render_mode, allowed_object_colors = allowed_object_colors)
     elif attendant_variants:
-        attendant_env = p_env_cls(seed, task, principal_level, **target_obj_kwargs, disallowed = disallowed, render_mode = attendant_render_mode)
+        attendant_env = p_env_cls(seed, task, principal_level, **target_obj_kwargs, disallowed = disallowed, render_mode = attendant_render_mode, allowed_object_colors = allowed_object_colors)
     elif attendant_edits:
         attendant_env = copy.deepcopy(principal_env)
         apply_edits(attendant_env, attendant_edits)
@@ -146,11 +147,12 @@ def _custom_init(self,
                  target_obj: WorldObj = None,
                  target_objs: List[WorldObj] = None,
                  disallowed: Dict[Variant, Any] = None,
+                 allowed_object_colors: List[str] = COLOR_NAMES,
                  max_steps: int = None,
                  agent_view_size: int = 5,
                  render_mode = None,
                  **kwargs):
-    Environment.__init__(self, env_seed, task, level, target_obj, target_objs, disallowed, max_steps, agent_view_size, render_mode, **kwargs)
+    Environment.__init__(self, env_seed, task, level, target_obj, target_objs, disallowed, allowed_object_colors, max_steps, agent_view_size, render_mode, **kwargs)
     task_cls = task_class_mapping[task]
     level_cls = level_class_mapping[level]
     task_cls.__init__(self)

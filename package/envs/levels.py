@@ -1,6 +1,6 @@
 from package.enums import Variant, Task, Level
 from package.envs.modifications import HeavyDoor, Bridge, FireproofShoes
-from package.infrastructure.env_constants import COLOR_NAMES, MAX_NUM_LOCKED_DOORS
+from package.infrastructure.env_constants import MAX_NUM_LOCKED_DOORS
 from package.infrastructure.obj_constants import TANGIBLE_OBJS, PLAYABLE_OBJS, DISTRACTOR_OBJS
 from package.infrastructure.basic_utils import flatten_list, debug, get_diagonally_adjacent_cells, get_adjacent_cells
 
@@ -54,10 +54,10 @@ class BaseLevel(ABC):
             elif self.task == Task.PICKUP:
                 index = self.env_seed % len(TANGIBLE_OBJS)
                 self.target_obj_type = TANGIBLE_OBJS[index]
-        object_colors = [cn for cn in COLOR_NAMES if cn != "grey"]
+        object_colors = self.allowed_object_colors
         index = self.env_seed % len(object_colors)
         if Variant.COLOR in self.disallowed:
-            color = list(set(COLOR_NAMES) - set([self.disallowed[Variant.COLOR]]))[index]
+            color = list(set(self.allowed_object_colors) - set([self.disallowed[Variant.COLOR]]))[index]
         else:
             color = object_colors[index]
         if self.target_obj_type == Goal:
@@ -73,7 +73,7 @@ class BaseLevel(ABC):
                 disallowed_color = self.disallowed[Variant.COLOR]
             else:
                 disallowed_color = ""
-            allowed_colors = [color for color in COLOR_NAMES if color != disallowed_color]
+            allowed_colors = [color for color in self.allowed_object_colors if color != disallowed_color]
             if self.task == Task.PUT:
                 idx1 = self.env_seed % len(TANGIBLE_OBJS)
                 idx2 = (self.env_seed + 1) % len(PLAYABLE_OBJS)
@@ -155,6 +155,7 @@ class BaseLevel(ABC):
 
     def _set_target_start_position(self, allowed_positions: set = None) -> None:
         if allowed_positions:
+            allowed_positions = copy.deepcopy(self.all_possible_pos.intersection(set(allowed_positions)))
             self.target_obj_pos = random.choice(list(allowed_positions))
             allowed_positions -= set([self.target_obj_pos])
         else:
@@ -166,7 +167,7 @@ class BaseLevel(ABC):
         if allowed_positions is None:
             allowed_positions = copy.deepcopy(self.all_possible_pos)
         else:
-            allowed_positions = copy.deepcopy(allowed_positions)
+            allowed_positions = copy.deepcopy(self.all_possible_pos.intersection(set(allowed_positions)))
         if self.task == Task.PUT:
             allowed_positions = list(allowed_positions)
             a, b = (0, 0), (0, 0)
@@ -286,7 +287,7 @@ class BaseLevel(ABC):
         for existing_obj, _ in self.objs:
             disallowed_blocker_obj_config.add((type(existing_obj), existing_obj.color))
         while (type(blocker_obj), blocker_obj.color) in disallowed_blocker_obj_config:
-            blocker_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(COLOR_NAMES))
+            blocker_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(self.allowed_object_colors))
         self.objs.append((blocker_obj, blocker_obj_pos))
         self.blocker_obj = blocker_obj
 
@@ -341,7 +342,7 @@ class BaseLevel(ABC):
             self._rearrange_objects(wall_positions)
 
         # Establish doors
-        self.doors = [(Door(is_locked = self.level in [Level.UNLOCK_DOOR, Level.HIDDEN_KEY], color = random.choice(COLOR_NAMES)), random.choice(wall_positions))]
+        self.doors = [(Door(is_locked = self.level in [Level.UNLOCK_DOOR, Level.HIDDEN_KEY], color = random.choice(self.allowed_object_colors)), random.choice(wall_positions))]
 
         # Return for future calculations
         return other_side_x_lb, other_side_x_ub, other_side_y_lb, other_side_y_ub
@@ -405,7 +406,7 @@ class BaseLevel(ABC):
         self.all_possible_pos -= set(wall_positions)
 
         # Establish doors
-        self.doors = [(Door(color = random.choice(COLOR_NAMES)), random.choice(wall_positions))]
+        self.doors = [(Door(color = random.choice(self.allowed_object_colors)), random.choice(wall_positions))]
 
         # Return for future calculations
         return return_tuple
@@ -424,7 +425,7 @@ class BaseLevel(ABC):
                 for to in flatten_list(self.target_objs):
                     if type(to) == Box:
                         disallowed_box_colors.add(to.color)
-            box = Box(color = random.choice(list(set(COLOR_NAMES) - disallowed_box_colors)))
+            box = Box(color = random.choice(list(set(self.allowed_object_colors) - disallowed_box_colors)))
             box.contains = key
             self.objs.append((box, key_pos))
         else:
@@ -501,17 +502,25 @@ class BaseLevel(ABC):
         return [(x, y) for x in range(start_x, end_x + 1) for y in range(start_y, end_y + 1)]
     
     
-    def _generate_walls_for_partition(self, start_x: int, end_x: int, start_y: int, end_y: int, min_subroom_size: int = 2) -> Tuple[List[Tuple[int, int]], Tuple[int, int]]:
+    def _generate_walls_for_partition(self, start_x: int, end_x: int, start_y: int, end_y: int, disallowed_wall_rows: List[int], disallowed_wall_cols: List[int], min_subroom_size: int = 2) -> Tuple[List[Tuple[int, int]], Tuple[int, int]]:
         walls = []
         door = None  # Initialize door as None; it may remain None based on randomness
         # Determine if we're splitting vertically or horizontally based on the larger dimension
         split_vertically = (end_x - start_x) > (end_y - start_y)
+        # debug("Split vertically?", split_vertically)
         if split_vertically:
             # Ensure there's enough space for a subroom on either side of the wall
             if (end_x - start_x) < 2 * min_subroom_size:
+                # debug("welp the room would be too small! from", start_x, "to", end_x)
                 return walls, door  # Not enough space to split this partition further
-            wall_x = random.randint(start_x + min_subroom_size, end_x - min_subroom_size)
+            allowed_wall_cols = set(range(start_x + min_subroom_size, end_x - min_subroom_size + 1)) - set(disallowed_wall_cols)
+            if len(allowed_wall_cols) == 0:
+                return walls, door  # No more possible wall column to make
+            wall_x = random.choice(list(allowed_wall_cols))
+            # debug("Wall column will be at", wall_x)
             slit_y = random.randint(start_y, end_y)
+            # debug("Opening will be at", slit_y)
+            disallowed_wall_rows.append(slit_y)  # later wall rows, if any, cannot be at this opening
             for y in range(start_y, end_y + 1):
                 if y != slit_y:  # Skip the slit position
                     walls.append((wall_x, y))
@@ -519,9 +528,16 @@ class BaseLevel(ABC):
                     door = (wall_x, y)
         else:
             if (end_y - start_y) < 2 * min_subroom_size:
+                # debug("welp the room would be too small! from", start_y, "to", end_y)
                 return walls, door
-            wall_y = random.randint(start_y + min_subroom_size, end_y - min_subroom_size)
+            allowed_wall_rows = set(range(start_y + min_subroom_size, end_y - min_subroom_size + 1)) - set(disallowed_wall_rows)
+            if len(allowed_wall_rows) == 0:
+                return walls, door  # No more possible wall row to make
+            wall_y = random.choice(list(allowed_wall_rows))
+            # debug("Wall row will be at", wall_y)
             slit_x = random.randint(start_x, end_x)
+            # debug("Opening will be at", slit_x)
+            disallowed_wall_cols.append(slit_x)  # later wall columns, if any, cannot be at this opening
             for x in range(start_x, end_x + 1):
                 if x != slit_x:  # Skip the slit position
                     walls.append((x, wall_y))
@@ -531,21 +547,35 @@ class BaseLevel(ABC):
     
     
     def _gen_multiple_rooms(self) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]], List[set[Tuple[int, int]]], List[bool]]:
+        # debug("we want", self.num_rooms, "rooms and the size is", self.room_size)
         walls = []
         doors = []
+        disallowed_wall_rows = []
+        disallowed_wall_cols = []
         partitions = [(1, self.room_size - 2, 1, self.room_size - 2)]  # Initial partition covering the whole room
         partition_cells = []
         partition_entryways = []
         while len(partitions) < self.num_rooms:
+            # debug("num partitions now", len(partitions))
             # Randomly select a partition to split
             partition_to_split = random.choice(partitions)
             partitions.remove(partition_to_split)
-            start_x, end_x, start_y, end_y = partition_to_split    
+            start_x, end_x, start_y, end_y = partition_to_split
+            # debug("Splitting partition: X from", start_x, "to", end_x, "Y from", start_y, "to", end_y)
+            # debug("still gucci")
             # Generate walls within the selected partition
-            new_walls, door = self._generate_walls_for_partition(start_x, end_x, start_y, end_y)
+            new_walls, door = self._generate_walls_for_partition(start_x, end_x, start_y, end_y, disallowed_wall_rows, disallowed_wall_cols)
+            # debug("New walls!", new_walls)
+            # debug("Dis wall rows", disallowed_wall_rows)
+            # debug("Dis wall cols", disallowed_wall_cols)
+            # debug(door)
             if not new_walls and not door:
+                # debug("room size", self.room_size)
+                # debug("walls", walls)
+                # debug("doors", doors)
+                # return
                 partitions.append(partition_to_split)  # Revert if no walls or door were added
-                continue
+                break  # once we hit a block, exit loop and stop trying to make rooms
             if door:
                 doors.append(door)
             # Determine new partitions created by the wall
@@ -621,8 +651,8 @@ class BaseLevel(ABC):
                 temp = flatten_list(self.target_objs)
                 dist_obj = temp[0]
             while (type(dist_obj), dist_obj.color) in self.disallowed_obj_config:
-                dist_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(COLOR_NAMES))
-            if Variant.OBJECTS in self.disallowed and self.required_obj_positions[i] in self.all_possible_pos and (additional_allowable_pos is None or (self.required_obj_positions[i] in additional_allowable_pos)):
+                dist_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(self.allowed_object_colors))
+            if Variant.OBJECTS in self.disallowed and self.required_obj_positions[i] in self.all_possible_pos and (additional_allowable_pos is None or self.required_obj_positions[i] in additional_allowable_pos):
                 dist_obj_pos = self.required_obj_positions[i]
             else:
                 dist_obj_pos = random.choice(list(self.all_possible_pos))
@@ -813,7 +843,7 @@ class MultipleRoomsLevel(BaseLevel):
         self._determine_num_rooms()
         room_walls, room_doors, room_cells, door_markers = self._gen_multiple_rooms()
         self.walls.extend([(Wall(), pos) for pos in room_walls + room_doors])
-        available_door_colors = copy.deepcopy(COLOR_NAMES)
+        available_door_colors = copy.deepcopy(self.allowed_object_colors)
         for pos in room_doors:
             chosen_color = random.choice(available_door_colors)
             self.doors.append((Door(is_locked = False, color = chosen_color), pos))
@@ -853,7 +883,7 @@ class RoomDoorKeyLevel(BaseLevel):
                 valid_door_pos.append(pos)
         door_pos = random.choice(valid_door_pos)
         door_locked = self.env_seed % 2 == 1
-        self.doors.append((Door(is_locked = door_locked, color = random.choice(COLOR_NAMES)), door_pos))
+        self.doors.append((Door(is_locked = door_locked, color = random.choice(self.allowed_object_colors)), door_pos))
         self.all_possible_pos -= get_adjacent_cells(door_pos)  # FIXME: sort of a temporary fix because there's no easy way to tell if door in this environment is blocked but it still works tbh
 
         # Place agent and key outside of the room, target inside the room
@@ -891,7 +921,7 @@ class RoomDoorKeyLevel(BaseLevel):
         available_outer_pos = self.all_possible_pos.intersection(self.outer_cells)
         door_locked = np.random.rand() > 0.5 and len(available_outer_pos) > 5  # arbitrary threshold to make sure there's space for a key and to walk around
         if is_door:
-            door = Door(is_locked = door_locked, color = random.choice(COLOR_NAMES))
+            door = Door(is_locked = door_locked, color = random.choice(self.allowed_object_colors))
             self.doors.append((door, opening_pos))
             if door_locked:
                 key_pos = random.choice(list(available_outer_pos))
@@ -932,7 +962,7 @@ class RoomDoorKeyLevel(BaseLevel):
                     blocker_obj = flatten_list(self.target_objs)[0]
                 disallowed_blocker_obj_config = set([(type(blocker_obj), blocker_obj.color)])
                 while (type(blocker_obj), blocker_obj.color) in disallowed_blocker_obj_config:
-                    blocker_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(COLOR_NAMES))
+                    blocker_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(self.allowed_object_colors))
                 self.objs.append((blocker_obj, blocker_pos))
         self._gen_grid(self.room_size, self.room_size)
         if failed:
@@ -1032,10 +1062,10 @@ class BossLevel(BaseLevel):
         # Handle UNLOCK_DOOR characteristics
         necessary_key_colors = []
         locked_doors = 0
-        available_door_colors = copy.deepcopy(COLOR_NAMES)
+        available_door_colors = copy.deepcopy(self.allowed_object_colors)
         for room_door_pos in room_doors:
             is_locked = random.choice([True, False])
-            chosen_color = random.choice(COLOR_NAMES)
+            chosen_color = random.choice(available_door_colors)
             available_door_colors.remove(chosen_color)
             door = Door(is_locked = is_locked and locked_doors < MAX_NUM_LOCKED_DOORS, color = chosen_color)
             if is_locked:
@@ -1095,7 +1125,7 @@ class BossLevel(BaseLevel):
                 else:
                     dist_obj = flatten_list(self.target_objs)[0]
                 while (type(dist_obj), dist_obj.color) in self.disallowed_obj_config:
-                    dist_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(COLOR_NAMES))
+                    dist_obj = random.choice(DISTRACTOR_OBJS)(color = random.choice(self.allowed_object_colors))
                 if Variant.OBJECTS in self.disallowed and self.required_obj_positions[i] in self.all_possible_pos:
                     dist_obj_pos = self.required_obj_positions[i]
                 else:

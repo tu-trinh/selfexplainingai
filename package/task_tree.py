@@ -4,7 +4,7 @@ from package.infrastructure.env_constants import ACTION_TO_IDX
 from package.infrastructure.basic_utils import debug
 
 from minigrid.minigrid_env import MiniGridEnv
-from minigrid.core.world_object import WorldObj, Wall
+from minigrid.core.world_object import WorldObj, Wall, Lava
 
 import copy
 from collections import deque
@@ -40,8 +40,8 @@ class TaskNode:
         agent_pos = env.agent_pos
         dir_vec = env.dir_vec
         facing_obj = env.grid.get(agent_pos[0] + dir_vec[0], agent_pos[1] + dir_vec[1])
-        # if end of trajectory and agent is facing nothing or a wall, check if it's on a goal or a bridge
-        if facing_obj is None or type(facing_obj) == Wall:
+        # if end of trajectory and agent is facing nothing or a wall or lava, check if it's on a goal or a bridge
+        if facing_obj is None or type(facing_obj) in [Wall, Lava]:
             facing_obj = env.grid.get(agent_pos[0], agent_pos[1])
         return facing_obj
     

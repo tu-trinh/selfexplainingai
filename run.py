@@ -48,41 +48,35 @@ if __name__ == "__main__":
     assert xor(args.speaker_task, args.listener_task, none_check = False), "Exactly one type of task needed"
 
     principal, attendant = make_agents(f"./package/configs/{yaml_builder(args)}")
-    # debug("hoe what")
-    # debug(attendant.world_model.allowable_skills.keys())
-    # debug("bitch what")
-    # debug(attendant.skills)
-    # attendant.world_model.render_mode = "human"
-    # attendant.world_model.render()
-    # time.sleep(10)
+    attendant.world_model.render_mode = "human"
+    attendant.world_model.render()
+    time.sleep(10)
     
-    for skill in attendant.skills:
-        debug("Current skill:", skill)
-        setup_actions, actions = attendant._retrieve_actions_from_skill_func(skill)
-        obs_act_seq = attendant._generate_obs_act_sequence(actions, setup_actions)
-        if "go_" in skill or "move_" in skill:
-            hint = "This task has something to do with movement."
-        else:
-            hint = "This task has something to do with interacting with some object."
-        prompt = f"There is a grid-like environment in which there is an AI agent. Some special quirks about this environment: locked doors can only be unlocked by keys of the same color as the door. In addition, when boxes are opened, they disappear and whatever was inside them replaces their spot on the grid. Now, we have an AI agent who is repeatedly given observations (environment descriptions) and then chooses actions to execute in response to the observations. This process has resulted in the below observation-and-action sequence. The ultimate goal of the AI agent in doing this sequence is to complete a task/skill/ability. Given this sequence, what do you think the AI agent is trying to do? (Hint: {hint}) In your response, on the first line please give me the task/skill/ability you think the agent is trying to do, then on subsequent lines give me 10 paraphrases of this task/skill/ability. Do not say anything else or format your response in any other way. Observation-and-action sequence below:\n{obs_act_seq}\n"
-        debug("Asked the LLM")
-        debug(prompt)
-        url = f"https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1"
-        headers = {"Authorization": f"Bearer {HUGGINGFACE_KEY}"}
-        payload = {
-            "inputs": prompt,
-            "options": {"wait_for_model": True},
-            "parameters": {"max_new_tokens": MAX_NEW_TOKENS, "temperature": TEMPERATURE}
-        }
-        try:
-            response_obj = requests.post(url, headers = headers, json = payload)
-            # debug("LLM SAID?")
-            # debug(response_obj.json())
-            response = response_obj.json()[0]["generated_text"][len(prompt):]
-            debug("LLM SAID!")
-            debug(response)
-        except Exception as e:
-            print("Could not complete LLM request due to", e)
-        print("\n\n\n")
-        
-
+    # for skill in attendant.skills:
+    #     debug("Current skill:", skill)
+    #     setup_actions, actions = attendant._retrieve_actions_from_skill_func(skill)
+    #     obs_act_seq = attendant._generate_obs_act_sequence(actions, setup_actions)
+    #     if "go_" in skill or "move_" in skill:
+    #         hint = "This task has something to do with movement."
+    #     else:
+    #         hint = "This task has something to do with interacting with some object."
+    #     prompt = f"There is a grid-like environment in which there is an AI agent. Some special quirks about this environment: locked doors can only be unlocked by keys of the same color as the door. In addition, when boxes are opened, they disappear and whatever was inside them replaces their spot on the grid. Now, we have an AI agent who is repeatedly given observations (environment descriptions) and then chooses actions to execute in response to the observations. This process has resulted in the below observation-and-action sequence. The ultimate goal of the AI agent in doing this sequence is to complete a task/skill/ability. Given this sequence, what do you think the AI agent is trying to do? (Hint: {hint}) In your response, on the first line please give me the task/skill/ability you think the agent is trying to do, then on subsequent lines give me 10 paraphrases of this task/skill/ability. Do not say anything else or format your response in any other way. Observation-and-action sequence below:\n{obs_act_seq}\n"
+    #     debug("Asked the LLM")
+    #     debug(prompt)
+    #     url = f"https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1"
+    #     headers = {"Authorization": f"Bearer {HUGGINGFACE_KEY}"}
+    #     payload = {
+    #         "inputs": prompt,
+    #         "options": {"wait_for_model": True},
+    #         "parameters": {"max_new_tokens": MAX_NEW_TOKENS, "temperature": TEMPERATURE}
+    #     }
+    #     try:
+    #         response_obj = requests.post(url, headers = headers, json = payload)
+    #         # debug("LLM SAID?")
+    #         # debug(response_obj.json())
+    #         response = response_obj.json()[0]["generated_text"][len(prompt):]
+    #         debug("LLM SAID!")
+    #         debug(response)
+    #     except Exception as e:
+    #         print("Could not complete LLM request due to", e)
+    #     print("\n\n\n")

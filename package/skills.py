@@ -4,9 +4,9 @@ from package.search import Search, State
 from package.infrastructure.basic_utils import manhattan_distance, debug, get_adjacent_cells
 from package.envs.modifications import Bridge
 
-from minigrid.core.world_object import Wall
+from minigrid.core.world_object import Wall, Door, Lava
 
-from typing import Tuple, List
+from typing import Tuple, List, Union
 from gymnasium import Env
 import copy
 
@@ -160,7 +160,7 @@ def close_color_door_hof(color: str):
 """
 Helper methods
 """
-def _find_path(master_env: Env, object_pos: Tuple[int, int], action_type: str, forbidden_actions: List[int] = [], can_overlap: bool = False, reset: bool = False):
+def _find_path(master_env: Env, object_pos: Union[Tuple[int, int], Tuple[Tuple[int, int]]], action_type: str, forbidden_actions: List[int] = [], can_overlap: bool = False, reset: bool = False):
     env = copy.deepcopy(master_env)
     if reset:
         env.reset()
@@ -180,8 +180,8 @@ def _find_path(master_env: Env, object_pos: Tuple[int, int], action_type: str, f
             return correct_distance_away and carrying
     elif action_type == "putdown":
         def goal_check(state: State):  # object_pos here is the door which should not have objects blocking it
-            clear_door, _ = _check_clear_door(state.loc, object_pos, state.grid)
-            return state.carrying is None and clear_door
+            clear_pos, _ = _check_clear_pos(state.loc, object_pos, state.grid)
+            return state.carrying is None and clear_pos
     search_problem = Search("bfs", env, goal_check, "s", forbidden_actions)
     actions = search_problem.search()
     if actions is None:  # TODO: idk
@@ -189,45 +189,61 @@ def _find_path(master_env: Env, object_pos: Tuple[int, int], action_type: str, f
     return actions
 
 
-def _check_clear_door(agent_pos, door_pos, grid, is_bridge = False):
-    dir_to_agent = (agent_pos[0] - door_pos[0], agent_pos[1] - door_pos[1])
-    # Finding where the agent is in relation to the door
-    agent_dir_locs = [False, False, False, False]  # right, below, left, above
-    if dir_to_agent[0] < 0:
-        agent_dir_locs[2] = True
-    elif dir_to_agent[0] > 0:
-        agent_dir_locs[0] = True
-    if dir_to_agent[1] < 0:
-        agent_dir_locs[3] = True
-    elif dir_to_agent[1] > 0:
-        agent_dir_locs[1] = True
-    clear_door = True
-    blocker_obj = None
-    # Special case where agent is standing inside the doorway
-    # Then no object can be in front of agent, blocking it. There also should not be one behind it since it would have been removed to unblock the door
-    if agent_pos == door_pos:
-        adjacent_cells = get_adjacent_cells(door_pos)
-        for ac in adjacent_cells:
-            adj_obj = grid.get(*ac)
-            if is_bridge:
-                clear_condition = lambda ao: ao is None or type(ao) == Bridge
-            else:
-                clear_condition = lambda ao: ao is None or type(ao) == Wall
-            if not clear_condition:
-                clear_door = False
-                blocker_obj = adj_obj
-                break
-    else:
-        for i, adl in enumerate(agent_dir_locs):
-            if adl:
-                dir_vec = DIR_TO_VEC[i]
-                adj_obj = grid.get(door_pos[0] + dir_vec[0], door_pos[1] + dir_vec[1])
+def _check_clear_pos(agent_pos: Tuple[int, int], obj_pos: Union[Tuple[int, int], Tuple[Tuple[int, int]]], grid, is_bridge = False):
+    # obj_pos: 1-2 door/bridge/objs we don't want blocked
+    # is_bridge means obj_pos is a single bridge
+    def helper(to_be_clear_pos: Tuple[int, int]):
+        dir_to_agent = (agent_pos[0] - to_be_clear_pos[0], agent_pos[1] - to_be_clear_pos[1])
+        # Finding where the agent is in relation to the door/bridge/obj
+        agent_dir_locs = [False, False, False, False]  # right, below, left, above
+        if dir_to_agent[0] < 0:
+            agent_dir_locs[2] = True
+        elif dir_to_agent[0] > 0:
+            agent_dir_locs[0] = True
+        if dir_to_agent[1] < 0:
+            agent_dir_locs[3] = True
+        elif dir_to_agent[1] > 0:
+            agent_dir_locs[1] = True
+        clear_obj = True
+        blocker_obj = None
+        # Special case where agent is standing inside the doorway
+        # Then there should not be an obj behind it since it would have been removed if agent has gone through door
+        if agent_pos == to_be_clear_pos:
+            # debug("INSIDE HERE YIPPEE")
+            # debug("to be clear pos", to_be_clear_pos)
+            adjacent_cells = get_adjacent_cells(to_be_clear_pos)
+            for ac in adjacent_cells:
+                # debug("adj pos", ac)
+                adj_obj = grid.get(*ac)
                 if is_bridge:
-                    clear_condition = lambda ao: ao is None or type(ao) == Bridge
+                    clear_condition = lambda ao: ao is None or type(ao) == Lava
                 else:
-                    clear_condition = lambda ao: ao is None or type(ao) == Wall
-                if not clear_condition:
-                    clear_door = False
+                    # if it's a door, we only allow surrounding walls. if it's an object, it's ok to have an (open) door next to it
+                    clear_condition = lambda ao: ao is None or type(ao) == Wall or (type(ao) == Door and ao.is_open)
+                if not clear_condition(adj_obj):
+                    clear_obj = False
                     blocker_obj = adj_obj
                     break
-    return clear_door, blocker_obj
+        else:
+            for i, adl in enumerate(agent_dir_locs):
+                if adl:
+                    dir_vec = DIR_TO_VEC[i]
+                    adj_obj = grid.get(to_be_clear_pos[0] + dir_vec[0], to_be_clear_pos[1] + dir_vec[1])
+                    if is_bridge:
+                        clear_condition = lambda ao: ao is None or type(ao) == Lava
+                    else:
+                        clear_condition = lambda ao: ao is None or type(ao) == Wall or (type(ao) == Door and ao.is_open)
+                        # if it's a door, we only allow surrounding walls. if it's an object, it's ok to have an (open) door next to it
+                    if not clear_condition(adj_obj):
+                        clear_obj = False
+                        blocker_obj = adj_obj
+                        break
+        return clear_obj, blocker_obj
+    if isinstance(obj_pos[0], tuple):
+        for tbcp in obj_pos:  # if multiple positions need clearing. ONLY used for goal checking, NOT to detect if there is a blocking object
+            clear_obj, _ = helper(tbcp)
+            if not clear_obj:
+                return False, None
+        return True, None
+    else:  # if just one position needing to be clear
+        return helper(obj_pos)

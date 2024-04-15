@@ -4,7 +4,7 @@ from package.enums import MessageType, Task, Level
 from package.search import Search
 from package.llm import LLM
 import package.reward_functions as REWARD_FUNCTIONS
-from package.skills import _find_path, _check_clear_door
+from package.skills import _find_path, _check_clear_pos
 from package.infrastructure.basic_utils import debug, get_adjacent_cells
 from package.infrastructure.env_utils import get_obs_desc
 from package.infrastructure.env_constants import IDX_TO_ACTION
@@ -14,6 +14,7 @@ from package.envs.modifications import Bridge
 
 from minigrid.wrappers import FullyObsWrapper
 from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box, WorldObj
+from minigrid.core.grid import Grid
 from minigrid.minigrid_env import MiniGridEnv
 
 from typing import Callable, Dict, List, Tuple, Any, Union
@@ -144,19 +145,19 @@ class Agent:
             elif self.world_model.level in [Level.UNLOCK_DOOR, Level.HIDDEN_KEY, Level.ROOM_DOOR_KEY]:
                 door, door_pos = self.world_model.doors[0]
                 if self.world_model.level == Level.ROOM_DOOR_KEY:
-                    clear_door, blocker_obj = _check_clear_door(world_model_copy.agent_start_pos, door_pos, world_model_copy.grid)
-                    if (not clear_door) and ((type(blocker_obj) != Key) or (type(blocker_obj) == Key and blocker_obj.color != door.color)):  # if an object other than the key we need happens to be right in front of the door
+                    clear_door, blocker_obj = _check_clear_pos(world_model_copy.agent_start_pos, door_pos, world_model_copy.grid)
+                    if (not clear_door) and ((type(blocker_obj) != Key) or (type(blocker_obj) == Key and (not door.is_locked or blocker_obj.color != door.color))):  # if an object other than the key we need happens to be right in front of the door
                         all_actions.extend(self._pickup_blocking_obj(world_model_copy, blocker_obj.init_pos))
                         all_actions.extend(self._putdown_blocking_obj(world_model_copy, door_pos))
                 if self.world_model.level == Level.HIDDEN_KEY:
                     all_actions.extend(self._open_box_and_get_key(world_model_copy))
-                else:
+                elif door.is_locked:
                     all_actions.extend(self._get_key_lying_outside(world_model_copy, door))
-                # open the door (while holding the key)
+                # open the door (while holding the key if needed)
                 all_actions.extend(self._open_door_and_go_through(world_model_copy, door_pos))
                 if self.world_model.task == Task.PICKUP:
                     # must put down key that was used to unlock the door
-                    all_actions.extend(self._put_down_key(world_model_copy, self.world_model.target_obj_pos))
+                    all_actions.extend(self._put_down_key(world_model_copy, (self.world_model.target_obj_pos, door_pos)))
                 can_overlap = type(self.world_model.target_obj) == Goal
                 all_actions.extend(self._go_directly_to_obj(world_model_copy, self.world_model.target_obj_pos, can_overlap))
             elif self.world_model.level == Level.TREASURE_ISLAND:
@@ -164,12 +165,10 @@ class Agent:
                 for obj, pos in self.world_model.objs:
                     if type(obj) == Bridge:
                         bridge_pos = pos
-                        debug("IDENTIFIED A BRIDGE", bridge_pos)
                         break
                 if bridge_pos:  # must go to bridge first before object
-                    clear_bridge, blocker_obj = _check_clear_door(world_model_copy.agent_start_pos, bridge_pos, world_model_copy.grid, is_bridge = True)
+                    clear_bridge, blocker_obj = _check_clear_pos(world_model_copy.agent_start_pos, bridge_pos, world_model_copy.grid, is_bridge = True)
                     if not clear_bridge:  # if an object happens to be right in front of the bridge
-                        debug("BRIDGE IS NOT CLEAR", blocker_obj, "IS BLOCKING")
                         all_actions.extend(self._pickup_blocking_obj(world_model_copy, blocker_obj.init_pos))
                         all_actions.extend(self._putdown_blocking_obj(world_model_copy, bridge_pos))
                     all_actions.extend(self._go_directly_to_obj(world_model_copy, bridge_pos, True))
@@ -200,18 +199,18 @@ class Agent:
             elif self.world_model.level in [Level.UNLOCK_DOOR, Level.HIDDEN_KEY, Level.ROOM_DOOR_KEY]:
                 door, door_pos = self.world_model.doors[0]
                 if self.world_model.level == Level.ROOM_DOOR_KEY:
-                    clear_door, blocker_obj = _check_clear_door(world_model_copy.agent_start_pos, door_pos, world_model_copy.grid)
+                    clear_door, blocker_obj = _check_clear_pos(world_model_copy.agent_start_pos, door_pos, world_model_copy.grid)
                     if (not clear_door) and (type(blocker_obj) != Key):  # if an object other than the key we need happens to be right in front of the door
                         all_actions.extend(self._pickup_blocking_obj(world_model_copy, blocker_obj.init_pos))
                         all_actions.extend(self._putdown_blocking_obj(world_model_copy, door_pos))
                 if self.world_model.level == Level.HIDDEN_KEY:
                     all_actions.extend(self._open_box_and_get_key(world_model_copy))
-                else:
+                elif door.is_locked:
                     all_actions.extend(self._get_key_lying_outside(world_model_copy, door))
                 # open the door (while holding the key)
                 all_actions.extend(self._open_door_and_go_through(world_model_copy, door_pos))
                 # must put down key that was used to unlock the door
-                all_actions.extend(self._put_down_key(world_model_copy, first_obj_pos if put_first_next_to_second else second_obj_pos))
+                all_actions.extend(self._put_down_key(world_model_copy, (first_obj_pos if put_first_next_to_second else second_obj_pos, door_pos)))
                 all_actions.extend(self._go_directly_to_obj(world_model_copy, first_obj_pos if put_first_next_to_second else second_obj_pos, False) + [3])
                 all_actions.extend(self._go_directly_to_obj(world_model_copy, valid_putting_place, False) + [4])
             elif self.world_model.level == Level.TREASURE_ISLAND:
@@ -221,7 +220,7 @@ class Agent:
                         bridge_pos = pos
                         break
                 if bridge_pos:  # must go to bridge first before object
-                    clear_bridge, blocker_obj = _check_clear_door(world_model_copy.agent_start_pos, bridge_pos, world_model_copy.grid, is_bridge = True)
+                    clear_bridge, blocker_obj = _check_clear_pos(world_model_copy.agent_start_pos, bridge_pos, world_model_copy.grid, is_bridge = True)
                     if not clear_bridge:  # if an object happens to be right in front of the bridge
                         all_actions.extend(self._pickup_blocking_obj(world_model_copy, blocker_obj.init_pos))
                         all_actions.extend(self._putdown_blocking_obj(world_model_copy, bridge_pos))
@@ -255,7 +254,7 @@ class Agent:
     
 
     def _open_door_and_go_through(self, wmc: MiniGridEnv, door_pos: Tuple[int, int]) -> List[int]:
-        actions = _find_path(wmc, door_pos, "goto", forbidden_actions = [3, 4, 5]) + [5, 2, 2]
+        actions = _find_path(wmc, door_pos, "goto", forbidden_actions = [3, 4, 5]) + [5, 2]
         debug("OPENING THE DOOR (MAYBE WITH KEY)", actions)
         self.execute_actions(actions, wmc)
         return actions
@@ -283,7 +282,7 @@ class Agent:
         return actions
     
 
-    def _put_down_key(self, wmc: MiniGridEnv, obj_pos: Tuple[int, int]) -> List[int]:
+    def _put_down_key(self, wmc: MiniGridEnv, obj_pos: Union[Tuple[int, int], Tuple[Tuple[int, int]]]) -> List[int]:
         actions = _find_path(wmc, obj_pos, "putdown", forbidden_actions = [3, 5])
         debug("PUTTING DOWN UNLOCKING KEY", actions)
         self.execute_actions(actions, wmc)
@@ -401,10 +400,7 @@ class Agent:
                                 temp_tree_builder.append(tree_builder[k])
                         else:
                             obj_name = OBJ_NAME_MAPPING[type(obj_in_front)]
-                            if obj_name in ["wall", "lava"]:
-                                node.update_name(f"go_to_{obj_name}")
-                            else:
-                                node.update_name(f"go_to_{obj_in_front.color}_{obj_name}")
+                            node.update_name(f"go_to_{obj_in_front.color}_{obj_name}")
                             temp_tree_builder.append(node)
                     i = j
                 else:
@@ -504,34 +500,48 @@ class Agent:
         return self.skills
     
     
-    def _generate_obs_act_sequence(self, action_sequence: Union[List[int], TaskNode], setup_actions: List[int] = []) -> str:
+    def _generate_obs_act_sequence(self, action_sequence: Union[List[int], TaskNode], setup_actions: List[int] = [], as_text = True) -> Union[str, List[Tuple[Grid, int]]]:
         detail_level = 3
         if isinstance(action_sequence, list):
             sequence = action_sequence
         else:
             sequence = action_sequence.children  # highest level skills, whatever those may be
-        obs_act_seq = ""
         env_copy = copy.deepcopy(self.world_model)
         obs, _ = env_copy.reset()
         for act in setup_actions:
             obs, _, _, _, _ = env_copy.step(act)
+        if as_text:
+            obs_act_seq = ""
+        else:
+            obs_act_seq = []
         idx = 0
         while idx < len(sequence):
-            obs_act_seq += f"Obs {idx + 1}: "
-            obs_act_seq += get_obs_desc(obs, detail = detail_level)
-            obs_act_seq += "\n"
-            obs_act_seq += f"Act {idx + 1}: "
+            if as_text:
+                obs_act_seq += f"Obs {idx + 1}: "
+                obs_act_seq += get_obs_desc(obs, detail = detail_level)
+                obs_act_seq += "\n"
+                obs_act_seq += f"Act {idx + 1}: "
             if isinstance(action_sequence, list):
-                obs_act_seq += IDX_TO_ACTION[sequence[idx]]
-                obs, _, _, _, _ = env_copy.step(action_sequence[idx])
+                if as_text:
+                    obs_act_seq += IDX_TO_ACTION[sequence[idx]]
+                else:
+                    obs_act_seq.append((env_copy.grid, sequence[idx]))  # for raw grid purposes, need (grid, int) for dataset
+                obs, _, _, _, _ = env_copy.step(sequence[idx])
             else:
-                obs_act_seq += sequence[idx].name
+                if as_text:
+                    obs_act_seq += sequence[idx].name
+                else:
+                    obs_act_seq.append((env_copy.grid, sequence[idx].name))  # kind of placeholder for now but this use case doesn't show up really
                 sequence[idx].execute(env_copy)
                 obs = env_copy.gen_obs()
-            obs_act_seq += "\n"
+            if as_text:
+                obs_act_seq += "\n"
             idx += 1
-        obs_act_seq += "Final obs: "
-        obs_act_seq += get_obs_desc(obs, detail = detail_level)
+        if as_text:
+            obs_act_seq += "Final obs: "
+            obs_act_seq += get_obs_desc(obs, detail = detail_level)
+        else:
+            obs_act_seq.append((obs, None))
         return obs_act_seq
     
 
@@ -548,7 +558,7 @@ class Agent:
         world_model_copy = copy.deepcopy(self.world_model)
         world_model_copy.reset()
         if basic_skill:  # covers primitive MiniGrid skills and `move` skills
-            setup_actions = []  # no set up necessary, not even to find object to pick up or pick up object for put down, because we want to demonstrate the primitive skill
+            setup_actions = []  # no set up necessary, not even for forward or to find object to pick up or pick up object for put down, because we want to demonstrate the primitive skill
             actions = skill_func()
         else:
             # TODO: what if there are multiple objects that match color and target type? most obvious example is wall

@@ -886,8 +886,13 @@ class RoomDoorKeyLevel(BaseLevel):
         self.doors.append((Door(is_locked = door_locked, color = random.choice(self.allowed_object_colors)), door_pos))
         self.all_possible_pos -= get_adjacent_cells(door_pos)  # FIXME: sort of a temporary fix because there's no easy way to tell if door in this environment is blocked but it still works tbh
 
-        # Place agent and key outside of the room, target inside the room
-        self._set_agent_start_position(self.outer_cells)
+        # Place key outside of the room, target inside the room, agent randomly somwhere but mostly outside the room
+        if "2" in str(self.env_seed):
+            self.agent_starts_outside = False
+            self._set_agent_start_position(self.inner_cells)
+        else:
+            self.agent_starts_outside = True
+            self._set_agent_start_position(self.outer_cells)
         key_pos = random.choice(list(self.outer_cells))
         self.all_possible_pos -= set([key_pos])
         self.all_possible_pos -= get_adjacent_cells(key_pos)
@@ -990,8 +995,13 @@ class TreasureIslandLevel(BaseLevel):
         self.objs.append((Bridge(), bridge_pos))
         self.all_possible_pos -= get_adjacent_cells(bridge_pos)  # FIXME: sort of a temporary fix because there's no easy way to tell if door in this environment is blocked but it still works tbh
 
-        # Place agent outside of the section, target inside the section
-        self._set_agent_start_position(self.outer_cells)
+        # Place key outside of the room, target inside the room, agent randomly somwhere but mostly outside the room
+        if "2" in str(self.env_seed):
+            self.agent_starts_outside = False
+            self._set_agent_start_position(self.inner_cells)
+        else:
+            self.agent_starts_outside = True
+            self._set_agent_start_position(self.outer_cells)
         if self.is_single_target:
             self._set_target_start_position(self.inner_cells)
             self._make_target_obj()

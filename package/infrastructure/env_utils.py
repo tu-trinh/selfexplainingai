@@ -1,6 +1,7 @@
 from package.infrastructure.env_constants import IDX_TO_OBJECT, IDX_TO_COLOR, IDX_TO_STATE, IDX_TO_DIR, AGENT_VIEW_SIZE, NUM_TO_WORD, NUM_TO_ORDERING
 
 from minigrid.minigrid_env import MiniGridEnv
+from minigrid.core.world_object import WorldObj
 
 import numpy as np
 from typing import Union, List, Dict
@@ -16,12 +17,14 @@ def get_unit_desc(cell: Union[np.ndarray, List]) -> str:
         state = IDX_TO_STATE[cell[2]]
         beginning = "an" if state == "open" else "a"
         desc = beginning + " " + state + " " + color + " " + obj
-    elif obj == "empty":
+    elif obj == "empty" or obj == "floor":
         desc = "empty floor"
     elif obj == "unseen":
         desc = "an unknown cell"
     elif obj == "lava":
         desc = "a patch of lava"
+    elif obj == "agent":
+        desc = "agent"
     else:
         desc = "a " + color + " " + obj
     return desc
@@ -90,14 +93,14 @@ def get_unit_location_desc(desc: str, img_row: int, img_col: int, left: bool = F
     return loc_desc
 
 
-def get_obs_desc(obs: Dict, left_obs: Dict = None, backwards_obs: Dict = None, right_obs: Dict = None, detail: int = 3) -> str:
+def get_obs_desc(obs: Dict, left_obs: Dict = None, backwards_obs: Dict = None, right_obs: Dict = None, detail: int = 3, carrying: WorldObj = None) -> str:
     """
     Detail levels:
     0 - TODO: list objects in the field of vision, grouped
     1 - list objects in the field of vision, individually
     2 - list objects in the 360 field of vision and their location
     3 - list what is in the field of vision row-by-row and directly at front/left/right
-    4 - TODO: list everything cell by cell
+    4 - list everything cell by cell, excluding border walls
     """
     if detail == 1:
         description = f"You are facing {IDX_TO_DIR[obs['direction']]}. Your field of vision is a {AGENT_VIEW_SIZE}x{AGENT_VIEW_SIZE} square in which you are located at the bottom middle. "
@@ -240,6 +243,30 @@ def get_obs_desc(obs: Dict, left_obs: Dict = None, backwards_obs: Dict = None, r
             description += f"Finally, you are holding {agent_obj}."
         
         return description
+    if detail == 4:
+        img = obs["image"]
+        size = img.shape[-2]
+        description = f"Description of room (sized {size - 2} x {size - 2}), going from leftmost column (Col 1) to rightmost column (Col {size - 2}), top cell to bottom cell for each column:\n"
+        
+        for c in range(1, len(img) - 1):  # skip leftmost and rightmost columns of walls
+            description += f"Col {c}: "
+            for r in range(1, len(img[0]) - 1):  # skip top and bottom walls in column
+                desc = get_unit_desc(img[r][c])
+                if desc == "empty floor":
+                    actual_desc = "floor"
+                elif desc == "agent":
+                    if carrying is not None:
+                        carry_addendum = f" and carrying a {carrying.color} {carrying.type}"
+                    else:
+                        carry_addendum = ""
+                    actual_desc = f"your location (you're facing {IDX_TO_DIR[obs['direction']]}{carry_addendum})"
+                else:
+                    actual_desc = desc
+                if r == len(img[0]) - 2:
+                    description += "and " + actual_desc + "\n"
+                else:
+                    description += actual_desc + ", "
+        return description.strip()
 
 
 def get_babyai_desc(env: MiniGridEnv, image: np.ndarray) -> str:

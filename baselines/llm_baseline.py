@@ -1,4 +1,9 @@
+import sys
+sys.path.append("/nas/ucb/tutrinh/selfexplainingai")
+
 from package.infrastructure.basic_utils import debug
+from package.infrastructure.env_constants import SKILL_PHRASES
+from package.infrastructure.llm_constants import GET_SKILL_NAME_QUESTION
 
 import traceback
 import numpy as np
@@ -9,27 +14,27 @@ if torch.cuda.is_available():
 else:
     device = torch.device("cpu")
 import re
-from dignity.prompting import *
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, Trainer, TrainingArguments
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
+from sentence_transformers import SentenceTransformer
 from datasets import Dataset
 import gc
 import pickle
+from typing import Tuple
 import wandb
 wandb.login()
 
 
 PROJECT_NAME = "seai-intention-speaker-language-baseline"
-
 RUN_CONFIGURATION = {
     "batch_size": 4,
     "warmup_ratio": 0.065,
-    "quantization": "int8",
+    "quantization": "int8",  # or None for smaller models
     "schedule": "cosine",
     "weight_decay": 0.005,
     "model": "mistralai/Mistral-7B-Instruct-v0.2",  # try gpt2, smaller models?
-    "max_new_tokens": 200,
-    "max_input_token_length": 2000,
+    "max_new_tokens": 10,
+    "max_input_token_length": 5000,
     "num_epochs": 3,
     "learning_rate": 0.00003,
     "lora_dropout": 0,
@@ -38,12 +43,28 @@ RUN_CONFIGURATION = {
 }
 
 
-def get_datasets(mismatch: str):
+def get_datasets(mismatch: str) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     with open(f"../datasets/{mismatch}_datasets.pkl", "rb") as f:
         full_dataset = pickle.load(f)
-    training_data = full_dataset["train"]
-    validation_data = full_dataset["val"]
-    return training_data, validation_data
+    training_data = pd.DataFrame(full_dataset["train"])
+    validation_data = pd.DataFrame(full_dataset["val"])
+    test_data = pd.DataFrame(full_dataset["test"])
+    return training_data, validation_data, test_data
+
+
+def process_dataset(df: pd.DataFrame, mismatch: str, task: str):
+    """
+    Returns the necessary dataframe for the training with just prompt and response columns
+    """
+    assert mismatch in ["intention", "belief"], f"Bad mismatch {mismatch}"
+    assert task in ["speaker", "listener"], f"Bad task {task}"
+
+    out_df = pd.DataFrame()
+
+    if mismatch == "intention" and task == "speaker":
+        out_df["prompt"] = GET_SKILL_NAME_QUESTION.format(obs_act_seq = df["traj_fully_obs_text"])
+        out_df["response"] = df["skill"]
+    return out_df
 
 
 def tokenize_dataset(df, model, for_train, max_input_token_length = None, valid_prompts = None, valid_responses = None):
@@ -70,8 +91,8 @@ def tokenize_dataset(df, model, for_train, max_input_token_length = None, valid_
     
     if for_train:
         max_length, valid_prompt_indices = _find_max_length(tokenizer, df, max_input_token_length)
-        valid_prompts = np.array(df["trajectory_text"])[valid_prompt_indices].tolist()
-        valid_responses = np.array(df["skill"])[valid_prompt_indices].tolist()
+        valid_prompts = np.array(df["prompt"])[valid_prompt_indices].tolist()
+        valid_responses = np.array(df["response"])[valid_prompt_indices].tolist()
 
         tokenized_df = {"input_ids": [], "attention_mask": [], "labels": []}
         for i in range(len(valid_prompts)):
@@ -97,8 +118,9 @@ def tokenize_dataset(df, model, for_train, max_input_token_length = None, valid_
         input_tokenization = tokenizer(valid_prompts, padding = True, truncation = True)
         tokenized_df["input_ids"] = input_tokenization["input_ids"]
         tokenized_df["attention_mask"] = input_tokenization["attention_mask"]
+        # tokenized_df["og_prompts"] = [vp.split("prompt:")[1].strip() for vp in valid_prompts]
+        tokenized_df["og_prompts"] = valid_prompts
         tokenized_df["og_responses"] = valid_responses
-        tokenized_df["og_prompts"] = [vp.split("prompt:")[1].strip() for vp in valid_prompts]
     
     tokenized_df = pd.DataFrame(tokenized_df)
     gc.collect()
@@ -110,13 +132,13 @@ def tokenize_dataset(df, model, for_train, max_input_token_length = None, valid_
 
 
 def _find_max_length(tokenizer, df, max_input_token_length):
-    prompt_tokenization = tokenizer(df["trajectory_text"].tolist(), truncation = True)
+    prompt_tokenization = tokenizer(df["prompt"].tolist(), truncation = True)
     prompt_lengths = [len(tokens) for tokens in prompt_tokenization["input_ids"]]
-    print(f"{np.count_nonzero(np.array(prompt_lengths) <= max_input_token_length)} prompts out of {len(prompt_lengths)} can fit")
+    debug(f"{np.count_nonzero(np.array(prompt_lengths) <= max_input_token_length)} prompts out of {len(prompt_lengths)} can fit")
     max_prompt_length = min(max_input_token_length, max(prompt_lengths))
     gc.collect()
     torch.cuda.empty_cache()
-    return int(max_prompt_length * 1.25), np.where(np.array(prompt_lengths) <= max_prompt_length)[0]
+    return max_prompt_length, np.where(np.array(prompt_lengths) <= max_prompt_length)[0]
 
 
 def get_quantized_model(model, quantization, lorar, loraa, lorad):
@@ -165,54 +187,31 @@ def evaluate_model(model, tokenizer, data, temperature, max_new_tokens):
             )[:, input_tensors.shape[1]:]
             for j in range(start, end):
                 try:
-                    grand_outputs += f"prompt {j} IS: {decoded_prompts[j]}"
+                    grand_outputs += f"PROMPT {j} IS: {decoded_prompts[j]}"
+                    grand_outputs += f"ANSWER IS: {decoded_labels[j]}\n"
                     decoded_output = tokenizer.decode(model_outputs[j - start], skip_special_tokens = True).strip()
                     decoded_outputs.append(decoded_output)
                     grand_outputs += f"MODEL RESPONDED: {decoded_output}\n\n"
                 except IndexError:
                     break
-    with open("./big_boss_outputs.txt", "w") as f:
+    with open("./baselines/logs/intention_speaker_llm_baseline.txt", "w") as f:
         f.write(grand_outputs)
     print("Finished generating and decoding")
     del grand_outputs
 
-    output_scores = np.array([_parse_output(decoded_output) for decoded_output in decoded_outputs])
-    labels = np.array([_parse_output(decoded_label) for decoded_label in decoded_labels])
-    weighted_mae = 0
-    weights = 0
-    for c in range(1, 9):
-        indices = np.where(labels == c)[0]
-        if len(indices) > 0:
-            true_c = labels[indices]
-            pred_c = output_scores[indices]
-            valid_mask = ~np.isnan(true_c) & ~np.isnan(pred_c)
-            if np.count_nonzero(valid_mask) > 0:
-                true_c = true_c[valid_mask]
-                pred_c = pred_c[valid_mask]
-                mae = np.abs(true_c - pred_c).mean()
-                weight = 1 / len(true_c)
-                weighted_mae += weight * mae
-                weights += weight
-    try:
-        result = weighted_mae / weights
-    except ZeroDivisionError:
-        result = np.nan
+    matches = 0
+    compare_length = min(len(decoded_outputs), len(decoded_labels))
+    embedder = SentenceTransformer("all-roberta-large-v1")
+    for output, label in zip(decoded_outputs[:compare_length], decoded_labels[:compare_length]):
+        output_enc = embedder.encode(output)
+        label_enc = embedder.encode(label)
+        similarity = np.dot(output_enc, label_enc) / (np.linalg.norm(output_enc) * np.linalg.norm(label_enc))
+        matches += similarity > 0.8
+    result = matches / len(compare_length)
     gc.collect()
     torch.cuda.empty_cache()
+    del embedder
     return result
-
-
-def _parse_output(text):
-    match = re.search(r"DIGNITY INDEX: (\d)", text)
-    if match:
-        score = int(match.group(1))
-    else:
-        match = re.search(r"DIGNITY INIX: (\d)", text)
-        if match:
-            score = int(match.group(1))
-        else:
-            return np.nan
-    return score
 
 
 def main():
@@ -220,9 +219,15 @@ def main():
     wandb.config = RUN_CONFIGURATION
 
     torch.cuda.empty_cache()
-    training_data, validation_data = get_datasets()
+    training_data, validation_data, test_data = get_datasets()
+
+    training_data = process_dataset(training_data, "intention", "speaker")
+    validation_data = process_dataset(validation_data, "intention", "speaker")
+    test_data = process_dataset(test_data, "intention", "speaker")
+
     training_set, fit_prompts, fit_responses = tokenize_dataset(training_data, wandb.config["model"], True, max_input_token_length = wandb.config["max_input_token_length"])
-    validation_set, validation_tokenizer = tokenize_dataset(validation_data, wandb.config["model"], False, valid_prompts = fit_prompts, valid_responses = fit_responses)
+    validation_set, _, _ = tokenize_dataset(validation_data, wandb.config["model"], True, max_input_token_length = wandb.config["max_input_token_length"])
+    test_set, test_tokenizer = tokenize_dataset(test_data, wandb.config["model"], False, valid_prompts = fit_prompts, valid_responses = fit_responses)
     gc.collect()
     torch.cuda.empty_cache()
 
@@ -233,13 +238,13 @@ def main():
         num_train_epochs = wandb.config["num_epochs"],
         per_device_train_batch_size = wandb.config["batch_size"],
         per_device_eval_batch_size = wandb.config["batch_size"],
+        evaluation_strategy = "epoch",
         gradient_checkpointing = True,
         warmup_ratio = wandb.config["warmup_ratio"],
         weight_decay = wandb.config["weight_decay"],
         save_strategy = "no",
         hub_strategy = "end",
-        logging_dir = "./logs/speaker_task",
-        fp16 = True,
+        fp16 = True
     )
     model = get_quantized_model(
         wandb.config["model"],
@@ -252,6 +257,7 @@ def main():
         model = model,
         args = training_args,
         train_dataset = Dataset.from_pandas(training_set),
+        eval_dataset = Dataset.from_pandas(validation_set)
     )
     print("Starting finetuning")
     trainer.train()
@@ -269,22 +275,18 @@ def main():
             return
     del trainer
 
-    wmae = evaluate_model(
+    match_rate = evaluate_model(
         model,
-        VALIDATION_TOKENIZER,
-        Dataset.from_pandas(VALIDATION_SET),
+        test_tokenizer,
+        Dataset.from_pandas(test_set),
         wandb.config["temperature"],
         wandb.config["max_new_tokens"]
     )
-    wandb.log({"validation_wmae": wmae})
+    wandb.log({"eval_match_rate": match_rate})
     del model
 
     gc.collect()
     torch.cuda.empty_cache()
-    # MAKE SURE MODEL HAS SKILL NAMES TO CHOOSE FROM !!!!!!!!!!!!!!!!!!!!!!!!!!! #
-    # LISTENER TASK SPLIT UP INTO SLIDING WINDOW CHUNKS !!!!!!!!!!!!!!!!!!!!!!!!! #
-    # CUSTOM LOSS FUNCTION ????????????????????????? #
-    # if speaker too long: T1 to encode a single s into an embedding, T2 encodes entire trajectory of s's
 
 
 if __name__ == "__main__":

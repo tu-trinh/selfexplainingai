@@ -184,7 +184,8 @@ def _find_path(master_env: Env, object_pos: Union[Tuple[int, int], Tuple[Tuple[i
             return state.carrying is None and clear_pos
     search_problem = Search("bfs", env, goal_check, "s", forbidden_actions)
     actions = search_problem.search()
-    if actions is None:  # TODO: idk
+    if actions is None:
+        print("Oh no! No path found :(")
         return [0]
     return actions
 

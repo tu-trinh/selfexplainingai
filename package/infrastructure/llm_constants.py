@@ -86,14 +86,21 @@ Sequence of observations (obs) and actions (act):
 # IMPORTANT: If the agent only executes one action in the sequence, your answer MUST be the EXACT action string that follows 'Act 1'. Otherwise, if and only if the agent executes more than one action, choose the highest-level matching skill name possible.
 # """
 
-GET_NEW_PLAN_BASED_ON_SKILLS_QUESTION = """
-Below you will be given a sequence of observations and corresponding actions taken by agent 1 in executing the following task: {task}. The observations should be interpreted as environment descriptions told to agent 1. There is a second agent, agent 2, who has a (potentially) different set of skills compared to agent 1 but who also wants to achieve the same task. Given agent 1's trajectory and agent 2's skills, please come up with a skill sequence for agent 2 that will help it achieve the same task in as few steps as possible. Your answer should just be comma-separated skills chosen from the list; don't say anything else.
+GET_NEXT_ACTION_QUESTION = """
+You are an agent who is trying to complete a task in an unknown, grid-like environment. Keep in mind that in this environment, you can only unlock a locked door with a key of the same color, you can only carry one object at a time, and you can only put an object down in a cell that has no other object.
 
-Agent 1 sequence of observations (obs) and actions (act):
-{obs_act_seq}
+YOUR TASK IS: {skill_name}.
 
-Agent 2 skills:
-{skill_choices}
+Current environment description:
+{obs_desc}
+
+Given the above description, which of the following actions should you take in order to make progress towards or complete your given task? Choose ONE of the following actions. Your response should just be the singular action word, no more, no less. For example, if you pick the first answer choice, just answer with "left" instead of "turn left" or "left (turn left)".
+- left (turn left)
+- right (turn right)
+- forward (go forward)
+- pickup (pick up whichever object is one cell in front of you)
+- drop (if you're holding an object, put it down on the cell in front of you)
+- toggle (blanket action for interactions with doors and boxes, such as opening, closing, and unlocking)
 """
 
 SKILL_CLASSIFICATION = {

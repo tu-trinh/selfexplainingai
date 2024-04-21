@@ -1,0 +1,91 @@
+[DEBUG] LOADED TOKENIZER
+[DEBUG] 554 prompts out of 554 can fit
+Asking to truncate to max_length but no maximum length is provided and the model has no predefined maximum length. Default to no truncation.
+
+ 73%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▍                                                    | 407/554 [00:02<00:00, 151.11it/s]
+[DEBUG] LOADED TOKENIZER
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 554/554 [00:02<00:00, 195.89it/s]
+Asking to truncate to max_length but no maximum length is provided and the model has no predefined maximum length. Default to no truncation.
+ 67%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▍                                                                 | 354/529 [00:01<00:00, 236.24it/s]
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 529/529 [00:02<00:00, 200.60it/s]
+Asking to truncate to max_length but no maximum length is provided and the model has no predefined maximum length. Default to no truncation.
+
+
+
+Loading checkpoint shards: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:50<00:00, 16.92s/it]
+[DEBUG] Starting finetuning
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+  0%|                                                                                                                                                                                                                 | 0/417 [00:00<?, ?it/s]`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`...
+Traceback (most recent call last):
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline.py", line 295, in <module>
+    main()
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline.py", line 264, in main
+    trainer.train()
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/trainer.py", line 1539, in train
+    return inner_training_loop(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/trainer.py", line 1869, in _inner_training_loop
+    tr_loss_step = self.training_step(model, inputs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/trainer.py", line 2768, in training_step
+    loss = self.compute_loss(model, inputs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/trainer.py", line 2791, in compute_loss
+    outputs = model(**inputs)
+              ^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/accelerate/utils/operations.py", line 687, in forward
+    return model_forward(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/accelerate/utils/operations.py", line 675, in __call__
+    return convert_to_fp32(self.model_forward(*args, **kwargs))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/torch/amp/autocast_mode.py", line 16, in decorate_autocast
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/peft/peft_model.py", line 1083, in forward
+    return self.base_model(
+           ^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/peft/tuners/tuners_utils.py", line 161, in forward
+    return self.model.forward(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/accelerate/hooks.py", line 165, in new_forward
+    output = module._old_forward(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/models/mistral/modeling_mistral.py", line 1154, in forward
+    outputs = self.model(
+              ^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/accelerate/hooks.py", line 165, in new_forward
+    output = module._old_forward(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/models/mistral/modeling_mistral.py", line 1009, in forward
+    attention_mask = _prepare_4d_causal_attention_mask(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/modeling_attn_mask_utils.py", line 307, in _prepare_4d_causal_attention_mask
+    attention_mask = attn_mask_converter.to_4d(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/modeling_attn_mask_utils.py", line 132, in to_4d
+    expanded_attn_mask = self._expand_mask(attention_mask_2d, dtype, tgt_len=input_shape[-1]).to(
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/modeling_attn_mask_utils.py", line 186, in _expand_mask
+    return inverted_mask.masked_fill(inverted_mask.to(torch.bool), torch.finfo(dtype).min)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 542.00 MiB. GPU 0 has a total capacty of 47.54 GiB of which 32.50 MiB is free. Process 3290999 has 262.00 MiB memory in use. Process 93434 has 542.00 MiB memory in use. Process 271181 has 35.95 GiB memory in use. Process 2703101 has 262.00 MiB memory in use. Including non-PyTorch memory, this process has 10.49 GiB memory in use. Of the allocated memory 10.08 GiB is allocated by PyTorch, and 115.23 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+None

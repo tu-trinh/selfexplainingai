@@ -1,0 +1,37 @@
+[DEBUG] LOADED TOKENIZER
+[DEBUG] 2420 prompts out of 2420 can fit
+Asking to truncate to max_length but no maximum length is provided and the model has no predefined maximum length. Default to no truncation.
+Asking to truncate to max_length but no maximum length is provided and the model has no predefined maximum length. Default to no truncation.
+[DEBUG] LOADED TOKENIZER
+[DEBUG] 2368 prompts out of 2368 can fit
+Asking to truncate to max_length but no maximum length is provided and the model has no predefined maximum length. Default to no truncation.
+[DEBUG] LOADED TOKENIZER
+Loading checkpoint shards:   0%|                                                                                                                                                                                        | 0/3 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline_listener.py", line 302, in <module>
+    main()
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline_listener.py", line 257, in main
+    model = get_quantized_model(
+            ^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline_listener.py", line 162, in get_quantized_model
+    model = AutoModelForCausalLM.from_pretrained(model, quantization_config = bnb_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py", line 566, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/modeling_utils.py", line 3852, in from_pretrained
+    ) = cls._load_pretrained_model(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/modeling_utils.py", line 4286, in _load_pretrained_model
+    new_error_msgs, offload_index, state_dict_index = _load_state_dict_into_meta_model(
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/modeling_utils.py", line 841, in _load_state_dict_into_meta_model
+    set_module_quantized_tensor_to_device(model, param_name, param_device, value=param)
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/integrations/bitsandbytes.py", line 128, in set_module_quantized_tensor_to_device
+    new_value = value.to(device)
+                ^^^^^^^^^^^^^^^^
+RuntimeError: CUDA error: out of memory
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+None

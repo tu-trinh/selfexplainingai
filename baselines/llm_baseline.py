@@ -20,6 +20,7 @@ from sentence_transformers import SentenceTransformer
 from datasets import Dataset
 import gc
 import pickle
+from tqdm import tqdm
 from typing import Tuple
 import wandb
 wandb.login()
@@ -27,14 +28,15 @@ wandb.login()
 
 PROJECT_NAME = "seai-intention-speaker-language-baseline"
 RUN_CONFIGURATION = {
-    "batch_size": 4,
+    "batch_size": 1,
     "warmup_ratio": 0.065,
-    "quantization": "int8",  # or None for smaller models
+    "quantization": "int4",  # or None for smaller models
     "schedule": "cosine",
     "weight_decay": 0.005,
     "model": "mistralai/Mistral-7B-Instruct-v0.2",  # try gpt2, smaller models?
+    # "model": "google/gemma-2b-it",
     "max_new_tokens": 10,
-    "max_input_token_length": 5000,
+    "max_input_token_length": 1600,
     "num_epochs": 3,
     "learning_rate": 0.00003,
     "lora_dropout": 0,
@@ -62,7 +64,7 @@ def process_dataset(df: pd.DataFrame, mismatch: str, task: str):
     out_df = pd.DataFrame()
 
     if mismatch == "intention" and task == "speaker":
-        out_df["prompt"] = GET_SKILL_NAME_QUESTION.format(obs_act_seq = df["traj_fully_obs_text"])
+        out_df["prompt"] = df["traj_fully_obs_text"].apply(lambda x: GET_SKILL_NAME_QUESTION.format(obs_act_seq = x))
         out_df["response"] = df["skill"]
     return out_df
 
@@ -95,7 +97,7 @@ def tokenize_dataset(df, model, for_train, max_input_token_length = None, valid_
         valid_responses = np.array(df["response"])[valid_prompt_indices].tolist()
 
         tokenized_df = {"input_ids": [], "attention_mask": [], "labels": []}
-        for i in range(len(valid_prompts)):
+        for i in tqdm(range(len(valid_prompts))):
             prompt_tokenization = tokenizer(valid_prompts[i], padding = True, truncation = True)
             prompt_tokens = prompt_tokenization["input_ids"]
             prompt_mask = prompt_tokenization["attention_mask"]
@@ -157,6 +159,7 @@ def get_quantized_model(model, quantization, lorar, loraa, lorad):
         inference_mode = False
     )
     model = get_peft_model(model, lora_config)
+    debug("LOADED MODEL")
     return model
 
 
@@ -169,9 +172,9 @@ def evaluate_model(model, tokenizer, data, temperature, max_new_tokens):
     decoded_prompts = data["og_prompts"]
     
     decoded_outputs = []
-    batch_size = 4
+    batch_size = 1
     num_batches = len(decoded_prompts) // batch_size + 1
-    for i in range(num_batches):
+    for i in tqdm(range(num_batches)):
         start = i * batch_size
         end = (i + 1) * batch_size
         input_tensors = input_ids[start : end, :]
@@ -194,7 +197,7 @@ def evaluate_model(model, tokenizer, data, temperature, max_new_tokens):
                     grand_outputs += f"MODEL RESPONDED: {decoded_output}\n\n"
                 except IndexError:
                     break
-    with open("./baselines/logs/intention_speaker_llm_baseline.txt", "w") as f:
+    with open("intention_speaker_llm_baseline.txt", "w") as f:
         f.write(grand_outputs)
     print("Finished generating and decoding")
     del grand_outputs
@@ -219,7 +222,7 @@ def main():
     wandb.config = RUN_CONFIGURATION
 
     torch.cuda.empty_cache()
-    training_data, validation_data, test_data = get_datasets()
+    training_data, validation_data, test_data = get_datasets("intention")
 
     training_data = process_dataset(training_data, "intention", "speaker")
     validation_data = process_dataset(validation_data, "intention", "speaker")
@@ -259,7 +262,7 @@ def main():
         train_dataset = Dataset.from_pandas(training_set),
         eval_dataset = Dataset.from_pandas(validation_set)
     )
-    print("Starting finetuning")
+    debug("Starting finetuning")
     trainer.train()
     try:
         trainer.push_to_hub("intention-speaker")

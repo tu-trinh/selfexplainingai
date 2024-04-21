@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline_listener.py", line 300, in <module>
+    main()
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline_listener.py", line 230, in main
+    training_data = process_dataset(training_data, "intention", "listener")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline_listener.py", line 71, in process_dataset
+    matches = re.find_all(r"Obs \d+: ([\w ():,'\n]*?)\nAct \d+: (\w+)", obs_act_seq)
+              ^^^^^^^^^^^
+AttributeError: module 're' has no attribute 'find_all'
+None

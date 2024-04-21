@@ -71,22 +71,20 @@ Which of the following reflects the differences in these two environments? There
 Please give only the letter(s) in your response in a comma-separated list, such as 'A' or 'A,D,E'."""
 
 GET_SKILL_NAME_QUESTION = """
-Below is a sequence of observations and corresponding actions taken by an AI agent in trying to execute a 'skill'. Observations should be interpreted as environment descriptions told to the agent. Given this sequence, please choose from the available choices the skill name that best describes the agent's trajectory. Don't say anything else except your chosen skill name.
+Below is a sequence of observations and corresponding actions taken by an AI agent in trying to execute a 'skill.' Observations should be interpreted as environment descriptions told to the agent. In this environment, names of skills are always succinct, specify object color when appropriate, and have underscores: for example, 'move_forward_2_steps', 'put_blue_key_on_floor', 'unlatch_green_door', or 'procure_brown_box'. Given this sequence below, what is the skill name that best describes the agent's trajectory? Do NOT say anything else except your chosen skill name.
 
 Sequence of observations (obs) and actions (act):
 {obs_act_seq}
-
-Skill choices:
-{skill_choices}
-
-Important notes about the skill choices you might see:
-1. Special meanings for single-word directional skills: 'left' means ONLY the act of turning left (not MOVING left). Likewise, 'right' means ONLY turning right. 'backward' means ONLY turning backwards. 'forward', on the other hand, means to take ONE step forward into the cell in front.
-2. Directional skills that are not single-word should be self-explanatory; for example, move_left_1_steps means to turn left and then take one step forward.
-2. Special meanings for single-world interaction skills: 'pickup' denotes ONLY the act of physically picking up whatever is in front. Likewise, 'drop' means ONLY the act of physically putting down whatever the agent is holding. 'toggle' means ONLY the act of physically toggling the object in front. It could be physically opening it, closing it, etc. depending on what the object is.
-4. Interaction skills that are not single-word describe a longer sequence that terminate with the corresponding single-word skill. For example, 'pickup_green_ball' denotes the act of first navigating to the green ball such that the agent is facing it head-on, and then physically picking it up.
-
-IMPORTANT: If the agent only executes one action in the sequence, your answer MUST be the EXACT action string that follows 'Act 1'. Otherwise, if and only if the agent executes more than one action, choose the highest-level matching skill name possible.
 """
+# """
+# Important notes about the skill choices you might see:
+# 1. Special meanings for single-word directional skills: 'left' means ONLY the act of turning left (not MOVING left). Likewise, 'right' means ONLY turning right. 'backward' means ONLY turning backwards. 'forward', on the other hand, means to take ONE step forward into the cell in front.
+# 2. Directional skills that are not single-word should be self-explanatory; for example, move_left_1_steps means to turn left and then take one step forward.
+# 2. Special meanings for single-world interaction skills: 'pickup' denotes ONLY the act of physically picking up whatever is in front. Likewise, 'drop' means ONLY the act of physically putting down whatever the agent is holding. 'toggle' means ONLY the act of physically toggling the object in front. It could be physically opening it, closing it, etc. depending on what the object is.
+# 4. Interaction skills that are not single-word describe a longer sequence that terminate with the corresponding single-word skill. For example, 'pickup_green_ball' denotes the act of first navigating to the green ball such that the agent is facing it head-on, and then physically picking it up.
+
+# IMPORTANT: If the agent only executes one action in the sequence, your answer MUST be the EXACT action string that follows 'Act 1'. Otherwise, if and only if the agent executes more than one action, choose the highest-level matching skill name possible.
+# """
 
 GET_NEW_PLAN_BASED_ON_SKILLS_QUESTION = """
 Below you will be given a sequence of observations and corresponding actions taken by agent 1 in executing the following task: {task}. The observations should be interpreted as environment descriptions told to agent 1. There is a second agent, agent 2, who has a (potentially) different set of skills compared to agent 1 but who also wants to achieve the same task. Given agent 1's trajectory and agent 2's skills, please come up with a skill sequence for agent 2 that will help it achieve the same task in as few steps as possible. Your answer should just be comma-separated skills chosen from the list; don't say anything else.

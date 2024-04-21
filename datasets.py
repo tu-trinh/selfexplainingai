@@ -31,7 +31,8 @@ Belief Mismatch Dataset
 """
 Intention Mismatch Dataset
 """
-INTENTION_COLUMNS = ["config", "mission", "skill", "actions", "trajectory_obs", "trajectory_text"]
+INTENTION_COLUMNS = ["config", "mission", "skill", "actions",
+                     "traj_fully_obs_grid", "traj_fully_obs_text", "traj_partial_obs_grid", "traj_partial_obs_text"]
 
 
 def split_attributes(attr: Union[List, Dict]) -> Union[Tuple[List, List, List], Dict[str, List]]:
@@ -106,7 +107,7 @@ def save_dataset(mismatch: str, task: Task, level: Level, ds: str, dataset: Dict
 def create_datasets(mismatch):  # loose upper bound: 5 tasks x 12 levels x 2 train/test x 12 sets x 2 secs = 48 min
     start = time.time()
     for task in [Task.GOTO, Task.PICKUP]:
-        for level in [Level.BOSS]:
+        for level in [Level.ROOM_DOOR_KEY, Level.TREASURE_ISLAND]:
             # Split up attributes for train/val/test
             train_colors, val_colors, test_colors = split_attributes(COLOR_NAMES)
             train_steps, val_steps, test_steps = split_attributes(list(range(MIN_ROOM_SIZE - 2, MAX_ROOM_SIZE - 1)))
@@ -168,8 +169,10 @@ def add_to_dataset(task: Task, level: Level, colors: List[str], steps: List[int]
                 yaml_obj["env_specs"]["attendant_setup_actions"] = setup_actions
                 yaml_str = yaml.dump(yaml_obj)
                 mission = a.world_model.mission
-                traj_obs = a._generate_obs_act_sequence(actions, setup_actions, as_text = False)
-                traj_text = a._generate_obs_act_sequence(actions, setup_actions)
+                traj_fully_obs_grid = a._generate_obs_act_sequence(actions, setup_actions, as_text = False, fully_obs = True)
+                traj_fully_obs_text = a._generate_obs_act_sequence(actions, setup_actions, as_text = True, fully_obs = True)
+                traj_partial_obs_grid = a._generate_obs_act_sequence(actions, setup_actions, as_text = False, fully_obs = False)
+                traj_partial_obs_text = a._generate_obs_act_sequence(actions, setup_actions, as_text = True, fully_obs = False)
                 if ds == "train" or i not in [2, 3]:
                     paraphrases = phrases
                 else:
@@ -179,8 +182,10 @@ def add_to_dataset(task: Task, level: Level, colors: List[str], steps: List[int]
                     dataset["mission"].append(mission)
                     dataset["skill"].append(paraphrase(skill))
                     dataset["actions"].append(actions)
-                    dataset["trajectory_obs"].append(traj_obs)
-                    dataset["trajectory_text"].append(traj_text)
+                    dataset["traj_fully_obs_grid"].append(traj_fully_obs_grid)
+                    dataset["traj_fully_obs_text"].append(traj_fully_obs_text)
+                    dataset["traj_partial_obs_grid"].append(traj_partial_obs_grid)
+                    dataset["traj_partial_obs_text"].append(traj_partial_obs_text)
     return dataset
 
 

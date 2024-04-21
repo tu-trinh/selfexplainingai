@@ -145,33 +145,37 @@ class Agent:
             elif self.world_model.level in [Level.UNLOCK_DOOR, Level.HIDDEN_KEY, Level.ROOM_DOOR_KEY]:
                 door, door_pos = self.world_model.doors[0]
                 if self.world_model.level == Level.ROOM_DOOR_KEY:
-                    clear_door, blocker_obj = _check_clear_pos(world_model_copy.agent_start_pos, door_pos, world_model_copy.grid)
-                    if (not clear_door) and ((type(blocker_obj) != Key) or (type(blocker_obj) == Key and (not door.is_locked or blocker_obj.color != door.color))):  # if an object other than the key we need happens to be right in front of the door
-                        all_actions.extend(self._pickup_blocking_obj(world_model_copy, blocker_obj.init_pos))
-                        all_actions.extend(self._putdown_blocking_obj(world_model_copy, door_pos))
+                    if self.world_model.agent_starts_outside:
+                        clear_door, blocker_obj = _check_clear_pos(world_model_copy.agent_start_pos, door_pos, world_model_copy.grid)
+                        if (not clear_door) and ((type(blocker_obj) != Key) or (type(blocker_obj) == Key and (not door.is_locked or blocker_obj.color != door.color))):  # if an object other than the key we need happens to be right in front of the door
+                            all_actions.extend(self._pickup_blocking_obj(world_model_copy, blocker_obj.init_pos))
+                            all_actions.extend(self._putdown_blocking_obj(world_model_copy, door_pos))
                 if self.world_model.level == Level.HIDDEN_KEY:
                     all_actions.extend(self._open_box_and_get_key(world_model_copy))
-                elif door.is_locked:
+                elif door.is_locked and (self.world_model.level != Level.ROOM_DOOR_KEY or self.world_model.agent_starts_outside):
                     all_actions.extend(self._get_key_lying_outside(world_model_copy, door))
-                # open the door (while holding the key if needed)
-                all_actions.extend(self._open_door_and_go_through(world_model_copy, door_pos))
+                # open the door (while holding the key if needed) (and if agent is outside of the room)
+                if self.world_model.level != Level.ROOM_DOOR_KEY or self.world_model.agent_starts_outside:
+                    all_actions.extend(self._open_door_and_go_through(world_model_copy, door_pos))
                 if self.world_model.task == Task.PICKUP:
-                    # must put down key that was used to unlock the door
-                    all_actions.extend(self._put_down_key(world_model_copy, (self.world_model.target_obj_pos, door_pos)))
+                    # must put down key that was used to unlock the door, if holding it
+                    if world_model_copy.carrying is not None:
+                        all_actions.extend(self._put_down_key(world_model_copy, (self.world_model.target_obj_pos, door_pos)))
                 can_overlap = type(self.world_model.target_obj) == Goal
                 all_actions.extend(self._go_directly_to_obj(world_model_copy, self.world_model.target_obj_pos, can_overlap))
             elif self.world_model.level == Level.TREASURE_ISLAND:
-                bridge_pos = None
-                for obj, pos in self.world_model.objs:
-                    if type(obj) == Bridge:
-                        bridge_pos = pos
-                        break
-                if bridge_pos:  # must go to bridge first before object
-                    clear_bridge, blocker_obj = _check_clear_pos(world_model_copy.agent_start_pos, bridge_pos, world_model_copy.grid, is_bridge = True)
-                    if not clear_bridge:  # if an object happens to be right in front of the bridge
-                        all_actions.extend(self._pickup_blocking_obj(world_model_copy, blocker_obj.init_pos))
-                        all_actions.extend(self._putdown_blocking_obj(world_model_copy, bridge_pos))
-                    all_actions.extend(self._go_directly_to_obj(world_model_copy, bridge_pos, True))
+                if self.world_model.agent_starts_outside:
+                    bridge_pos = None
+                    for obj, pos in self.world_model.objs:
+                        if type(obj) == Bridge:
+                            bridge_pos = pos
+                            break
+                    if bridge_pos:  # must go to bridge first before object
+                        clear_bridge, blocker_obj = _check_clear_pos(world_model_copy.agent_start_pos, bridge_pos, world_model_copy.grid, is_bridge = True)
+                        if not clear_bridge:  # if an object happens to be right in front of the bridge
+                            all_actions.extend(self._pickup_blocking_obj(world_model_copy, blocker_obj.init_pos))
+                            all_actions.extend(self._putdown_blocking_obj(world_model_copy, bridge_pos))
+                        all_actions.extend(self._go_directly_to_obj(world_model_copy, bridge_pos, True))
                 can_overlap = type(self.world_model.target_obj) == Goal
                 all_actions.extend(self._go_directly_to_obj(world_model_copy, self.world_model.target_obj_pos, can_overlap))
             if self.world_model.task == Task.PICKUP:
@@ -500,16 +504,22 @@ class Agent:
         return self.skills
     
     
-    def _generate_obs_act_sequence(self, action_sequence: Union[List[int], TaskNode], setup_actions: List[int] = [], as_text = True) -> Union[str, List[Tuple[Grid, int]]]:
+    def _generate_obs_act_sequence(self, action_sequence: Union[List[int], TaskNode], setup_actions: List[int] = [], as_text: bool = True, fully_obs: bool = False) -> Union[str, List[Tuple[Grid, int]]]:
         detail_level = 3
         if isinstance(action_sequence, list):
             sequence = action_sequence
         else:
             sequence = action_sequence.children  # highest level skills, whatever those may be
+        
         env_copy = copy.deepcopy(self.world_model)
+        if fully_obs:
+            env_copy = FullyObsWrapper(env_copy)
         obs, _ = env_copy.reset()
         for act in setup_actions:
             obs, _, _, _, _ = env_copy.step(act)
+        carrying = None  # a helper parameter for fully obs text generation; not used in `get_obs_desc` if not fully obs
+        
+        # Finished setup actions above, now start to record actual actions
         if as_text:
             obs_act_seq = ""
         else:
@@ -518,30 +528,39 @@ class Agent:
         while idx < len(sequence):
             if as_text:
                 obs_act_seq += f"Obs {idx + 1}: "
-                obs_act_seq += get_obs_desc(obs, detail = detail_level)
+                obs_act_seq += get_obs_desc(obs, detail = detail_level if not fully_obs else 4, carrying = carrying)
                 obs_act_seq += "\n"
                 obs_act_seq += f"Act {idx + 1}: "
             if isinstance(action_sequence, list):
+                if sequence[idx] == 3:
+                    carrying = env_copy.grid.get(env_copy.front_pos[0], env_copy.front_pos[1])
+                elif sequence[idx] == 4:
+                    carrying = None
                 if as_text:
                     obs_act_seq += IDX_TO_ACTION[sequence[idx]]
                 else:
-                    obs_act_seq.append((env_copy.grid, sequence[idx]))  # for raw grid purposes, need (grid, int) for dataset
+                    obs_act_seq.append((obs["image"], sequence[idx]))  # for raw grid purposes, need (obs img array, int) for dataset
                 obs, _, _, _, _ = env_copy.step(sequence[idx])
             else:
+                if "pick" in sequence[idx].name:
+                    carrying = env_copy.grid.get(env_copy.front_pos[0], env_copy.front_pos[1])
+                elif "put" in sequence[idx].name:
+                    carrying = None
                 if as_text:
                     obs_act_seq += sequence[idx].name
                 else:
-                    obs_act_seq.append((env_copy.grid, sequence[idx].name))  # kind of placeholder for now but this use case doesn't show up really
+                    obs_act_seq.append((obs["image"], sequence[idx].name))  # kind of placeholder for now but this use case doesn't show up really
                 sequence[idx].execute(env_copy)
                 obs = env_copy.gen_obs()
             if as_text:
                 obs_act_seq += "\n"
             idx += 1
+        
         if as_text:
             obs_act_seq += "Final obs: "
-            obs_act_seq += get_obs_desc(obs, detail = detail_level)
+            obs_act_seq += get_obs_desc(obs, detail = detail_level if not fully_obs else 4, carrying = carrying)
         else:
-            obs_act_seq.append((obs, None))
+            obs_act_seq.append((obs["image"], None))
         return obs_act_seq
     
 
@@ -586,12 +605,21 @@ class Agent:
             
             if skill_type == "pickup_":  # special case of hidden key because agent won't be able to pick up the key directly at first
                 if self.world_model.level == Level.HIDDEN_KEY:
+                    og_agent_dir = world_model_copy.agent_dir
                     setup_actions = _find_path(world_model_copy, target_pos, "goto", forbidden_actions = [3, 4, 5]) + [5]
                     self.execute_actions(setup_actions, world_model_copy)
                     additional = _find_path(world_model_copy, self.world_model.agent_start_pos, action_type = "goto", forbidden_actions = [3, 4, 5], can_overlap = True)
+                    curr_agent_dir = world_model_copy.agent_dir
+                    while curr_agent_dir > og_agent_dir:  # ex. currently facing up, needs to face right
+                        additional.append(0)
+                        curr_agent_dir -= 1
+                    while curr_agent_dir < og_agent_dir:  # ex. currently facing down, needs to face up
+                        additional.append(1)
+                        curr_agent_dir += 1
                     setup_actions.extend(additional)
                     self.execute_actions(additional, world_model_copy)
             elif skill_type == "put_down_":
+                og_agent_dir = world_model_copy.agent_dir
                 setup_actions = _find_path(world_model_copy, target_pos, "goto", forbidden_actions = [3, 4, 5])
                 setup_actions += [5, 3] if self.world_model.level == Level.HIDDEN_KEY else [3]
                 self.execute_actions(setup_actions, world_model_copy)
@@ -600,13 +628,28 @@ class Agent:
                 else:
                     target_pos = self.world_model.agent_start_pos  # no better default
                 additional = _find_path(world_model_copy, self.world_model.agent_start_pos, action_type = "goto", forbidden_actions = [3, 4, 5], can_overlap = True)
+                curr_agent_dir = world_model_copy.agent_dir
+                while curr_agent_dir > og_agent_dir:  # ex. currently facing up, needs to face right
+                    additional.append(0)
+                    curr_agent_dir -= 1
+                while curr_agent_dir < og_agent_dir:  # ex. currently facing down, needs to face up
+                    additional.append(1)
+                    curr_agent_dir += 1
                 setup_actions.extend(additional)
                 self.execute_actions(additional, world_model_copy)
             elif skill_type == "open_":  # close door if needed then put agent back
                 if target == Door and target_obj.is_open:
+                    og_agent_dir = world_model_copy.agent_dir
                     setup_actions = _find_path(world_model_copy, target_pos, "goto", forbidden_actions = [3, 4, 5]) + [5]
                     self.execute_actions(setup_actions, world_model_copy)
                     additional = _find_path(world_model_copy, self.world_model.agent_start_pos, action_type = "goto", forbidden_actions = [3, 4, 5], can_overlap = True)
+                    curr_agent_dir = world_model_copy.agent_dir
+                    while curr_agent_dir > og_agent_dir:  # ex. currently facing up, needs to face right
+                        additional.append(0)
+                        curr_agent_dir -= 1
+                    while curr_agent_dir < og_agent_dir:  # ex. currently facing down, needs to face up
+                        additional.append(1)
+                        curr_agent_dir += 1
                     setup_actions.extend(additional)
                     self.execute_actions(additional, world_model_copy)
                 else:
@@ -617,6 +660,7 @@ class Agent:
                 if target_obj.is_open:
                     setup_actions = []
                 else:
+                    og_agent_dir = world_model_copy.agent_dir
                     if target_obj.is_locked:
                         for key, pos in self.world_model.keys:
                             if key.color == target.color:
@@ -631,12 +675,26 @@ class Agent:
                         setup_actions.extend(additional)
                         self.execute_actions(additional, world_model_copy)
                         additional = _find_path(world_model_copy, self.world_model.agent_start_pos, action_type = "goto", forbidden_actions = [3, 4, 5], can_overlap = True)  # put agent back
+                        curr_agent_dir = world_model_copy.agent_dir
+                        while curr_agent_dir > og_agent_dir:  # ex. currently facing up, needs to face right
+                            additional.append(0)
+                            curr_agent_dir -= 1
+                        while curr_agent_dir < og_agent_dir:  # ex. currently facing down, needs to face up
+                            additional.append(1)
+                            curr_agent_dir += 1
                         setup_actions.extend(additional)
                         self.execute_actions(additional, world_model_copy)
                     else:
                         setup_actions = _find_path(world_model_copy, target_pos, "goto", forbidden_actions = [3, 4, 5]) + [5]
                         self.execute_actions(setup_actions, world_model_copy)
                         additional = _find_path(world_model_copy, self.world_model.agent_start_pos, action_type = "goto", forbidden_actions = [3, 4, 5], can_overlap = True)  # put agent back
+                        curr_agent_dir = world_model_copy.agent_dir
+                        while curr_agent_dir > og_agent_dir:  # ex. currently facing up, needs to face right
+                            additional.append(0)
+                            curr_agent_dir -= 1
+                        while curr_agent_dir < og_agent_dir:  # ex. currently facing down, needs to face up
+                            additional.append(1)
+                            curr_agent_dir += 1
                         setup_actions.extend(additional)
                         self.execute_actions(additional, world_model_copy)
             actions = skill_func(world_model_copy, target_pos)

@@ -20,11 +20,12 @@ import inspect
 import warnings
 
 
-def make_agents(config_path: str = None, config: Dict = None):
-    if config is None:
-        assert config_path is not None
+def make_agents(config_path: str = None, config: Dict = None, config_str: str = None):
+    if config_path is not None:
         with open(config_path, "r") as f:
             config = yaml.load(f, Loader = yaml.SafeLoader)
+    if config_str is not None:
+        config =  yaml.safe_load(config_str)
     assert "principal" in config, "Must define a principal agent"
     assert "attendant" in config, "Must define an attendant agent"
     assert "env_specs" in config, "Must define environment specifications"

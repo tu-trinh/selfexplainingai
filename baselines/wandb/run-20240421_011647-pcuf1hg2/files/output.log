@@ -1,0 +1,12 @@
+[DEBUG] LOADED TOKENIZER
+[DEBUG] 2420 prompts out of 2420 can fit
+Asking to truncate to max_length but no maximum length is provided and the model has no predefined maximum length. Default to no truncation.
+[DEBUG] LOADED TOKENIZER
+Asking to truncate to max_length but no maximum length is provided and the model has no predefined maximum length. Default to no truncation.
+[DEBUG] 2368 prompts out of 2368 can fit
+[DEBUG] LOADED TOKENIZER
+Asking to truncate to max_length but no maximum length is provided and the model has no predefined maximum length. Default to no truncation.
+
+
+
+Loading checkpoint shards: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:30<00:00, 10.01s/it]

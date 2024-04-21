@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline_listener.py", line 300, in <module>
+    main()
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline_listener.py", line 230, in main
+    training_data = process_dataset(training_data, "intention", "listener")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline_listener.py", line 77, in process_dataset
+    out_df = out_df.append(add_row, ignore_index = True)
+             ^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/pandas/core/generic.py", line 6204, in __getattr__
+    return object.__getattribute__(self, name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'DataFrame' object has no attribute 'append'
+None

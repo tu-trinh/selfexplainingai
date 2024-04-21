@@ -1,0 +1,86 @@
+wandb_version: 1
+
+batch_size:
+  desc: null
+  value: 4
+warmup_ratio:
+  desc: null
+  value: 0.065
+quantization:
+  desc: null
+  value: int8
+schedule:
+  desc: null
+  value: cosine
+weight_decay:
+  desc: null
+  value: 0.005
+model:
+  desc: null
+  value: mistralai/Mistral-7B-Instruct-v0.2
+max_new_tokens:
+  desc: null
+  value: 10
+max_input_token_length:
+  desc: null
+  value: 5000
+num_epochs:
+  desc: null
+  value: 3
+learning_rate:
+  desc: null
+  value: 3.0e-05
+lora_dropout:
+  desc: null
+  value: 0
+lora_alpha_rank_pairs:
+  desc: null
+  value:
+  - 512
+  - 256
+temperature:
+  desc: null
+  value: 0.1
+_wandb:
+  desc: null
+  value:
+    python_version: 3.11.5
+    cli_version: 0.16.2
+    framework: huggingface
+    huggingface_version: 4.37.1
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1713679393.919724
+    t:
+      1:
+      - 1
+      - 5
+      - 11
+      - 49
+      - 51
+      - 53
+      - 55
+      - 71
+      - 75
+      - 98
+      2:
+      - 1
+      - 5
+      - 11
+      - 49
+      - 51
+      - 53
+      - 55
+      - 71
+      - 75
+      - 98
+      3:
+      - 2
+      - 16
+      - 23
+      4: 3.11.5
+      5: 0.16.2
+      6: 4.37.1
+      8:
+      - 5
+      13: linux-x86_64

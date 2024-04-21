@@ -68,13 +68,15 @@ def process_dataset(df: pd.DataFrame, mismatch: str, task: str):
         for idx, row in df.iterrows():
             skill_name = row["skill"]
             obs_act_seq = row["traj_fully_obs_text"]
-            matches = re.find_all(r"Obs \d+: ([\w ():,'\n]*?)\nAct \d+: (\w+)", obs_act_seq)
+            matches = re.findall(r"Obs \d+: ([\w ():,'\n]*?)\nAct \d+: (\w+)", obs_act_seq)
             for match in matches:
                 add_row = {
-                    "prompt": GET_NEXT_ACTION_QUESTION.format(skill_name = skill_name, obs_desc = match[0]),
-                    "response": match[1].strip()
+                    "prompt": [GET_NEXT_ACTION_QUESTION.format(skill_name = skill_name, obs_desc = match[0])],
+                    "response": [match[1].strip()]
                 } 
-                out_df = out_df.append(add_row, ignore_index = True)
+                out_df = pd.concat([out_df, pd.DataFrame(add_row)], ignore_index = True)
+    out_df.reset_index(inplace = True)
+    out_df = out_df[["prompt", "response"]]
     return out_df
 
 
@@ -205,7 +207,7 @@ def evaluate_model(model, tokenizer, data, temperature, max_new_tokens):
                     grand_outputs += f"MODEL RESPONDED: {decoded_output}\n\n"
                 except IndexError:
                     break
-    with open("./baselines/logs/intention_speaker_llm_baseline.txt", "w") as f:
+    with open("intention_listener_llm_baseline.txt", "w") as f:
         f.write(grand_outputs)
     print("Finished generating and decoding")
     del grand_outputs
@@ -225,7 +227,7 @@ def main():
     wandb.config = RUN_CONFIGURATION
 
     torch.cuda.empty_cache()
-    training_data, validation_data, test_data = get_datasets()
+    training_data, validation_data, test_data = get_datasets("intention")
 
     training_data = process_dataset(training_data, "intention", "listener")
     validation_data = process_dataset(validation_data, "intention", "listener")

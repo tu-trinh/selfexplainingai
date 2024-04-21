@@ -1,0 +1,64 @@
+[DEBUG] EXAMPLE DF PROMPT
+[DEBUG] 0    NaN
+1    NaN
+2    NaN
+3    NaN
+4    NaN
+Name: prompt, dtype: object
+[DEBUG] EXAMPLE DF RESPONSE
+[DEBUG] 0       navigate_to_brown_box
+1      head_towards_brown_box
+2     navigate_to_purple_ball
+3    head_towards_purple_ball
+4     navigate_to_yellow_goal
+Name: response, dtype: object
+[DEBUG] EXAMPLE DF PROMPT
+[DEBUG] 0    NaN
+1    NaN
+2    NaN
+3    NaN
+4    NaN
+Name: prompt, dtype: object
+[DEBUG] EXAMPLE DF RESPONSE
+[DEBUG] 0    proceed_towards_green_box
+1              go_to_green_box
+2     proceed_towards_red_ball
+3               go_to_red_ball
+4      navigate_to_purple_ball
+Name: response, dtype: object
+[DEBUG] EXAMPLE DF PROMPT
+[DEBUG] 0    NaN
+1    NaN
+2    NaN
+3    NaN
+4    NaN
+Name: prompt, dtype: object
+[DEBUG] EXAMPLE DF RESPONSE
+[DEBUG] 0     make_way_towards_blue_box
+1             approach_blue_box
+2    make_way_towards_grey_ball
+3            approach_grey_ball
+4             make a right turn
+Name: response, dtype: object
+[DEBUG] LOADED TOKENIZER
+[DEBUG] HUH
+[DEBUG] [nan, nan]
+Traceback (most recent call last):
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline.py", line 301, in <module>
+    main()
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline.py", line 235, in main
+    training_set, fit_prompts, fit_responses = tokenize_dataset(training_data, wandb.config["model"], True, max_input_token_length = wandb.config["max_input_token_length"])
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline.py", line 98, in tokenize_dataset
+    max_length, valid_prompt_indices = _find_max_length(tokenizer, df, max_input_token_length)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline.py", line 142, in _find_max_length
+    prompt_tokenization = tokenizer(df["prompt"].tolist(), truncation = True)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/tokenization_utils_base.py", line 2803, in __call__
+    encodings = self._call_one(text=text, text_pair=text_pair, **all_kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/tokenization_utils_base.py", line 2861, in _call_one
+    raise ValueError(
+ValueError: text input must be of type `str` (single example), `List[str]` (batch or single pretokenized example) or `List[List[str]]` (batch of pretokenized examples).
+None

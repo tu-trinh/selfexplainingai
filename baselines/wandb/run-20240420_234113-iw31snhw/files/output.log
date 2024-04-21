@@ -1,0 +1,14 @@
+tokenizer_config.json: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 34.2k/34.2k [00:00<00:00, 685kB/s]
+Traceback (most recent call last):
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline.py", line 297, in <module>
+    main()
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline.py", line 231, in main
+    training_set, fit_prompts, fit_responses = tokenize_dataset(training_data, wandb.config["model"], True, max_input_token_length = wandb.config["max_input_token_length"])
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/selfexplainingai/baselines/llm_baseline.py", line 82, in tokenize_dataset
+    tokenizer = AutoTokenizer.from_pretrained(model)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/tutrinh/anaconda3/envs/chai/lib/python3.11/site-packages/transformers/models/auto/tokenization_auto.py", line 811, in from_pretrained
+    raise ValueError(
+ValueError: Tokenizer class GemmaTokenizer does not exist or is not currently imported.
+None

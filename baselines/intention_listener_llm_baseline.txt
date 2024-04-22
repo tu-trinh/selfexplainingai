@@ -1,0 +1,2049 @@
+----------SKILL 0 IS: make_way_towards_blue_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8571428571428571
+
+
+----------SKILL 1 IS: approach_blue_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8571428571428571
+
+
+----------SKILL 2 IS: make_way_towards_grey_ballCORRECT ANSWER IS: right, forward, right
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 3 IS: approach_grey_ballCORRECT ANSWER IS: right, forward, right
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 4 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 5 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 6 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 7 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 8 IS: make a left turnCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 9 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 10 IS: make a left turnCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 11 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 12 IS: navigate_to_blue_boxCORRECT ANSWER IS: left, left, forward, forward, forward, forward, forward, forward, left, forward, forward, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8666666666666667
+
+
+----------SKILL 13 IS: approach_blue_boxCORRECT ANSWER IS: left, left, forward, forward, forward, forward, forward, forward, left, forward, forward, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8
+
+
+----------SKILL 14 IS: navigate_to_brown_ballCORRECT ANSWER IS: right, forward, right
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 15 IS: approach_brown_ballCORRECT ANSWER IS: right, forward, right
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 16 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 17 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 18 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 19 IS: navigate_to_brown_ballCORRECT ANSWER IS: right, forward, right, forward, forward, forward, forward, forward, forward, right, forward, forward, forward, right
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7142857142857143
+
+
+----------SKILL 20 IS: approach_brown_ballCORRECT ANSWER IS: right, forward, right, forward, forward, forward, forward, forward, forward, right, forward, forward, forward, right
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7142857142857143
+
+
+----------SKILL 21 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 22 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 23 IS: go_to_yellow_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8571428571428571
+
+
+----------SKILL 24 IS: approach_yellow_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8571428571428571
+
+
+----------SKILL 25 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 26 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 27 IS: navigate_to_purple_boxCORRECT ANSWER IS: forward, forward, right
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 28 IS: head_towards_purple_boxCORRECT ANSWER IS: forward, forward, right
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 29 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 30 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 31 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 32 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 33 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 34 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 35 IS: approach_brown_doorCORRECT ANSWER IS: left, forward, right
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 36 IS: navigate_to_brown_doorCORRECT ANSWER IS: left, forward, right
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 37 IS: approach_blue_boxCORRECT ANSWER IS: left, forward, right, toggle, forward, forward, forward, forward, forward, left, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6923076923076923
+
+
+----------SKILL 38 IS: navigate_to_blue_boxCORRECT ANSWER IS: left, forward, right, toggle, forward, forward, forward, forward, forward, left, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6923076923076923
+
+
+----------SKILL 39 IS: switchCORRECT ANSWER IS: toggle
+MODEL RESPONDED: switchMatch percentage: 0.0
+
+
+----------SKILL 40 IS: swing_open_brown_doorCORRECT ANSWER IS: left, forward, forward, forward, right, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5
+
+
+----------SKILL 41 IS: approach_brown_ballCORRECT ANSWER IS: left, forward, forward, forward, right, toggle, forward, forward, right, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6363636363636364
+
+
+----------SKILL 42 IS: navigate_to_brown_ballCORRECT ANSWER IS: left, forward, forward, forward, right, toggle, forward, forward, right, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6363636363636364
+
+
+----------SKILL 43 IS: head_towards_purple_boxCORRECT ANSWER IS: left, left, forward, toggle, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward
+MODEL RESPONDED: left ==> forward ==> left ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7333333333333333
+
+
+----------SKILL 44 IS: proceed_towards_purple_boxCORRECT ANSWER IS: left, left, forward, toggle, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward
+MODEL RESPONDED: left ==> forward ==> left ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7333333333333333
+
+
+----------SKILL 45 IS: make a left turnCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 46 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 47 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 48 IS: head_towards_grey_goalCORRECT ANSWER IS: right, forward, forward, left, toggle, forward, forward, right, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5555555555555556
+
+
+----------SKILL 49 IS: proceed_towards_grey_goalCORRECT ANSWER IS: right, forward, forward, left, toggle, forward, forward, right, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5555555555555556
+
+
+----------SKILL 50 IS: make a left turnCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 51 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 52 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 53 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 54 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 55 IS: switchCORRECT ANSWER IS: toggle
+MODEL RESPONDED: switchMatch percentage: 0.0
+
+
+----------SKILL 56 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 57 IS: switchCORRECT ANSWER IS: toggle
+MODEL RESPONDED: switchMatch percentage: 0.0
+
+
+----------SKILL 58 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 59 IS: put_blue_ball_awayCORRECT ANSWER IS: right, drop
+MODEL RESPONDED: drop ==> dropMatch percentage: 0.5
+
+
+----------SKILL 60 IS: put_blue_ball_on_floorCORRECT ANSWER IS: right, drop
+MODEL RESPONDED: drop ==> dropMatch percentage: 0.5
+
+
+----------SKILL 61 IS: swing_open_green_doorCORRECT ANSWER IS: left, pickup, forward, right, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.2
+
+
+----------SKILL 62 IS: go_to_blue_boxCORRECT ANSWER IS: left, pickup, forward, right, toggle, forward, forward, forward, forward, forward, left, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6428571428571429
+
+
+----------SKILL 63 IS: approach_blue_boxCORRECT ANSWER IS: left, pickup, forward, right, toggle, forward, forward, forward, forward, forward, left, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6428571428571429
+
+
+----------SKILL 64 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 65 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 66 IS: put_blue_key_awayCORRECT ANSWER IS: left, drop
+MODEL RESPONDED: drop ==> dropMatch percentage: 0.5
+
+
+----------SKILL 67 IS: put_blue_key_on_floorCORRECT ANSWER IS: left, drop
+MODEL RESPONDED: drop ==> dropMatch percentage: 0.5
+
+
+----------SKILL 68 IS: swing_open_green_doorCORRECT ANSWER IS: left, forward, forward, pickup, forward, right, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.42857142857142855
+
+
+----------SKILL 69 IS: go_to_green_ballCORRECT ANSWER IS: left, forward, forward, pickup, forward, right, toggle, forward, forward, right, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> right ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5833333333333334
+
+
+----------SKILL 70 IS: approach_green_ballCORRECT ANSWER IS: left, forward, forward, pickup, forward, right, toggle, forward, forward, right, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5833333333333334
+
+
+----------SKILL 71 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 72 IS: backwardCORRECT ANSWER IS: left, left
+MODEL RESPONDED: left ==> backwardMatch percentage: 0.5
+
+
+----------SKILL 73 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 74 IS: lay downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 75 IS: open_brown_doorCORRECT ANSWER IS: left, left, pickup, forward, toggle
+MODEL RESPONDED: left ==> forward ==> left ==> left ==> leftMatch percentage: 0.2
+
+
+----------SKILL 76 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 77 IS: proceed_5_stepsCORRECT ANSWER IS: forward, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 1.0
+
+
+----------SKILL 78 IS: move_5_steps_forwardCORRECT ANSWER IS: forward, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 1.0
+
+
+----------SKILL 79 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 80 IS: fetch_red_ballCORRECT ANSWER IS: right, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> leftMatch percentage: 0.3333333333333333
+
+
+----------SKILL 81 IS: pickup_red_ballCORRECT ANSWER IS: right, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> leftMatch percentage: 0.3333333333333333
+
+
+----------SKILL 82 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 83 IS: lay downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 84 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 85 IS: open_red_doorCORRECT ANSWER IS: right, forward, pickup, forward, left, toggle
+MODEL RESPONDED: forward ==> forward ==> left ==> forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 86 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 87 IS: set downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 88 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 89 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 90 IS: switchCORRECT ANSWER IS: toggle
+MODEL RESPONDED: switchMatch percentage: 0.0
+
+
+----------SKILL 91 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 92 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 93 IS: set downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 94 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 95 IS: switchCORRECT ANSWER IS: toggle
+MODEL RESPONDED: switchMatch percentage: 0.0
+
+
+----------SKILL 96 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 97 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 98 IS: open_up_green_doorCORRECT ANSWER IS: right, forward, forward, forward, forward, left, toggle
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5714285714285714
+
+
+----------SKILL 99 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 100 IS: obtain_green_keyCORRECT ANSWER IS: right, pickup
+MODEL RESPONDED: forward ==> forwardMatch percentage: 0.0
+
+
+----------SKILL 101 IS: procure_green_keyCORRECT ANSWER IS: right, pickup
+MODEL RESPONDED: forward ==> forwardMatch percentage: 0.0
+
+
+----------SKILL 102 IS: open_up_green_doorCORRECT ANSWER IS: left, forward, forward, right, toggle
+MODEL RESPONDED: forward ==> forward ==> left ==> left ==> leftMatch percentage: 0.2
+
+
+----------SKILL 103 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 104 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 105 IS: approach_grey_doorCORRECT ANSWER IS: right, pickup, forward, right, forward
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> leftMatch percentage: 0.2
+
+
+----------SKILL 106 IS: make_way_towards_grey_doorCORRECT ANSWER IS: right, pickup, forward, right, forward
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> leftMatch percentage: 0.2
+
+
+----------SKILL 107 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 108 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 109 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 110 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 111 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 112 IS: swing_open_blue_doorCORRECT ANSWER IS: left, forward, forward, forward, right, toggle
+MODEL RESPONDED: forward ==> left ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 113 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 114 IS: approach_blue_goalCORRECT ANSWER IS: left, forward, forward, forward, forward, pickup, left, left, forward, left, toggle, forward, forward, right, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5333333333333333
+
+
+----------SKILL 115 IS: make_way_towards_blue_goalCORRECT ANSWER IS: left, forward, forward, forward, forward, pickup, left, left, forward, left, toggle, forward, forward, right, forward
+MODEL RESPONDED: forward ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.4666666666666667
+
+
+----------SKILL 116 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 117 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 118 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 119 IS: proceed_towards_brown_doorCORRECT ANSWER IS: right, forward, forward, forward, forward, forward, forward, left
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.75
+
+
+----------SKILL 120 IS: head_towards_brown_doorCORRECT ANSWER IS: right, forward, forward, forward, forward, forward, forward, left
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.75
+
+
+----------SKILL 121 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 122 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 123 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 124 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 125 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 126 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 127 IS: go_to_yellow_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, toggle, pickup, left, toggle, forward, forward, forward, forward, forward, left, forward, forward, forward
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 128 IS: approach_yellow_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, toggle, pickup, left, toggle, forward, forward, forward, forward, forward, left, forward, forward, forward
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 129 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 130 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 131 IS: switchCORRECT ANSWER IS: toggle
+MODEL RESPONDED: switchMatch percentage: 0.0
+
+
+----------SKILL 132 IS: swing_open_brown_boxCORRECT ANSWER IS: right, toggle
+MODEL RESPONDED: forward ==> forwardMatch percentage: 0.0
+
+
+----------SKILL 133 IS: go_to_brown_ballCORRECT ANSWER IS: right, toggle, pickup, left, left, forward, forward, right, toggle, forward, forward, right, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> left ==> left ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.42857142857142855
+
+
+----------SKILL 134 IS: approach_brown_ballCORRECT ANSWER IS: right, toggle, pickup, left, left, forward, forward, right, toggle, forward, forward, right, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> right ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.42857142857142855
+
+
+----------SKILL 135 IS: swing_open_brown_doorCORRECT ANSWER IS: left, forward, forward, right, toggle
+MODEL RESPONDED: forward ==> forward ==> right ==> left ==> leftMatch percentage: 0.2
+
+
+----------SKILL 136 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 137 IS: proceed_5_stepsCORRECT ANSWER IS: forward, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 1.0
+
+
+----------SKILL 138 IS: move_5_steps_forwardCORRECT ANSWER IS: forward, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 1.0
+
+
+----------SKILL 139 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 140 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 141 IS: open_purple_doorCORRECT ANSWER IS: right, pickup, forward, right, forward, toggle
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> left ==> leftMatch percentage: 0.16666666666666666
+
+
+----------SKILL 142 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 143 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 144 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 145 IS: navigate_to_red_goalCORRECT ANSWER IS: left, forward, forward, forward, forward, toggle, pickup, left, left, forward, left, toggle, forward, forward, right, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5
+
+
+----------SKILL 146 IS: head_towards_red_goalCORRECT ANSWER IS: left, forward, forward, forward, forward, toggle, pickup, left, left, forward, left, toggle, forward, forward, right, forward
+MODEL RESPONDED: forward ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.4375
+
+
+----------SKILL 147 IS: make a left turnCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 148 IS: open_red_doorCORRECT ANSWER IS: left, forward, forward, forward, right, toggle
+MODEL RESPONDED: forward ==> left ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 149 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 150 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 151 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 152 IS: swing_open_yellow_doorCORRECT ANSWER IS: right, forward, forward, forward, forward, forward, forward, left, toggle
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 153 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 154 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 155 IS: switchCORRECT ANSWER IS: toggle
+MODEL RESPONDED: switchMatch percentage: 0.0
+
+
+----------SKILL 156 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 157 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 158 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 159 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 160 IS: switchCORRECT ANSWER IS: toggle
+MODEL RESPONDED: switchMatch percentage: 0.0
+
+
+----------SKILL 161 IS: approach_green_doorCORRECT ANSWER IS: right, forward, forward, left
+MODEL RESPONDED: left ==> forward ==> forward ==> forwardMatch percentage: 0.5
+
+
+----------SKILL 162 IS: navigate_to_green_doorCORRECT ANSWER IS: right, forward, forward, left
+MODEL RESPONDED: left ==> forward ==> forward ==> forwardMatch percentage: 0.5
+
+
+----------SKILL 163 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 164 IS: approach_blue_boxCORRECT ANSWER IS: right, forward, forward, left, toggle, forward, forward, forward, forward, forward, left, forward
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 165 IS: navigate_to_blue_boxCORRECT ANSWER IS: right, forward, forward, left, toggle, forward, forward, forward, forward, forward, left, forward
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 166 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 167 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 168 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 169 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 170 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 171 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 172 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 173 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 174 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 175 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 176 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 177 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 178 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 179 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 180 IS: swing_open_brown_doorCORRECT ANSWER IS: forward, left, forward, forward, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6
+
+
+----------SKILL 181 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 182 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 183 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 184 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 185 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 186 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 187 IS: open_red_doorCORRECT ANSWER IS: left, left, forward, right, forward, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 188 IS: open_purple_doorCORRECT ANSWER IS: forward, forward, left, forward, forward, forward, forward, forward, right, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> left ==> forwardMatch percentage: 0.7
+
+
+----------SKILL 189 IS: navigate_to_red_goalCORRECT ANSWER IS: forward, forward, left, forward, forward, forward, forward, forward, right, toggle, forward, forward, forward, forward, right, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7894736842105263
+
+
+----------SKILL 190 IS: head_towards_red_goalCORRECT ANSWER IS: forward, forward, left, forward, forward, forward, forward, forward, right, toggle, forward, forward, forward, forward, right, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7894736842105263
+
+
+----------SKILL 191 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 192 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 193 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 194 IS: switchCORRECT ANSWER IS: toggle
+MODEL RESPONDED: switchMatch percentage: 0.0
+
+
+----------SKILL 195 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 196 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 197 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 198 IS: swing_open_red_doorCORRECT ANSWER IS: forward, forward, forward, left, forward, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 199 IS: retrieve_red_keyCORRECT ANSWER IS: left, forward, forward, left, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5714285714285714
+
+
+----------SKILL 200 IS: obtain_red_keyCORRECT ANSWER IS: left, forward, forward, left, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5714285714285714
+
+
+----------SKILL 201 IS: navigate_to_blue_boxCORRECT ANSWER IS: left, left, forward, forward, forward, right, forward, pickup, right, forward, forward, forward, forward, forward, forward, left, toggle, forward, forward, forward, left
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6190476190476191
+
+
+----------SKILL 202 IS: approach_blue_boxCORRECT ANSWER IS: left, left, forward, forward, forward, right, forward, pickup, right, forward, forward, forward, forward, forward, forward, left, toggle, forward, forward, forward, left
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6190476190476191
+
+
+----------SKILL 203 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 204 IS: open_up_purple_doorCORRECT ANSWER IS: left, forward, forward, left, forward, forward, toggle
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7142857142857143
+
+
+----------SKILL 205 IS: open_up_purple_doorCORRECT ANSWER IS: left, forward, right, forward, forward, toggle
+MODEL RESPONDED: forward ==> left ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 206 IS: swing_open_blue_doorCORRECT ANSWER IS: right, forward, forward, left, forward, forward, forward, forward, toggle
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> left ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5555555555555556
+
+
+----------SKILL 207 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 208 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 209 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 210 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 211 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 212 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 213 IS: proceed_towards_grey_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, left, forward, forward, forward, forward, forward, left, forward, forward, right
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7333333333333333
+
+
+----------SKILL 214 IS: go_to_grey_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, left, forward, forward, forward, forward, forward, left, forward, forward, right
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7333333333333333
+
+
+----------SKILL 215 IS: make a U-turnCORRECT ANSWER IS: left, left
+MODEL RESPONDED: left ==> leftMatch percentage: 1.0
+
+
+----------SKILL 216 IS: approach_brown_boxCORRECT ANSWER IS: right, forward, forward, forward, right, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7777777777777778
+
+
+----------SKILL 217 IS: head_towards_brown_boxCORRECT ANSWER IS: right, forward, forward, forward, right, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7777777777777778
+
+
+----------SKILL 218 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 219 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 220 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 221 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 222 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 223 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 224 IS: obtain_green_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8
+
+
+----------SKILL 225 IS: procure_green_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8
+
+
+----------SKILL 226 IS: obtain_grey_ballCORRECT ANSWER IS: right, forward, right, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forwardMatch percentage: 0.25
+
+
+----------SKILL 227 IS: procure_grey_ballCORRECT ANSWER IS: right, forward, right, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forwardMatch percentage: 0.25
+
+
+----------SKILL 228 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 229 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 230 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 231 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 232 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 233 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 234 IS: make a left turnCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 235 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 236 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 237 IS: make a left turnCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 238 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 239 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 240 IS: pickup_blue_boxCORRECT ANSWER IS: left, left, forward, forward, forward, forward, forward, forward, left, forward, forward, forward, forward, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8125
+
+
+----------SKILL 241 IS: obtain_blue_boxCORRECT ANSWER IS: left, left, forward, forward, forward, forward, forward, forward, left, forward, forward, forward, forward, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8125
+
+
+----------SKILL 242 IS: pickup_brown_ballCORRECT ANSWER IS: right, forward, right, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forwardMatch percentage: 0.25
+
+
+----------SKILL 243 IS: obtain_brown_ballCORRECT ANSWER IS: right, forward, right, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forwardMatch percentage: 0.25
+
+
+----------SKILL 244 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 245 IS: proceed_towards_purple_ballCORRECT ANSWER IS: forward, forward, right
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 246 IS: head_towards_purple_ballCORRECT ANSWER IS: forward, forward, right
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 247 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 248 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 249 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 250 IS: pickup_brown_ballCORRECT ANSWER IS: right, forward, right, forward, forward, forward, forward, forward, forward, right, forward, forward, forward, right, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 251 IS: obtain_brown_ballCORRECT ANSWER IS: right, forward, right, forward, forward, forward, forward, forward, forward, right, forward, forward, forward, right, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 252 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 253 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 254 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 255 IS: acquire_blue_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8
+
+
+----------SKILL 256 IS: fetch_blue_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8
+
+
+----------SKILL 257 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 258 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 259 IS: pickup_grey_ballCORRECT ANSWER IS: forward, forward, right, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forwardMatch percentage: 0.5
+
+
+----------SKILL 260 IS: obtain_grey_ballCORRECT ANSWER IS: forward, forward, right, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forwardMatch percentage: 0.5
+
+
+----------SKILL 261 IS: make_way_towards_yellow_ballCORRECT ANSWER IS: forward, left
+MODEL RESPONDED: forward ==> forwardMatch percentage: 0.5
+
+
+----------SKILL 262 IS: go_to_yellow_ballCORRECT ANSWER IS: forward, left
+MODEL RESPONDED: forward ==> forwardMatch percentage: 0.5
+
+
+----------SKILL 263 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 264 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 265 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 266 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 267 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 268 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 269 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 270 IS: acquire_grey_boxCORRECT ANSWER IS: left, forward, right, toggle, forward, forward, forward, forward, forward, left, forward, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6428571428571429
+
+
+----------SKILL 271 IS: fetch_grey_boxCORRECT ANSWER IS: left, forward, right, toggle, forward, forward, forward, forward, forward, left, forward, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6428571428571429
+
+
+----------SKILL 272 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 273 IS: approach_blue_doorCORRECT ANSWER IS: left, forward, right
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 274 IS: navigate_to_blue_doorCORRECT ANSWER IS: left, forward, right
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 275 IS: swing_open_blue_doorCORRECT ANSWER IS: left, forward, forward, forward, right, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> right ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 276 IS: acquire_blue_ballCORRECT ANSWER IS: left, forward, forward, forward, right, toggle, forward, forward, right, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5833333333333334
+
+
+----------SKILL 277 IS: fetch_blue_ballCORRECT ANSWER IS: left, forward, forward, forward, right, toggle, forward, forward, right, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5833333333333334
+
+
+----------SKILL 278 IS: pickup_brown_ballCORRECT ANSWER IS: left, left, forward, toggle, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward, pickup
+MODEL RESPONDED: left ==> forward ==> left ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6875
+
+
+----------SKILL 279 IS: obtain_brown_ballCORRECT ANSWER IS: left, left, forward, toggle, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward, pickup
+MODEL RESPONDED: left ==> forward ==> left ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6875
+
+
+----------SKILL 280 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 281 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 282 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 283 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 284 IS: pickup_purple_ballCORRECT ANSWER IS: right, forward, forward, left, toggle, forward, forward, right, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.4444444444444444
+
+
+----------SKILL 285 IS: obtain_purple_ballCORRECT ANSWER IS: right, forward, forward, left, toggle, forward, forward, right, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.4444444444444444
+
+
+----------SKILL 286 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 287 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 288 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 289 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 290 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 291 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 292 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 293 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 294 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 295 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 296 IS: swing_open_brown_doorCORRECT ANSWER IS: left, pickup, forward, right, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.2
+
+
+----------SKILL 297 IS: obtain_yellow_boxCORRECT ANSWER IS: left, pickup, forward, right, toggle, forward, forward, forward, forward, forward, drop, left, forward, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5625
+
+
+----------SKILL 298 IS: procure_yellow_boxCORRECT ANSWER IS: left, pickup, forward, right, toggle, forward, forward, forward, forward, forward, drop, left, forward, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5625
+
+
+----------SKILL 299 IS: put_yellow_ball_awayCORRECT ANSWER IS: right, drop
+MODEL RESPONDED: drop ==> dropMatch percentage: 0.5
+
+
+----------SKILL 300 IS: put_yellow_ball_on_floorCORRECT ANSWER IS: right, drop
+MODEL RESPONDED: drop ==> dropMatch percentage: 0.5
+
+
+----------SKILL 301 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 302 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 303 IS: put_yellow_key_awayCORRECT ANSWER IS: left, drop
+MODEL RESPONDED: drop ==> dropMatch percentage: 0.5
+
+
+----------SKILL 304 IS: put_yellow_key_on_floorCORRECT ANSWER IS: left, drop
+MODEL RESPONDED: drop ==> dropMatch percentage: 0.5
+
+
+----------SKILL 305 IS: swing_open_brown_doorCORRECT ANSWER IS: left, forward, forward, pickup, forward, right, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.42857142857142855
+
+
+----------SKILL 306 IS: obtain_brown_ballCORRECT ANSWER IS: left, forward, forward, pickup, forward, right, toggle, forward, forward, drop, right, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5
+
+
+----------SKILL 307 IS: procure_brown_ballCORRECT ANSWER IS: left, forward, forward, pickup, forward, right, toggle, forward, forward, drop, right, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5
+
+
+----------SKILL 308 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 309 IS: backwardCORRECT ANSWER IS: left, left
+MODEL RESPONDED: left ==> backwardMatch percentage: 0.5
+
+
+----------SKILL 310 IS: lay downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 311 IS: open_purple_doorCORRECT ANSWER IS: left, left, pickup, forward, toggle
+MODEL RESPONDED: left ==> forward ==> left ==> left ==> leftMatch percentage: 0.2
+
+
+----------SKILL 312 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 313 IS: navigate_to_purple_ballCORRECT ANSWER IS: left, left, pickup, forward, toggle, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward
+MODEL RESPONDED: left ==> forward ==> left ==> left ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6875
+
+
+----------SKILL 314 IS: head_towards_purple_ballCORRECT ANSWER IS: left, left, pickup, forward, toggle, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward
+MODEL RESPONDED: left ==> forward ==> left ==> left ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> left ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6875
+
+
+----------SKILL 315 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 316 IS: navigate_to_red_ballCORRECT ANSWER IS: right, forward, pickup, forward, left, toggle, forward, forward, right
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.4444444444444444
+
+
+----------SKILL 317 IS: head_towards_red_ballCORRECT ANSWER IS: right, forward, pickup, forward, left, toggle, forward, forward, right
+MODEL RESPONDED: forward ==> forward ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.4444444444444444
+
+
+----------SKILL 318 IS: lay downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 319 IS: fetch_red_boxCORRECT ANSWER IS: right, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> leftMatch percentage: 0.3333333333333333
+
+
+----------SKILL 320 IS: pickup_red_boxCORRECT ANSWER IS: right, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> leftMatch percentage: 0.3333333333333333
+
+
+----------SKILL 321 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 322 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 323 IS: open_red_doorCORRECT ANSWER IS: right, forward, pickup, forward, left, toggle
+MODEL RESPONDED: forward ==> forward ==> left ==> forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 324 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 325 IS: set downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 326 IS: step_forward_6_timesCORRECT ANSWER IS: forward, forward, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 1.0
+
+
+----------SKILL 327 IS: advance_6_stepsCORRECT ANSWER IS: forward, forward, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 1.0
+
+
+----------SKILL 328 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 329 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 330 IS: switchCORRECT ANSWER IS: toggle
+MODEL RESPONDED: switchMatch percentage: 0.0
+
+
+----------SKILL 331 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 332 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 333 IS: set downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 334 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 335 IS: switchCORRECT ANSWER IS: toggle
+MODEL RESPONDED: switchMatch percentage: 0.0
+
+
+----------SKILL 336 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 337 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 338 IS: lay downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 339 IS: acquire_blue_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, pickup, left, toggle, forward, forward, forward, forward, forward, drop, left, forward, forward, forward, pickup
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.631578947368421
+
+
+----------SKILL 340 IS: fetch_blue_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, pickup, left, toggle, forward, forward, forward, forward, forward, drop, left, forward, forward, forward, pickup
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.631578947368421
+
+
+----------SKILL 341 IS: swing_open_green_doorCORRECT ANSWER IS: right, forward, forward, forward, forward, left, toggle
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5714285714285714
+
+
+----------SKILL 342 IS: acquire_green_keyCORRECT ANSWER IS: right, pickup
+MODEL RESPONDED: forward ==> forwardMatch percentage: 0.0
+
+
+----------SKILL 343 IS: fetch_green_keyCORRECT ANSWER IS: right, pickup
+MODEL RESPONDED: forward ==> forwardMatch percentage: 0.0
+
+
+----------SKILL 344 IS: lay downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 345 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 346 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 347 IS: swing_open_green_doorCORRECT ANSWER IS: left, forward, forward, right, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> left ==> rightMatch percentage: 0.4
+
+
+----------SKILL 348 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 349 IS: make_way_towards_grey_doorCORRECT ANSWER IS: right, pickup, forward, right, forward
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> leftMatch percentage: 0.2
+
+
+----------SKILL 350 IS: go_to_grey_doorCORRECT ANSWER IS: right, pickup, forward, right, forward
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> leftMatch percentage: 0.2
+
+
+----------SKILL 351 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 352 IS: dropCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 353 IS: make_way_towards_grey_ballCORRECT ANSWER IS: right, pickup, forward, right, forward, toggle, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> left ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> left ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6470588235294118
+
+
+----------SKILL 354 IS: go_to_grey_ballCORRECT ANSWER IS: right, pickup, forward, right, forward, toggle, forward, forward, forward, forward, forward, right, forward, forward, forward, forward, forward
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> left ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6470588235294118
+
+
+----------SKILL 355 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 356 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 357 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 358 IS: put_yellow_key_on_floorCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 359 IS: put_yellow_key_awayCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 360 IS: open_yellow_doorCORRECT ANSWER IS: left, forward, forward, forward, right, toggle
+MODEL RESPONDED: forward ==> left ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 361 IS: make a left turnCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 362 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 363 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 364 IS: approach_blue_doorCORRECT ANSWER IS: right, forward, forward, forward, forward, forward, forward, left
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.75
+
+
+----------SKILL 365 IS: navigate_to_blue_doorCORRECT ANSWER IS: right, forward, forward, forward, forward, forward, forward, left
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.75
+
+
+----------SKILL 366 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 367 IS: lay downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 368 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 369 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 370 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 371 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 372 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 373 IS: lay downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 374 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 375 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 376 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 377 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 378 IS: put_brown_key_on_floorCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 379 IS: put_down_brown_keyCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 380 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 381 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 382 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 383 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 384 IS: swing_open_brown_doorCORRECT ANSWER IS: left, forward, forward, right, toggle
+MODEL RESPONDED: forward ==> forward ==> right ==> right ==> rightMatch percentage: 0.4
+
+
+----------SKILL 385 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 386 IS: put_brown_key_on_floorCORRECT ANSWER IS: left, drop
+MODEL RESPONDED: drop ==> dropMatch percentage: 0.5
+
+
+----------SKILL 387 IS: put_down_brown_keyCORRECT ANSWER IS: left, drop
+MODEL RESPONDED: drop ==> dropMatch percentage: 0.5
+
+
+----------SKILL 388 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 389 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 390 IS: swing_open_brown_boxCORRECT ANSWER IS: right, toggle
+MODEL RESPONDED: forward ==> forwardMatch percentage: 0.0
+
+
+----------SKILL 391 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 392 IS: place_red_key_downCORRECT ANSWER IS: left, drop
+MODEL RESPONDED: drop ==> dropMatch percentage: 0.5
+
+
+----------SKILL 393 IS: lay_red_key_downCORRECT ANSWER IS: left, drop
+MODEL RESPONDED: drop ==> dropMatch percentage: 0.5
+
+
+----------SKILL 394 IS: make_way_towards_red_doorCORRECT ANSWER IS: right, pickup, forward, right, forward
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> leftMatch percentage: 0.2
+
+
+----------SKILL 395 IS: go_to_red_doorCORRECT ANSWER IS: right, pickup, forward, right, forward
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> leftMatch percentage: 0.2
+
+
+----------SKILL 396 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 397 IS: obtain_red_ballCORRECT ANSWER IS: right, toggle, pickup, forward, right, forward, toggle, forward, forward, forward, forward, drop, right, forward, forward, forward, forward, forward, forward, left, pickup
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> left ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5238095238095238
+
+
+----------SKILL 398 IS: retrieve_red_ballCORRECT ANSWER IS: right, toggle, pickup, forward, right, forward, toggle, forward, forward, forward, forward, drop, right, forward, forward, forward, forward, forward, forward, left, pickup
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> left ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5238095238095238
+
+
+----------SKILL 399 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 400 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 401 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 402 IS: make a left turnCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 403 IS: open_purple_doorCORRECT ANSWER IS: left, forward, forward, forward, right, toggle
+MODEL RESPONDED: forward ==> left ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 404 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 405 IS: place_purple_key_downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 406 IS: lay_purple_key_downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 407 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 408 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 409 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 410 IS: set downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 411 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 412 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 413 IS: swing_open_green_doorCORRECT ANSWER IS: right, forward, forward, forward, forward, forward, forward, left, toggle
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 414 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 415 IS: make a right turnCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 416 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 417 IS: set downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 418 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 419 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 420 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 421 IS: acquire_grey_boxCORRECT ANSWER IS: right, forward, forward, left, toggle, forward, forward, forward, forward, forward, left, forward, pickup
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6153846153846154
+
+
+----------SKILL 422 IS: fetch_grey_boxCORRECT ANSWER IS: right, forward, forward, left, toggle, forward, forward, forward, forward, forward, left, forward, pickup
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6153846153846154
+
+
+----------SKILL 423 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 424 IS: approach_blue_doorCORRECT ANSWER IS: right, forward, forward, left
+MODEL RESPONDED: left ==> forward ==> forward ==> forwardMatch percentage: 0.5
+
+
+----------SKILL 425 IS: navigate_to_blue_doorCORRECT ANSWER IS: right, forward, forward, left
+MODEL RESPONDED: left ==> forward ==> forward ==> forwardMatch percentage: 0.5
+
+
+----------SKILL 426 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 427 IS: acquire_blue_ballCORRECT ANSWER IS: toggle, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 428 IS: fetch_blue_ballCORRECT ANSWER IS: toggle, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 429 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 430 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 431 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 432 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 433 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 434 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 435 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 436 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 437 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 438 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 439 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 440 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 441 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 442 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 443 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 444 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 445 IS: swing_open_green_doorCORRECT ANSWER IS: forward, left, forward, forward, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6
+
+
+----------SKILL 446 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 447 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 448 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 449 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 450 IS: make_way_towards_grey_ballCORRECT ANSWER IS: left, left, forward, right, forward, toggle, forward, forward, right
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.4444444444444444
+
+
+----------SKILL 451 IS: go_to_grey_ballCORRECT ANSWER IS: left, left, forward, right, forward, toggle, forward, forward, right
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.4444444444444444
+
+
+----------SKILL 452 IS: open_yellow_doorCORRECT ANSWER IS: left, left, forward, right, forward, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 453 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 454 IS: open_grey_doorCORRECT ANSWER IS: forward, forward, left, forward, forward, forward, forward, forward, right, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> left ==> forwardMatch percentage: 0.7
+
+
+----------SKILL 455 IS: pickup_yellow_ballCORRECT ANSWER IS: forward, forward, left, forward, forward, forward, forward, forward, right, toggle, forward, forward, forward, forward, right, forward, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7368421052631579
+
+
+----------SKILL 456 IS: obtain_yellow_ballCORRECT ANSWER IS: forward, forward, left, forward, forward, forward, forward, forward, right, toggle, forward, forward, forward, forward, right, forward, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7368421052631579
+
+
+----------SKILL 457 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 458 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 459 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 460 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 461 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 462 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 463 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 464 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 465 IS: go forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 466 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 467 IS: acquire_blue_keyCORRECT ANSWER IS: left, forward, forward, left, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5714285714285714
+
+
+----------SKILL 468 IS: fetch_blue_keyCORRECT ANSWER IS: left, forward, forward, left, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5714285714285714
+
+
+----------SKILL 469 IS: swing_open_blue_doorCORRECT ANSWER IS: forward, forward, forward, left, forward, toggle
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6666666666666666
+
+
+----------SKILL 470 IS: lay_blue_key_downCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 471 IS: put_down_blue_keyCORRECT ANSWER IS: drop
+MODEL RESPONDED: dropMatch percentage: 1.0
+
+
+----------SKILL 472 IS: approach_grey_boxCORRECT ANSWER IS: left, left, forward, forward, forward, right, forward, pickup, right, forward, forward, forward, forward, forward, forward, left, toggle, forward, forward, forward, left
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6190476190476191
+
+
+----------SKILL 473 IS: navigate_to_grey_boxCORRECT ANSWER IS: left, left, forward, forward, forward, right, forward, pickup, right, forward, forward, forward, forward, forward, forward, left, toggle, forward, forward, forward, left
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6190476190476191
+
+
+----------SKILL 474 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 475 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 476 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 477 IS: toggleCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 478 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 479 IS: make_way_towards_brown_ballCORRECT ANSWER IS: left, forward, forward, left, forward, forward, toggle, forward, forward, right, forward, forward
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.75
+
+
+----------SKILL 480 IS: go_to_brown_ballCORRECT ANSWER IS: left, forward, forward, left, forward, forward, toggle, forward, forward, right, forward, forward
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.75
+
+
+----------SKILL 481 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 482 IS: pickup_purple_ballCORRECT ANSWER IS: left, forward, right, forward, forward, toggle, forward, forward, pickup
+MODEL RESPONDED: forward ==> left ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.4444444444444444
+
+
+----------SKILL 483 IS: obtain_purple_ballCORRECT ANSWER IS: left, forward, right, forward, forward, toggle, forward, forward, pickup
+MODEL RESPONDED: forward ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.4444444444444444
+
+
+----------SKILL 484 IS: open_brown_doorCORRECT ANSWER IS: left, forward, right, forward, forward, toggle
+MODEL RESPONDED: forward ==> left ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.3333333333333333
+
+
+----------SKILL 485 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 486 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 487 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 488 IS: swing_open_grey_doorCORRECT ANSWER IS: right, forward, forward, left, forward, forward, forward, forward, toggle
+MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> left ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5555555555555556
+
+
+----------SKILL 489 IS: snatch upCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 490 IS: activateCORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggleMatch percentage: 1.0
+
+
+----------SKILL 491 IS: turn leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 492 IS: rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+----------SKILL 493 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 494 IS: acquire_grey_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, left, forward, forward, forward, forward, forward, left, forward, forward, right, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6875
+
+
+----------SKILL 495 IS: pickup_grey_boxCORRECT ANSWER IS: right, forward, forward, forward, forward, left, forward, forward, forward, forward, forward, left, forward, forward, right, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.6875
+
+
+----------SKILL 496 IS: acquire_green_ballCORRECT ANSWER IS: left, left, pickup
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.0
+
+
+----------SKILL 497 IS: pickup_green_ballCORRECT ANSWER IS: left, left, pickup
+MODEL RESPONDED: forward ==> forward ==> forwardMatch percentage: 0.0
+
+
+----------SKILL 498 IS: obtain_red_ballCORRECT ANSWER IS: right, forward, forward, forward, right, forward, forward, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7
+
+
+----------SKILL 499 IS: retrieve_red_ballCORRECT ANSWER IS: right, forward, forward, forward, right, forward, forward, forward, forward, pickup
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.7
+
+
+----------SKILL 500 IS: move_5_steps_leftCORRECT ANSWER IS: left, forward, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8333333333333334
+
+
+----------SKILL 501 IS: proceed_left_5_stepsCORRECT ANSWER IS: left, forward, forward, forward, forward, forward
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8333333333333334
+
+
+----------SKILL 502 IS: pickupCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 503 IS: make a left turnCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 504 IS: step forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 505 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 506 IS: proceed_towards_green_ballCORRECT ANSWER IS: forward, forward, forward, forward, forward, right
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8333333333333334
+
+
+----------SKILL 507 IS: head_towards_green_ballCORRECT ANSWER IS: forward, forward, forward, forward, forward, right
+MODEL RESPONDED: forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.8333333333333334
+
+
+----------SKILL 508 IS: grabCORRECT ANSWER IS: pickup
+MODEL RESPONDED: pickupMatch percentage: 1.0
+
+
+----------SKILL 509 IS: forwardCORRECT ANSWER IS: forward
+MODEL RESPONDED: forwardMatch percentage: 1.0
+
+
+----------SKILL 510 IS: leftCORRECT ANSWER IS: left
+MODEL RESPONDED: leftMatch percentage: 1.0
+
+
+----------SKILL 511 IS: turn rightCORRECT ANSWER IS: right
+MODEL RESPONDED: rightMatch percentage: 1.0
+
+
+AVERAGE MATCH PERCENTAGE IS 0.8013412294629793

@@ -6,6 +6,7 @@ from package.infrastructure.llm_constants import GET_NEXT_ACTION_QUESTION
 import numpy as np
 import pandas as pd
 import pickle
+import re
 import torch
 if torch.cuda.is_available():
     device = torch.device("cuda")
@@ -19,7 +20,7 @@ from typing import Tuple, List
 
 
 BASE_MODEL = "mistralai/Mistral-7B-Instruct-v0.2"
-FINETUNED_MODEL = "tutrinh/speaker_task"
+FINETUNED_MODEL = "tutrinh/listener_task"
 EMBEDDER = SentenceTransformer("all-roberta-large-v1")
 MAX_NEW_TOKENS = 10
 TEMPERATURE = 0.1
@@ -37,8 +38,8 @@ def get_broken_up_data(skill_name: str, obs_act_seq: str) -> str:
     matches = re.findall(r"Obs \d+: ([\w ():,'\n]*?)\nAct \d+: (\w+)", obs_act_seq)
     for match in matches:
         pr_set = {
-            "prompt": [GET_NEXT_ACTION_QUESTION.format(skill_name = skill_name, obs_desc = match[0])],
-            "response": [match[1].strip()]
+            "prompt": GET_NEXT_ACTION_QUESTION.format(skill_name = skill_name, obs_desc = match[0]),
+            "response": match[1].strip()
         } 
         prompt_response_set.append(pr_set)
     return prompt_response_set
@@ -97,7 +98,7 @@ if __name__ == "__main__":
 
         grand_outputs += "----------"
         grand_outputs += f"SKILL {idx} IS: {row['skill']}"
-        grand_outputs += f"CORRECT ANSWER IS: {', '.join([pr["response"] for pr in prompt_response_set])}\n"
+        grand_outputs += f"CORRECT ANSWER IS: {', '.join([pr['response'] for pr in prompt_response_set])}\n"
         grand_outputs += f"MODEL RESPONDED: {full_model_response}"
         grand_outputs += f"Match percentage: {match_percentage}"
         grand_outputs += f"\n\n\n"

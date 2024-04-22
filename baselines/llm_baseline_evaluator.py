@@ -4,6 +4,8 @@ sys.path.append("/nas/ucb/tutrinh/selfexplainingai")
 from package.infrastructure.llm_constants import GET_SKILL_NAME_QUESTION
 
 import numpy as np
+import pandas as pd
+import pickle
 import torch
 if torch.cuda.is_available():
     device = torch.device("cuda")

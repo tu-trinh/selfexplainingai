@@ -102,7 +102,7 @@ if __name__ == "__main__":
         grand_outputs += f"MODEL RESPONDED: {full_model_response}"
         grand_outputs += f"Match percentage: {match_percentage}"
         grand_outputs += f"\n\n\n"
-    with open("intention_speaker_llm_baseline.txt", "w") as f:
+    with open("intention_listener_llm_baseline.txt", "w") as f:
         f.write(grand_outputs)
         f.write(f"AVERAGE MATCH PERCENTAGE IS {np.mean(avg_match_percentage)}")
     print("AVERAGE MATCH PERCENTAGE", np.mean(avg_match_percentage))

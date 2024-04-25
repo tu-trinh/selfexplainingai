@@ -1594,8 +1594,10 @@ MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> left =
 MODEL RESPONDED: left ==> forward ==> forward ==> forward ==> forward ==> left ==> left ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forward ==> forwardMatch percentage: 0.5238095238095238
 
 
-----------SKILL 399 IS: activateCORRECT ANSWER IS: toggle
-MODEL RESPONDED: toggleMatch percentage: 1.0
+----------SKILL 399 IS: activate
+CORRECT ANSWER IS: toggle
+MODEL RESPONDED: toggle
+Match percentage: 1.0
 
 
 ----------SKILL 400 IS: rightCORRECT ANSWER IS: right

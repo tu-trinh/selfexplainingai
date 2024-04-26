@@ -1,0 +1,41 @@
+task: PICKUP
+roles: 
+  executor: human
+  observer: ai
+  solver: ai
+human:
+  model_source: gpt
+  query_source: openai
+  preference:
+    - reward_carry_object_hof: 1
+  skillset:
+    - left
+    - right
+    - forward
+    - pickup
+    - drop
+    - toggle
+    - done
+  world_model:
+    layout: ROOM_DOOR_KEY
+    edits: [NONE]
+    seed: 1
+    allowed_object_colors: ["green", "blue"]
+ai:
+  model_source: gpt
+  query_source: openai
+  preference:
+    - reward_carry_object_hof: 1
+  skillset:
+    - left
+    - right
+    - forward
+    - pickup
+    - drop
+    - toggle
+    - done
+  world_model:
+    layout: ROOM_DOOR_KEY
+    edits: [NONE]
+    seed: 1
+    allowed_object_colors: ["green", "blue"]

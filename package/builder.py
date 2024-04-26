@@ -1,9 +1,11 @@
 import sys
+
 sys.path.append("/Users/tutrinh/Work/CHAI/selfexplainingai")
 
-from package.infrastructure.basic_utils import xor, convert_to_enum, flatten_list
+from package.infrastructure.config_utils import ConfigDict
+from package.infrastructure.basic_utils import xor, to_enum, flatten_list
 from package.infrastructure.env_constants import ALLOWABLE_VARIANTS, COLOR_NAMES
-from package.enums import Task, Level, Variant
+from package.enums import Task, Layout, Edit
 from package.envs.env import *
 from package.agents import *
 import package.reward_functions as REWARD_FUNCTIONS
@@ -18,122 +20,234 @@ import random
 import time
 import inspect
 import warnings
+import copy
 
 
-def make_agents(config_path: str = None, config: Dict = None, config_str: str = None):
-    if config_path is not None:
-        with open(config_path, "r") as f:
-            config = yaml.load(f, Loader = yaml.SafeLoader)
-    if config_str is not None:
-        config =  yaml.safe_load(config_str)
-    assert "principal" in config, "Must define a principal agent"
-    assert "attendant" in config, "Must define an attendant agent"
-    assert "env_specs" in config, "Must define environment specifications"
+def old_make_agent(
+    is_human: bool,
+    world_model: MiniGridEnv,
+    name: str = None,
+    query_source: str = None,
+    model_source: str = None,
+    basic_reward_functions: List[str] = None,
+    basic_reward_weights: List[float] = None,
+    skills: List[str] = None,
+):
+    assert (
+        basic_reward_functions is not None
+    ), "Must specify `basic_reward_functions` in config"
+    assert (
+        basic_reward_weights is not None
+    ), "Must specify `basic_reward_weights` in config"
+    assert len(basic_reward_functions) == len(
+        basic_reward_weights
+    ), "`basic_reward_functions` and `basic_reward_weights` must be the same length"
+    assert skills is not None, "Must specify `skills` in config"
 
-    principal_env, attendant_env = make_envs(**config["env_specs"])
-    principal = make_agent(is_principal = True, world_model = principal_env, **config["principal"])
-    attendant = make_agent(is_principal = False, world_model = attendant_env, **config["attendant"])
-    return principal, attendant
+    if is_human:
+        agent = Human(query_source, model_source, name=name)
+    else:
+        agent = AI(query_source, model_source, name=name)
+    agent.set_world_model(world_model)
+
+    with open("./package/configs/skills.txt", "r") as f:
+        all_possible_skills = [s.strip() for s in f.readlines()]
+    world_model.set_allowable_skills()
+    env_allowable_skills = world_model.allowable_skills
+    dropped_skills = 0
+    for skill in skills:
+        if skill in all_possible_skills and skill in env_allowable_skills.keys():
+            agent.add_skill(skill)
+        else:
+            dropped_skills += 1
+    if dropped_skills > 0:
+        warnings.warn(
+            f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'human' if is_human else 'ai'}"
+        )
+
+    all_possible_reward_functions = {
+        name: func
+        for name, func in inspect.getmembers(REWARD_FUNCTIONS, inspect.isfunction)
+    }
+    for i in range(len(basic_reward_functions)):
+        rf = basic_reward_functions[i]
+        func_name = rf.pop("name")
+        reward_amt = rf.get("amount", 1)
+        if func_name in all_possible_reward_functions:
+            agent.add_reward_function(
+                all_possible_reward_functions[func_name](world_model, amt=reward_amt),
+                basic_reward_weights[i],
+            )
+        else:
+            warnings.warn(f"Reward function `{func_name}` is not yet defined")
+
+    return agent
 
 
+def make_env(config):
+    assert Task.has_value(config.task), "Task name {config.task} is invalid!"
+    assert Layout.has_value(config.layout), "Layout name {config.layout} is invalid!"
+    for edit in config.edits:
+        assert Edit.has_value(edit), "Edit name {edit} is invalid!"
+
+    task = to_enum(Task, config.task)
+    layout = to_enum(Layout, config.layout)
+    edits = [to_enum(Edit, edit) for edit in config.edits]
+    cls = create_env_class(task, layout)
+    human_env = cls(
+        config.seed,
+        task,
+        layout,
+        allowed_object_colors=config.allowed_object_colors,
+    )
+
+def create_env_class(task: Task, layout: Layout):
+    class_name = f"{task.value}_{layout.value}_Env"
+    new_class = type(
+        class_name,
+        (Environment, task_class_mapping[task], layout_class_mapping[layout]),
+        {"__init__": _custom_init},
+    )
+    return new_class
+
+
+def _custom_init(
+    self,
+    env_seed: int,
+    task: Task,
+    layout: Layout,
+    target_obj: WorldObj = None,
+    target_objs: List[WorldObj] = None,
+    disallowed: Dict[Variant, Any] = None,
+    allowed_object_colors: List[str] = COLOR_NAMES,
+    max_steps: int = 32,
+    agent_view_size: int = 5,
+    render_mode=None,
+    **kwargs,
+):
+    Environment.__init__(
+        self,
+        env_seed,
+        task,
+        layout,
+        target_obj,
+        target_objs,
+        disallowed,
+        allowed_object_colors,
+        max_steps,
+        agent_view_size,
+        render_mode,
+        **kwargs,
+    )
+    task_cls = task_class_mapping[task]
+    layout_cls = layout_class_mapping[layout]
+    task_cls.__init__(self)
+    layout_cls.__init__(self)
+    self.initialize_layout()
+    self._gen_grid(self.room_size, self.room_size)
+    self.set_mission()
+    # self.set_allowable_skills()
+    layout_cls.assert_successful_creation(self)
+
+
+"""
 def make_envs(task: Task,
-              principal_level: Level,
-              attendant_level: Level = None,
-              attendant_variants: List[Variant] = None,
-              attendant_edits: List[str] = None,
+              human_level: Level,
+              ai_level: Level = None,
+              ai_variants: List[Variant] = None,
+              ai_edits: List[str] = None,
               seed: int = None,
               allowed_object_colors: Union[List, str] = COLOR_NAMES,
-              principal_render_mode: str = None,
-              attendant_render_mode: str = None,
-              principal_setup_actions: List[int] = [],
-              attendant_setup_actions: List[int] = []):
+              human_render_mode: str = None,
+              ai_render_mode: str = None,
+              human_setup_actions: List[int] = [],
+              ai_setup_actions: List[int] = []):
     # Some asserts
     assert Task.has_value(task), "Env type is not valid"
-    assert Level.has_value(principal_level), "Principal level is not valid"
-    assert xor(attendant_level, attendant_variants, attendant_edits) or (not attendant_level and not attendant_variants and not attendant_edits), "Must have only one of `attendant_level`, `attendant_variants`, or `attendant_edits` or none at all"
-    if attendant_level:
-        assert Level.has_value(attendant_level), "Attendant level is not valid"
-    if attendant_variants:
-        for sv in attendant_variants:
-            assert Variant.has_value(sv), f"Attendant variant \"{sv}\" is not valid"
+    assert Level.has_value(human_level), "Human level is not valid"
+    assert xor(ai_level, ai_variants, ai_edits) or (not ai_level and not ai_variants and not ai_edits), "Must have only one of `ai_level`, `ai_variants`, or `ai_edits` or none at all"
+    if ai_level:
+        assert Level.has_value(ai_level), "AI level is not valid"
+    if ai_variants:
+        for sv in ai_variants:
+            assert Variant.has_value(sv), f"AI variant \"{sv}\" is not valid"
 
     # Converting things to enums
     task = convert_to_enum(Task, task)
-    principal_level = convert_to_enum(Level, principal_level)
-    if attendant_level is not None:
-        attendant_level = convert_to_enum(Level, attendant_level)
-    if attendant_variants is not None:
-        attendant_variants = convert_to_enum(Variant, attendant_variants)
+    human_level = convert_to_enum(Level, human_level)
+    if ai_level is not None:
+        ai_level = convert_to_enum(Level, ai_level)
+    if ai_variants is not None:
+        ai_variants = convert_to_enum(Variant, ai_variants)
 
-    # Making principal env first
+    # Making human env first
     seed = random.randint(0, 10000) if not seed else seed
-    p_env_cls = create_env_class(task, principal_level)
-    principal_env = p_env_cls(seed, task, principal_level, render_mode = principal_render_mode, allowed_object_colors = allowed_object_colors)
-    
+    p_env_cls = create_env_class(task, human_level)
+    human_env = p_env_cls(seed, task, human_level, render_mode = human_render_mode, allowed_object_colors = allowed_object_colors)
+
     # Creating the disallowed dictionary for variants
-    if attendant_variants is not None:
+    if ai_variants is not None:
         disallowed = {}  # FIXME: just revisit some of these
-        if Variant.COLOR in attendant_variants:
-            disallowed[Variant.COLOR] = principal_env.target_obj.color if hasattr(principal_env, "target_obj") else flatten_list(principal_env.target_objs)[0].color
-        if Variant.ROOM_SIZE in attendant_variants:
-            disallowed[Variant.ROOM_SIZE] = principal_env.room_size
-        if Variant.NUM_OBJECTS in attendant_variants:
-            disallowed[Variant.NUM_OBJECTS] = len(principal_env.objs) - 1
-        if Variant.OBJECTS in attendant_variants:
+        if Variant.COLOR in ai_variants:
+            disallowed[Variant.COLOR] = human_env.target_obj.color if hasattr(human_env, "target_obj") else flatten_list(human_env.target_objs)[0].color
+        if Variant.ROOM_SIZE in ai_variants:
+            disallowed[Variant.ROOM_SIZE] = human_env.room_size
+        if Variant.NUM_OBJECTS in ai_variants:
+            disallowed[Variant.NUM_OBJECTS] = len(human_env.objs) - 1
+        if Variant.OBJECTS in ai_variants:
             if task in [Task.GOTO, Task.PICKUP]:
-                disallowed_objs = [(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] != principal_env.target_obj]
-                disallowed_poses = [pos for obj, pos in principal_env.objs if obj != principal_env.target_obj]
+                disallowed_objs = [(type(obj[0]), obj[0].color) for obj in human_env.objs if obj[0] != human_env.target_obj]
+                disallowed_poses = [pos for obj, pos in human_env.objs if obj != human_env.target_obj]
                 disallowed[Variant.OBJECTS] = (disallowed_objs, disallowed_poses)
             else:
-                disallowed_objs = [(type(obj[0]), obj[0].color) for obj in principal_env.objs if obj[0] not in flatten_list(principal_env.target_objs)]
-                disallowed_poses = [pos for obj, pos in principal_env.objs if obj not in flatten_list(principal_env.target_objs)]
+                disallowed_objs = [(type(obj[0]), obj[0].color) for obj in human_env.objs if obj[0] not in flatten_list(human_env.target_objs)]
+                disallowed_poses = [pos for obj, pos in human_env.objs if obj not in flatten_list(human_env.target_objs)]
                 disallowed[Variant.OBJECTS] = (disallowed_objs, disallowed_poses)
-        if Variant.NUM_ROOMS in attendant_variants:
-            disallowed[Variant.NUM_ROOMS] = principal_env.num_rooms if hasattr(principal_env, "num_rooms") else None
-        if Variant.ORIENTATION in attendant_variants:
-            disallowed[Variant.ORIENTATION] = principal_env
+        if Variant.NUM_ROOMS in ai_variants:
+            disallowed[Variant.NUM_ROOMS] = human_env.num_rooms if hasattr(human_env, "num_rooms") else None
+        if Variant.ORIENTATION in ai_variants:
+            disallowed[Variant.ORIENTATION] = human_env
     else:
         disallowed = None
 
-    # Making the attendant env
+    # Making the ai env
     target_obj_kwargs = {}
     if task in [Task.GOTO, Task.PICKUP]:
-        target_obj_kwargs["target_obj"] = type(principal_env.target_obj)
+        target_obj_kwargs["target_obj"] = type(human_env.target_obj)
     elif task == Task.CLUSTER:
-        target_obj_kwargs["target_objs"] = [[type(obj) for obj in obj_cluster] for obj_cluster in principal_env.target_objs]
+        target_obj_kwargs["target_objs"] = [[type(obj) for obj in obj_cluster] for obj_cluster in human_env.target_objs]
     else:
-        target_obj_kwargs["target_objs"] = [type(obj) for obj in principal_env.target_objs]
-    if attendant_level:
-        a_env_cls = create_env_class(task, attendant_level)
-        attendant_env = a_env_cls(seed, task, attendant_level, **target_obj_kwargs, render_mode = attendant_render_mode, allowed_object_colors = allowed_object_colors)
-    elif attendant_variants:
-        attendant_env = p_env_cls(seed, task, principal_level, **target_obj_kwargs, disallowed = disallowed, render_mode = attendant_render_mode, allowed_object_colors = allowed_object_colors)
-    elif attendant_edits:
-        attendant_env = copy.deepcopy(principal_env)
-        apply_edits(attendant_env, attendant_edits)
+        target_obj_kwargs["target_objs"] = [type(obj) for obj in human_env.target_objs]
+    if ai_level:
+        a_env_cls = create_env_class(task, ai_level)
+        ai_env = a_env_cls(seed, task, ai_level, **target_obj_kwargs, render_mode = ai_render_mode, allowed_object_colors = allowed_object_colors)
+    elif ai_variants:
+        ai_env = p_env_cls(seed, task, human_level, **target_obj_kwargs, disallowed = disallowed, render_mode = ai_render_mode, allowed_object_colors = allowed_object_colors)
+    elif ai_edits:
+        ai_env = copy.deepcopy(human_env)
+        apply_edits(ai_env, ai_edits)
     else:
-        attendant_env = copy.deepcopy(principal_env)
+        ai_env = copy.deepcopy(human_env)
 
     # Making environment wrappers
     p_wrapper = EnvironmentWrapper({
-        "task": task, "level": principal_level, "render_mode": principal_render_mode
-    }, principal_env)
-    principal_env.bind_wrapper(p_wrapper)
+        "task": task, "level": human_level, "render_mode": human_render_mode
+    }, human_env)
+    human_env.bind_wrapper(p_wrapper)
     a_wrapper = EnvironmentWrapper({
-        "task": task, "level": attendant_level, **target_obj_kwargs, "disallowed": disallowed, "render_mode": attendant_render_mode
-    }, attendant_env)
-    attendant_env.bind_wrapper(a_wrapper)
+        "task": task, "level": ai_level, **target_obj_kwargs, "disallowed": disallowed, "render_mode": ai_render_mode
+    }, ai_env)
+    ai_env.bind_wrapper(a_wrapper)
 
     # Executing the setup actions, if any
-    principal_env.reset()
-    for act in principal_setup_actions:
-        principal_env.step(act)
-    attendant_env.reset()
-    for act in attendant_setup_actions:
-        attendant_env.step(act)
-    
-    return principal_env, attendant_env
+    human_env.reset()
+    for act in human_setup_actions:
+        human_env.step(act)
+    ai_env.reset()
+    for act in ai_setup_actions:
+        ai_env.step(act)
 
+    return human_env, ai_env
 
 def create_env_class(task: Task, level: Level):
     class_name = f"{task.value}_{level.value}_Env"
@@ -182,63 +296,18 @@ def apply_edits(env: MiniGridEnv, edits: List[Dict]) -> None:
         warnings.warn(f"{len(invalid_edits)} edits could not be applied: {invalid_edits}")
 
 
-def make_agent(is_principal: bool,
-               world_model: MiniGridEnv,
-               name: str = None,
-               query_source: str = None,
-               model_source: str = None,
-               basic_reward_functions: List[str] = None,
-               basic_reward_weights: List[float] = None,
-               skills: List[str] = None):
-    assert basic_reward_functions is not None, "Must specify `basic_reward_functions` in config"
-    assert basic_reward_weights is not None, "Must specify `basic_reward_weights` in config"
-    assert len(basic_reward_functions) == len(basic_reward_weights), "`basic_reward_functions` and `basic_reward_weights` must be the same length"
-    assert skills is not None, "Must specify `skills` in config"
-
-    if is_principal:
-        agent = Principal(query_source, model_source, name = name)
-    else:
-        agent = Attendant(query_source, model_source, name = name)
-    agent.set_world_model(world_model)
-
-    with open("./package/configs/skills.txt", "r") as f:
-        all_possible_skills = [s.strip() for s in f.readlines()]
-    world_model.set_allowable_skills()
-    env_allowable_skills = world_model.allowable_skills
-    dropped_skills = 0
-    for skill in skills:
-        if skill in all_possible_skills and skill in env_allowable_skills.keys():
-            agent.add_skill(skill)
-        else:
-            dropped_skills += 1
-    if dropped_skills > 0:
-        warnings.warn(f"{dropped_skills} skills were either not possible or not allowed in this world model for the {'principal' if is_principal else 'attendant'}")
-
-    all_possible_reward_functions = {name: func for name, func in inspect.getmembers(REWARD_FUNCTIONS, inspect.isfunction)}
-    for i in range(len(basic_reward_functions)):
-        rf = basic_reward_functions[i]
-        func_name = rf.pop("name")
-        reward_amt = rf.get("amount", 1)
-        if func_name in all_possible_reward_functions:
-            agent.add_reward_function(all_possible_reward_functions[func_name](world_model, amt = reward_amt), basic_reward_weights[i])
-        else:
-            warnings.warn(f"Reward function `{func_name}` is not yet defined")
-
-    return agent
-
-
-def set_advanced_reward_functions(config_path: str, principal: Principal, attendant: Attendant):
+def set_advanced_reward_functions(config_path: str, human: Human, ai: AI):
     with open(config_path, "r") as f:
         config = yaml.load(f, Loader = yaml.SafeLoader)
-    assert "principal" in config, "Must define a principal agent"
-    assert "attendant" in config, "Must define an attendant agent"
+    assert "human" in config, "Must define a human agent"
+    assert "ai" in config, "Must define an ai agent"
 
-    p_kwargs = config["principal"]
-    a_kwargs = config["attendant"]
+    p_kwargs = config["human"]
+    a_kwargs = config["ai"]
     if "advanced_reward_functions" in p_kwargs:
-        set_advanced_reward_functions_agent(principal, p_kwargs)
+        set_advanced_reward_functions_agent(human, p_kwargs)
     if "advanced_reward_functions" in a_kwargs:
-        set_advanced_reward_functions_agent(attendant, a_kwargs)
+        set_advanced_reward_functions_agent(ai, a_kwargs)
 
 
 def set_advanced_reward_functions_agent(agent: Agent, agent_kwargs: Dict):
@@ -266,12 +335,11 @@ def print_allowable_variants(level: Level = None):
         print(msg.strip())
     else:
         print(f"The following are allowable variants for level {level.value.upper()}:\n{[v.value for v in ALLOWABLE_VARIANTS[level]]}")
-
+"""
 
 if __name__ == "__main__":
-    principal_env, attendant_env = make_envs(task = "CLUSTER",
-                                         principal_level = "HIDDEN_KEY",
-                                         attendant_variants = ["ORIENTATION"],
-                                         seed = 400)
-    mc = ManualControl(attendant_env)
+    human_env, ai_env = make_envs(
+        task="CLUSTER", human_level="HIDDEN_KEY", ai_variants=["ORIENTATION"], seed=400
+    )
+    mc = ManualControl(ai_env)
     mc.start()

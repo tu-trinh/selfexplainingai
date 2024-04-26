@@ -1,5 +1,76 @@
 from enum import Enum
 
+class Task(Enum):
+    PICKUP = "Pickup"  # include returning to original spot
+
+    # current not supported!
+    GOTO = "Goto" # go to a location
+    PUT = "PUT" # put an object next to another object
+    COLLECT = "Collect" # put all objects in a region
+    CLUSTER = "Cluster"  # group objects by type or color
+
+    @classmethod
+    def has_value(cls, value):
+        if isinstance(value, Enum):
+            return value in cls
+        return any(value == item.name for item in cls)
+
+
+class Layout(Enum):
+
+    ROOM_DOOR_KEY = "Room_Door_Key"
+    TREASURE_ISLAND = "Treasure_Island"
+
+    # TODO: to be removed
+    EMPTY = "Empty"
+    DEATH = "Death"
+    DIST = "Dist"
+    OPEN_DOOR = "Open_Door"
+    BLOCKED_DOOR = "Blocked_Door"
+    UNLOCK_DOOR = "Unlock_Door"
+    HIDDEN_KEY = "Hidden_Key"
+    GO_AROUND = "Go_Around"
+    MULT_ROOMS = "Mult_Rooms"
+    BOSS = "Boss"
+
+
+    @classmethod
+    def has_value(cls, value):
+        if isinstance(value, Enum):
+            return value in cls
+        return any(value == item.name for item in cls)
+
+
+class Edit(Enum):
+
+    # applicable to all environments
+    NONE = "none"
+    INCREASE_ROOM_SIZE = "larger_room_size"
+    FLIP = "flip"
+    CHANGE_TARGET_COLOR = "change_target_color"
+    HIDE_TARGETS = "hide_targets"
+    HIDE_KEYS = "hide_keys"
+    REMOVE_KEYS = "remove_keys"
+    CHANGE_FIELD_OF_VISION = "change_field_of_vision"
+    TOGGLE_DOORS = "toggle_doors"
+
+    # room_door_key only
+    ADD_OPENING_TO_WALL = "add_opening_to_wall"
+    BLOCK_DOOR = "block_door"
+    PUT_AGENT_IN_ROOM = "put_agent_in_room"
+
+    # treasure_island only
+    ADD_BRIDGE = "add_bridge"
+    MAKE_LAVA_SAFE = "make_lava_safe"
+    ADD_FIREPROOF_SHOES = "add_fireproof_shoes"
+    PUT_AGENT_ON_ISLAND = "put_agent_on_island"
+
+    @classmethod
+    def has_value(cls, value):
+        if isinstance(value, Enum):
+            return value in cls
+        return any(value == item.name for item in cls)
+
 
 class Level(Enum):
     """
@@ -25,8 +96,8 @@ class Level(Enum):
     MULT_ROOMS = "Mult_Rooms"
     BOSS = "Boss"
 
-    ROOM_DOOR_KEY = "Room_Door_Key"
-    TREASURE_ISLAND = "Treasure_Island"
+    #ROOM_DOOR_KEY = "Room_Door_Key"
+    #TREASURE_ISLAND = "Treasure_Island"
 
     @classmethod
     def has_value(cls, value):
@@ -35,18 +106,6 @@ class Level(Enum):
         return any(value == item.name for item in cls)
 
 
-class Task(Enum):
-    GOTO = "Goto"
-    PICKUP = "Pickup"  # include returning to original spot
-    PUT = "Put"
-    COLLECT = "Collect"
-    CLUSTER = "Cluster"  # group objects by type or color
-
-    @classmethod
-    def has_value(cls, value):
-        if isinstance(value, Enum):
-            return value in cls
-        return any(value == item.name for item in cls)
 
 
 class Variant(Enum):

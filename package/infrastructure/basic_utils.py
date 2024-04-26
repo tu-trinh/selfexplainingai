@@ -2,7 +2,7 @@ from minigrid.core.world_object import WorldObj
 
 import numpy as np
 from enum import Enum
-from typing import Union, List, Tuple
+from typing import Union, List, Tuple, Dict
 
 
 def format_seconds(seconds: int) -> str:
@@ -26,11 +26,11 @@ def get_diagonally_adjacent_cells(cell: Tuple[int, int]) -> set:
     x, y = cell
     return set([(x + 1, y + 1), (x + 1, y - 1), (x - 1, y + 1), (x - 1, y - 1)])
 
-def convert_to_enum(enum: Enum, value: Union[List, str]) -> List:
+def to_enum(enum: Enum, value: Union[List, str]) -> List:
     if isinstance(value, str):
         return enum[value]
     return [enum[val] for val in value]
-    
+
 def debug(*strs):
     if not strs:
         print()

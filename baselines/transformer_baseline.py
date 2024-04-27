@@ -4,42 +4,57 @@ from transformer_constants import *
 import numpy as np
 from transformer_modules import *
 from tqdm import tqdm
-from utils import *
+from transformer_utils import *
 import argparse
 from torchinfo import summary
+import sentencepiece as spm
+from typing import Any, List, Tuple, Dict, Union
+from torch.utils.data import DataLoader
 
 
 class ModelWrapper:
-    def __init__(self, training):
+    def __init__(self, mode: str, training: bool):
+        assert mode in ["obs", "traj"]
+        self.mode = mode
+
         # Data initialization
-        self.func_spp = spm.SentencePieceProcessor()
-        self.func_spp.load("./tokenization/input.model")
-        self.deriv_spp = spm.SentencePieceProcessor()
-        self.deriv_spp.load("./tokenization/output.model")
-        if training:
-            self.train_data_loader = build_data_loader("./data/train_processed.txt", self.func_spp, self.deriv_spp)
-            self.valid_data_loader = build_data_loader("./data/valid_processed.txt", self.func_spp, self.deriv_spp)
+        if mode == "obs":
+            self.obs_spp = spm.SentencePieceProcessor()
+            self.obs_spp.load(f"./tokenization/{SPM_OBS_PREFIX}.model")
+            dataloaders = build_data_loaders("datasets/intention_datasets.pkl", self.obs_spp, "obs", training)
+            self.train_data_loader = dataloaders[0]
+            self.valid_data_loader = dataloaders[1]
+        else:
+            pass  # TODO: add another for the other
 
         # Model initialization
-        self.model = Transformer(INPUT_VOCAB_SIZE, OUTPUT_ACTION_SIZE).to(DEVICE)
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr = LEARNING_RATE)
-        self.loss_func = nn.CrossEntropyLoss()
-        self.best_loss = float("inf")
+        if mode == "obs":
+            self.model = ObservationTransformer(INPUT_OBS_VOCAB_SIZE, OUTPUT_ACTION_SIZE).to(DEVICE)
+            self.optimizer = torch.optim.Adam(self.model.parameters(), lr = LEARNING_RATE)
+            self.loss_func = nn.CrossEntropyLoss()
+            self.best_loss = float("inf")
+        else:
+            pass  # TODO: add another for the other
     
     
-    def mask(self, func_data, deriv_data):
+    def mask(self, input_data: Any, desired_output: Any = None) -> Tuple[torch.Tensor, torch.Tensor]:
         """
-        Creates masks on inputs
+        Creates masks on model inputs and expected outputs
         """
-        enc_mask = (func_data != PAD_ID).unsqueeze(1).to(DEVICE)
-        dec_mask = (deriv_data != PAD_ID).unsqueeze(1).to(DEVICE)
-        helper_mask = torch.ones([1, MAX_SEQ_LEN, MAX_SEQ_LEN], dtype = torch.bool)
-        helper_mask = torch.tril(helper_mask).to(DEVICE)
-        dec_mask = dec_mask & helper_mask
+        enc_mask, dec_mask = None, None
+        if self.mode == "obs":
+            enc_mask = (input_data != PAD_ID).unsqueeze(1).to(DEVICE)
+        else:
+            pass  # TODO: add another for the other
+        # enc_mask = (func_data != PAD_ID).unsqueeze(1).to(DEVICE)
+        # dec_mask = (deriv_data != PAD_ID).unsqueeze(1).to(DEVICE)
+        # helper_mask = torch.ones([1, MAX_SEQ_LEN, MAX_SEQ_LEN], dtype = torch.bool)
+        # helper_mask = torch.tril(helper_mask).to(DEVICE)
+        # dec_mask = dec_mask & helper_mask
         return enc_mask, dec_mask
+
     
-    
-    def train_model(self):
+    def train_model(self) -> None:
         """
         Runs training process and save model that performs the best on a the validation set
         """
@@ -47,24 +62,32 @@ class ModelWrapper:
             self.model.train()
             losses = []
             for batch in tqdm(self.train_data_loader):
-                func, deriv_in, deriv_out = batch
-                func = func.to(DEVICE)
-                deriv_in = deriv_in.to(DEVICE)
-                deriv_out = deriv_out.to(DEVICE)
-
-                enc_mask, dec_mask = self.mask(func, deriv_in)
-                output = self.model(func, deriv_in, enc_mask, dec_mask)
+                if self.mode == "obs":
+                    states, actions = batch
+                    states = states.to(DEVICE)
+                    actions = actions.to(DEVICE)
+                    enc_mask, _ = self.mask(states)
+                    action_dist = self.model(states, enc_mask)
+                else:
+                    pass  # TODO: add another for the other                
 
                 self.optimizer.zero_grad()
-                loss = self.loss_func(
-                    output.view(-1, OUTPUT_ACTION_SIZE),
-                    deriv_out.view(deriv_out.shape[0] * deriv_out.shape[1])
-                )
+                if self.mode == "obs":
+                    loss = self.loss_func(action_dist, actions)
+                else:
+                    loss = self.loss_func(
+                        action_dist.view(-1, OUTPUT_ACTION_SIZE),
+                        deriv_out.view(deriv_out.shape[0] * deriv_out.shape[1])
+                    )
+                    pass  # TODO: add another for the other
                 loss.backward()
                 self.optimizer.step()
-
                 losses.append(loss.item())
-                del func, deriv_in, deriv_out, enc_mask, dec_mask, output
+
+                if self.mode == "obs":
+                    del states, actions, enc_mask, action_dist
+                else:
+                    pass  # TODO: add another for the other
                 if DEVICE == torch.device("cuda"):
                     torch.cuda.empty_cache()
             
@@ -80,11 +103,12 @@ class ModelWrapper:
                     "optimizer_dict": self.optimizer.state_dict(),
                     "validation_loss": valid_loss
                 }
-                torch.save(state_dict, "checkpoint.tar")
+                chkpt_name = "intention_listener" if self.mode == "obs" else "intention_speaker"
+                torch.save(state_dict, f"baselines/{chkpt_name}_checkpoint.tar")
                 print("New best validation accuracy achieved, saved to checkpoint")
 
     
-    def validate_model(self):
+    def validate_model(self) -> float:
         """
         Tests the current model on a validation set
         """
@@ -92,20 +116,25 @@ class ModelWrapper:
         losses = []
         with torch.no_grad():
             for batch in tqdm(self.valid_data_loader):
-                func, deriv_in, deriv_out = batch
-                func = func.to(DEVICE)
-                deriv_in = deriv_in.to(DEVICE)
-                deriv_out = deriv_out.to(DEVICE)
+                if self.mode == "obs":
+                    states, actions = batch
+                    states = states.to(DEVICE)
+                    actions = actions.to(DEVICE)
+                    enc_mask, _ = self.mask(states)
+                    action_dist = self.model(states, enc_mask)
+                else:
+                    pass  # TODO: add another for the other
 
-                enc_mask, dec_mask = self.mask(func, deriv_in)
-                output = self.model(func, deriv_in, enc_mask, dec_mask)
-
-                loss = self.loss_func(
-                    output.view(-1, OUTPUT_ACTION_SIZE),
-                    deriv_out.view(deriv_out.shape[0] * deriv_out.shape[1])
-                )
+                if self.mode == "obs":
+                    loss = self.loss_func(action_dist, actions)
+                else:
+                    pass  # TODO: add another for the other
                 losses.append(loss.item())
-                del func, deriv_in, deriv_out, enc_mask, dec_mask, output
+
+                if self.mode == "obs":
+                    del states, actions, enc_mask, action_dist
+                else:
+                    pass  # TODO: add another for the other
                 if DEVICE == torch.device("cuda"):
                     torch.cuda.empty_cache()
         
@@ -113,55 +142,27 @@ class ModelWrapper:
         return valid_loss
     
     
-    def infer(self, function):
+    def infer(self, input_data: Union[List[str]]) -> Union[List[int]]:
         """
-        Run inference with the model; outputs the derivative prediction given a function
+        Run inference with the model (test time)
         """
         self.model.eval()
 
         # Process input and run through encoder side
-        func_tokens = standardize_length(self.func_spp.EncodeAsIds(function))
-        func_tokens = torch.LongTensor(func_tokens).unsqueeze(0).to(DEVICE)
-        func_mask = (func_tokens != PAD_ID).unsqueeze(1).to(DEVICE)
-        func_embedding = self.model.input_embedding(func_tokens)
-        func_embedding = self.model.positional_encoding(func_embedding)
-        enc_output = self.model.encoder(func_embedding, func_mask)
+        if self.mode == "obs":
+            if isinstance(input_data, str):
+                input_data = [input_data]
 
-        # Conduct greedy search to find best decoder output
-        sequence = torch.LongTensor([PAD_ID for _ in range(MAX_SEQ_LEN)]).unsqueeze(0).to(DEVICE)
-        sequence[0] = BOS_ID
-        curr_len = 1
-        for i in range(MAX_SEQ_LEN):
-            deriv_mask = (sequence != PAD_ID).unsqueeze(1).to(DEVICE)
-            helper_mask = torch.ones([1, MAX_SEQ_LEN, MAX_SEQ_LEN], dtype = torch.bool)
-            helper_mask = torch.tril(helper_mask).to(DEVICE)
-            deriv_mask = deriv_mask & helper_mask
-
-            deriv_embedding = self.model.output_embedding(sequence)
-            deriv_embedding = self.model.positional_encoding(deriv_embedding)
-            
-            dec_output = self.model.decoder(deriv_embedding, enc_output, func_mask, deriv_mask)
-            dec_output = self.model.linear(dec_output)
-            dec_output = self.model.softmax(dec_output)
-            dec_output = dec_output.argmax(dim = -1)
-            id = dec_output[0][i].item()
-
-            if i + 1 < MAX_SEQ_LEN:
-                sequence[0][i + 1] = id
-                curr_len += 1
-            if id == EOS_ID:
-                break
-        
-        # Decode output into understandable math
-        if sequence[0][-1].item() == PAD_ID:
-            final_output = sequence[0][1:curr_len].tolist()
-        else:
-            final_output = sequence[0][1:].tolist()
-        final_output = self.deriv_spp.decode_ids(final_output)
-        return final_output
+            observations = tokenize_observations(input_data, self.obs_spp)
+            observations = torch.LongTensor(observations).to(DEVICE)
+            masks = (observations != PAD_ID).unsqueeze(1).to(DEVICE)
+            with torch.no_grad():
+                action_dists = self.model(observations, masks)
+                action_preds = action_dists.argmax(dim = -1)
+            return action_preds.tolist()
     
 
-    def load_state(self, checkpoint_file = "checkpoint.tar"):
+    def load_state(self, checkpoint_file: str) -> None:
         """
         Sets model and optimizer training state to be ones saved prior
         """
@@ -173,7 +174,8 @@ class ModelWrapper:
         self.optimizer.load_state_dict(state_dict["optimizer_dict"])
         self.best_loss = state_dict["validation_loss"]
     
-    def load_model(self, model_file = "model.pt"):
+    
+    def load_model(self, model_file: str) -> None:
         """
         Sets only model weights to be the one saved prior
         """

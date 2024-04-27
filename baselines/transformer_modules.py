@@ -66,19 +66,20 @@ class FeedForward(nn.Module):
 
 
 class PositionalEncoding(nn.Module):
-    def __init__(self):
+    def __init__(self, max_length: int):
         super().__init__()
+        self.max_length = max_length
 
         # Initialize constants
         self.power = torch.arange(0, D_MODEL, step = 2, dtype = torch.float32)[:] / D_MODEL
         self.divisor = 10000 ** self.power
 
          # Create positional encodings
-        self.seq_pos = torch.arange(1, MAX_SEQ_LEN + 1, dtype = torch.float32)[None, :, None]
+        self.seq_pos = torch.arange(1, self.max_length + 1, dtype = torch.float32)[None, :, None]
         self.indices = self.seq_pos.repeat(*[1, 1, D_MODEL // 2])
         self.sin_embedding = torch.sin(self.indices / self.divisor)
         self.cos_embedding = torch.cos(self.indices / self.divisor)
-        self.pos_shape = (1, MAX_SEQ_LEN, -1)
+        self.pos_shape = (1, self.max_length, -1)
         self.final_embedding = torch.stack((self.sin_embedding, self.cos_embedding), dim = 3).view(self.pos_shape)
         self.final_embedding = self.final_embedding.to(DEVICE).requires_grad_(False)
 
@@ -156,14 +157,14 @@ class TransformerDecoder(nn.Module):
         return x
 
 
-class TrajectoryTransformer(nn.Module):
+class TrajectoryTransformer(nn.Module):  # this is the full transformer T2 for the second task
     def __init__(self, input_vocab_size, output_vocab_size):
         super().__init__()
 
         # Initialize layers
         self.input_embedding = nn.Embedding(input_vocab_size, D_MODEL)
         self.output_embedding = nn.Embedding(output_vocab_size, D_MODEL)
-        self.positional_encoding = PositionalEncoding()
+        self.positional_encoding = PositionalEncoding(MAX_SEQ_LEN)
         self.encoder = TransformerEncoder()
         self.decoder = TransformerDecoder()
         self.linear = nn.Linear(D_MODEL, output_vocab_size)
@@ -190,13 +191,13 @@ class TrajectoryTransformer(nn.Module):
         return final_output
     
 
-class ObservationTransformer(nn.Module):
+class ObservationTransformer(nn.Module):  # this is T1, really just an encoder, for the first task
     def __init__(self, input_vocab_size, output_action_size):
         super().__init__()
 
         # Initialize layers
         self.input_embedding = nn.Embedding(input_vocab_size, D_MODEL)
-        self.positional_encoding = PositionalEncoding()
+        self.positional_encoding = PositionalEncoding(MAX_OBS_LEN)
         self.encoder = TransformerEncoder()
         self.linear = nn.Linear(D_MODEL, output_action_size)
         self.softmax = nn.LogSoftmax(dim = -1)

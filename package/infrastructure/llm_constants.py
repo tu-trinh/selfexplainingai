@@ -71,7 +71,18 @@ Which of the following reflects the differences in these two environments? There
 Please give only the letter(s) in your response in a comma-separated list, such as 'A' or 'A,D,E'."""
 
 GET_SKILL_NAME_QUESTION = """
-Below is a sequence of observations and corresponding actions taken by an AI agent in trying to execute a 'skill.' Observations should be interpreted as environment descriptions told to the agent. In this environment, names of skills are always succinct, specify object color when appropriate, and have underscores: for example, 'move_forward_2_steps', 'put_blue_key_on_floor', 'unlatch_green_door', or 'procure_brown_box'. Given this sequence below, what is the skill name that best describes the agent's trajectory? Do NOT say anything else except your chosen skill name.
+Below is a sequence of observations and corresponding actions taken by an AI agent in trying to execute a 'skill.' Observations should be interpreted as environment descriptions told to the agent. In this environment, names of skills are always succinct, specify object color when appropriate, and have underscores: for example, 'move_forward_2_steps', 'put_blue_key_on_floor', 'unlatch_green_door', or 'procure_brown_box'. Given this sequence below, what is the skill name that best describes the agent's trajectory? Do NOT say anything else except your chosen skill name!
+
+Sequence of observations (obs) and actions (act):
+{obs_act_seq}
+"""
+
+GET_SKILL_NAME_QUESTION_FEW_SHOT = """
+Below is a sequence of observations and corresponding actions taken by an AI agent in trying to execute a 'skill.' Observations should be interpreted as environment descriptions told to the agent. In this environment, names of skills are always succinct, specify object color when appropriate, and have underscores: for example, 'move_forward_2_steps', 'put_blue_key_on_floor', 'unlatch_green_door', or 'procure_brown_box'. Your job is to correctly name the skill the agent is attempting.
+
+{few_shot_examples}
+
+Now it is your turn. Given this sequence below, what is the skill name that best describes the agent's trajectory? Do NOT say anything else except your chosen skill name!
 
 Sequence of observations (obs) and actions (act):
 {obs_act_seq}
@@ -89,18 +100,37 @@ Sequence of observations (obs) and actions (act):
 GET_NEXT_ACTION_QUESTION = """
 You are an agent who is trying to complete a task in an unknown, grid-like environment. Keep in mind that in this environment, you can only unlock a locked door with a key of the same color, you can only carry one object at a time, and you can only put an object down in a cell that has no other object.
 
-YOUR TASK IS: {skill_name}.
+YOUR TASK IS: {skill_name}
 
 Current environment description:
 {obs_desc}
 
-Given the above description, which of the following actions should you take in order to make progress towards or complete your given task? Choose ONE of the following actions. Your response should just be the singular action word, no more, no less. For example, if you pick the first answer choice, just answer with "left" instead of "turn left" or "left (turn left)".
-- left (turn left)
-- right (turn right)
-- forward (go forward)
-- pickup (pick up whichever object is one cell in front of you)
-- drop (if you're holding an object, put it down on the cell in front of you)
-- toggle (blanket action for interactions with doors and boxes, such as opening, closing, and unlocking)
+Given the above description, which of the following actions should you take in order to make progress towards or complete your given task? Choose ONE of the following actions. Your response should just be the NUMBER of the action, no more, no less. For example, if you pick the first answer choice, just answer with "0" instead of "left" or "turn left" or "left (turn left)" or anything else. Please adhere strictly to this answer formatting rule.
+0. left (turn left)
+1. right (turn right)
+2. forward (go forward)
+3. pickup (pick up whichever object is one cell in front of you)
+4. drop (if you're holding an object, put it down on the cell in front of you)
+5. toggle (blanket action for interactions with doors and boxes, such as opening, closing, and unlocking)
+"""
+
+GET_NEXT_ACTION_QUESTION_FEW_SHOT = """
+You are an agent who is trying to complete a task in an unknown, grid-like environment. Keep in mind that in this environment, you can only unlock a locked door with a key of the same color, you can only carry one object at a time, and you can only put an object down in a cell that has no other object.
+
+{few_shot_examples}
+
+Now it is your turn. YOUR TASK IS: {skill_name}
+
+Current observation:
+{obs_desc}
+
+Given the above description, which of the following actions should you take in order to make progress towards or complete your given task? Choose ONE of the following actions. Your response should just be the NUMBER of the action, no more, no less. For example, if you pick the first answer choice, just answer with "0" instead of "left" or "turn left" or "left (turn left)" or anything else. Please adhere strictly to this answer formatting rule.
+0. left (turn left)
+1. right (turn right)
+2. forward (go forward)
+3. pickup (pick up whichever object is one cell in front of you)
+4. drop (if you're holding an object, put it down on the cell in front of you)
+5. toggle (blanket action for interactions with doors and boxes, such as opening, closing, and unlocking)
 """
 
 SKILL_CLASSIFICATION = {

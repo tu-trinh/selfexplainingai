@@ -1,136 +1,157 @@
+from package.infrastructure.basic_utils import flatten_list
+
 import torch
 from torch.utils.data import DataLoader, Dataset
 from transformer_constants import *
 from transformer_modules import *
-import random
 import sentencepiece as spm
+from sentencepiece import SentencePieceProcessor
+import pickle
+from typing import List, Tuple, Dict
 
 
-class DataHolder(Dataset):
+class ObservationDataHolder(Dataset):
     """
-    Custom dataset class to store zipped inputs and outputs
+    Custom dataset class to store input observations and output actions
     """
-    def __init__(self, func_tokens, deriv_tokens_in, deriv_tokens_out):
+    def __init__(self, state_tokens: List[List[int]], actions: List[int]):
         super().__init__()
-        self.func_data = torch.LongTensor(func_tokens)
-        self.deriv_in_data = torch.LongTensor(deriv_tokens_in)
-        self.deriv_out_data = torch.LongTensor(deriv_tokens_out)
+        self.state_data = torch.LongTensor(state_tokens)
+        self.action_data = torch.LongTensor(actions)
 
-    def __getitem__(self, idx):
-        return self.func_data[idx], self.deriv_in_data[idx], self.deriv_out_data[idx]
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, int]:
+        return self.state_data[idx], self.action_data[idx]
 
-    def __len__(self):
-        return self.func_data.shape[0]
+    def __len__(self) -> int:
+        return self.state_data.shape[0]
 
 
-def process_data(data_file):
+def preprocess_obs(obs: str) -> str:
+    """
+    Takes in a SINGULAR observation and preprocesses it into compressed form
+    """
+    single_line_obs = " ".join(obs.strip().split("\n"))
+    return single_line_obs
+
+
+def preprocess_obs_list(data: Dict) -> List[str]:
+    """
+    From a data dictionary, get all observations present in all trajectories, compress them, add task, and flatten into a singular list
+    This correctly excludes the final obs
+    """
+    all_obs = []
+    obs_act_seqs = data["traj_fully_obs_text"]
+    skills = data["skill"]
+    for i, oas in enumerate(obs_act_seqs):
+        matches = re.findall(r"Obs \d+: ([\w ():,'\n]*?)\nAct \d+: (\w+)", oas)
+        for match in matches:
+            all_obs.append(f"Current task: {skills[i]}. Current observation: {preprocess_obs(match[0])}")
+    return all_obs
+
+
+def preprocess_action_list(data: Dict) -> List[int]:
+    """
+    From a data dictionary, get all actions for each skill and flatten into a singular list
+    This should correspond directly with the preprocessed obs list as (s, a) pairs
+    """
+    all_actions = flatten_list(data["actions"])
+    return all_actions
+
+
+def process_data(data_file: str) -> None:
     """
     Processes a data file into different data sets for various training and testing purposes
     """
-    # Split into train, valid, test
-    with open(data_file) as f:
-        lines = f.readlines()
-    random.shuffle(lines)
-    train_size = int(len(lines) * TRAIN_SIZE)
-    val_size = int(len(lines) * VALID_SIZE)
-    train_data = lines[:train_size]
-    val_data = lines[train_size : train_size + val_size]
-    test_data = lines[train_size + val_size:]
-    with open("./data/train_processed.txt", "w") as f:
-        f.writelines(train_data)
-    with open("./data/valid_processed.txt", "w") as f:
-        f.writelines(val_data)
-    with open("./data/test_processed.txt", "w") as f:
-        f.writelines(test_data)
-
-    # Make training sets for SentencePiece
-    train_funcs, train_derivs = load_file("./data/train_processed.txt")
-    valid_funcs, valid_derivs = load_file("./data/valid_processed.txt")
-    functions = list(train_funcs) + list(valid_funcs)
-    derivatives = list(train_derivs) + list(valid_derivs)
-    with open("./data/sp_training_input.txt", "w") as f:
-        f.writelines("\n".join(functions))
-    with open("./data/sp_training_output.txt", "w") as f:
-        f.writelines("\n".join(derivatives))
+    with open(data_file, "rb") as f:
+        dataset = pickle.load(f)
+    training_data = dataset["train"]
+    validation_data = dataset["val"]
+    
+    # Smush train and valid observations together for vocab-building
+    with open(SPM_OBS_TRAINING_FILE, "w") as f:
+        for ds in [training_data, validation_data]:
+            obs_list = preprocess_obs_list(ds)
+            for obs in obs_list:
+                f.write(obs + "\n")
+    
+    # TODO: add another for the other
 
 
-def load_file(file_path):
+def build_vocab() -> None:
     """
-    Loads the test file and extracts all functions/derivatives
-    """
-    data = open(file_path, "r").readlines()
-    functions, derivatives = zip(*[line.strip().split("=") for line in data])
-    return functions, derivatives
-
-
-def build_vocab():
-    """
-    Trains SentencePiece on the math vocabulary
+    Trains SentencePiece on the input vocabularies
     """
     spm.SentencePieceTrainer.train(
-        input = "./data/sp_training_input.txt",
-        model_prefix = "input",
-        vocab_size = INPUT_VOCAB_SIZE,
+        input = SPM_OBS_TRAINING_FILE,
+        model_prefix = SPM_OBS_PREFIX,
+        vocab_size = INPUT_OBS_VOCAB_SIZE,
         pad_id = PAD_ID,
         bos_id = BOS_ID,
         eos_id = EOS_ID,
-        unk_id = UNK_ID,
-        user_defined_symbols = [r'[\d.]+', r'[a-zA-Z]{2,}']
+        unk_id = UNK_ID
     )
-    spm.SentencePieceTrainer.train(
-        input = "./data/sp_training_output.txt",
-        model_prefix = "output",
-        vocab_size = OUTPUT_ACTION_SIZE,
-        pad_id = PAD_ID,
-        bos_id = BOS_ID,
-        eos_id = EOS_ID,
-        unk_id = UNK_ID,
-        user_defined_symbols = [r'[\d.]+', r'[a-zA-Z]{2,}']
-    )
+    # TODO: add another for the other?
 
 
-def build_data_loader(file_path, func_spp, deriv_spp):
+def tokenize_observations(observations: List[str], obs_spp: SentencePieceProcessor) -> List[List[int]]:
     """
-    Returns an iterable over a set of data
+    Tokenize observations with help from SentencePiece
     """
-    funcs, derivs = load_file(file_path)
-    func_tokens = tokenize_input(funcs, func_spp)
-    deriv_tokens_in, deriv_tokens_out = tokenize_output(derivs, deriv_spp)
-    dataholder = DataHolder(func_tokens, deriv_tokens_in, deriv_tokens_out)
-    dataloader = DataLoader(dataholder, batch_size = BATCH_SIZE, shuffle = True)
-    return dataloader
+    all_tokens = []
+    for obs in observations:
+        tokens = obs_spp.EncodeAsIds(obs.strip()) + [EOS_ID]
+        all_tokens.append(standardize_length(tokens, "obs"))
+    return all_tokens
+# TODO: add another for the other
 
 
-def tokenize_input(data, func_spp):
-    """
-    Tokenize functions with help from SentencePiece
-    """
-    tokens = []
-    for elem in data:
-        token = func_spp.EncodeAsIds(elem.strip()) + [EOS_ID]
-        tokens.append(standardize_length(token))
-    return tokens
+# def tokenize_output(data, deriv_spp):
+#     """
+#     Tokenize derivatives with help from SentencePiece
+#     """
+#     in_tokens = []
+#     out_tokens = []
+#     for elem in data:
+#         token = deriv_spp.EncodeAsIds(elem.strip())
+#         in_tokens.append(standardize_length([BOS_ID] + token))
+#         out_tokens.append(standardize_length(token + [EOS_ID]))
+#     return in_tokens, out_tokens
 
 
-def tokenize_output(data, deriv_spp):
-    """
-    Tokenize derivatives with help from SentencePiece
-    """
-    in_tokens = []
-    out_tokens = []
-    for elem in data:
-        token = deriv_spp.EncodeAsIds(elem.strip())
-        in_tokens.append(standardize_length([BOS_ID] + token))
-        out_tokens.append(standardize_length(token + [EOS_ID]))
-    return in_tokens, out_tokens
-
-
-def standardize_length(tokens):
+def standardize_length(tokens: List[int], mode: str) -> List[int]:
     """
     Ensure sequences are all of same length
     """
-    if len(tokens) < MAX_SEQ_LEN:
-        tokens += [PAD_ID for _ in range(MAX_SEQ_LEN - len(tokens))]
+    assert mode in ["obs", "traj"]
+    if mode == "obs":
+        max_length = MAX_OBS_LEN
     else:
-        tokens = tokens[:MAX_SEQ_LEN]
+        max_length = MAX_SEQ_LEN
+    if len(tokens) < max_length:
+        tokens += [PAD_ID for _ in range(max_length - len(tokens))]
+    else:
+        tokens = tokens[:max_length]
     return tokens
+
+
+def build_data_loaders(file_path: str, spp: SentencePieceProcessor, mode: str, training: bool) -> Tuple[DataLoader, DataLoader, DataLoader]:
+    """
+    Returns iterables over train, val, and test sets
+    """
+    assert mode in ["obs", "traj"]
+
+    with open(data_file, "rb") as f:
+        dataset = pickle.load(f)
+    dataloaders = []
+    if mode == "obs":
+        for key in ["train", "val"] if training else ["test"]:
+            obs_list = preprocess_obs_list(dataset[key])
+            all_action_ints = preprocess_action_list(dataset[key])
+            assert len(obs_list) == len(act_list), f"(s, a) pairs don't match up for {key} set: {len(obs_list)} observations and {len(all_action_ints)} actions"
+            all_obs_tokens = tokenize_observations(obs_list, spp)
+            dataholder = ObservationDataHolder(all_obs_tokens, all_action_ints)
+            dataloader = DataLoader(dataholder, batch_size = BATCH_SIZE, shuffle = True)
+            dataloaders.append(dataloader)
+    else:
+        pass  # TODO: add another for other
+    return tuple(dataloaders)

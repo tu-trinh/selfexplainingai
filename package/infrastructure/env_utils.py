@@ -246,7 +246,7 @@ def get_obs_desc(obs: Dict, left_obs: Dict = None, backwards_obs: Dict = None, r
     if detail == 4:
         img = obs["image"]
         size = img.shape[-2]
-        description = f"Description of room (sized {size - 2} x {size - 2}), going from leftmost column (Col 1) to rightmost column (Col {size - 2}), top cell to bottom cell for each column:\n"
+        description = f"Description of room (sized {size - 2} x {size - 2}), going from leftmost (westmost) column (Col 1) to rightmost (eastmost) column (Col {size - 2}), top cell (north) to bottom cell (south) for each column:\n"
         
         for c in range(1, len(img) - 1):  # skip leftmost and rightmost columns of walls
             description += f"Col {c}: "

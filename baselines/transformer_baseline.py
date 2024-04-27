@@ -6,7 +6,7 @@ from transformer_modules import *
 from tqdm import tqdm
 from transformer_utils import *
 import argparse
-from torchinfo import summary
+# from torchinfo import summary
 import sentencepiece as spm
 from typing import Any, List, Tuple, Dict, Union
 from torch.utils.data import DataLoader
@@ -20,7 +20,7 @@ class ModelWrapper:
         # Data initialization
         if mode == "obs":
             self.obs_spp = spm.SentencePieceProcessor()
-            self.obs_spp.load(f"./tokenization/{SPM_OBS_PREFIX}.model")
+            self.obs_spp.load(f"baselines/{SPM_OBS_PREFIX}.model")
             dataloaders = build_data_loaders("datasets/intention_datasets.pkl", self.obs_spp, "obs", training)
             self.train_data_loader = dataloaders[0]
             self.valid_data_loader = dataloaders[1]
@@ -91,7 +91,7 @@ class ModelWrapper:
                 if DEVICE == torch.device("cuda"):
                     torch.cuda.empty_cache()
             
-            print("Finished training epoch {}".format(epoch + 1))
+            print("Finished training epoch {} with avg. loss {}".format(epoch + 1, round(np.mean(losses), 3)))
             valid_loss = self.validate_model()
             print("Validation loss:", valid_loss)
 
@@ -188,15 +188,16 @@ class ModelWrapper:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--mode", "-m", type = str, required = True)
     parser.add_argument("--setup", "-s", action = "store_true")
     parser.add_argument("--train", "-t", action = "store_true")
     args = parser.parse_args()
 
     if args.setup:
-        process_data("./data/train.txt")
-        build_vocab()
+        process_data_for_spm("datasets/intention_datasets.pkl", args.mode)
+        build_vocab(args.mode)
     elif args.train:
-        wrapper = ModelWrapper(True)
+        wrapper = ModelWrapper(args.mode, True)
         # print(summary(wrapper.model, [(BATCH_SIZE, MAX_SEQ_LEN), (BATCH_SIZE, MAX_SEQ_LEN), (BATCH_SIZE, 1, MAX_SEQ_LEN),
         #                               (BATCH_SIZE, MAX_SEQ_LEN, MAX_SEQ_LEN)],
         #                               dtypes = [torch.long, torch.long, torch.long, torch.long]))

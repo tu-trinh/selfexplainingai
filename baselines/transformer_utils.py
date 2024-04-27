@@ -1,5 +1,10 @@
+import sys
+sys.path.append("/nas/ucb/tutrinh/selfexplainingai")
+sys.path.append("/Users/tutrinh/Work/CHAI/selfexplainingai")
+
 from package.infrastructure.basic_utils import flatten_list
 
+import re
 import torch
 from torch.utils.data import DataLoader, Dataset
 from transformer_constants import *
@@ -10,6 +15,17 @@ import pickle
 from typing import List, Tuple, Dict
 
 
+"""
+TRAJECTORY TRANSFORMER UTILS
+"""
+class TrajectoryDataHolder(Dataset):
+    pass  # TODO: add another for the other
+
+
+
+"""
+OBSERVATION TRANSFORMER UTILS
+"""
 class ObservationDataHolder(Dataset):
     """
     Custom dataset class to store input observations and output actions
@@ -58,9 +74,12 @@ def preprocess_action_list(data: Dict) -> List[int]:
     return all_actions
 
 
-def process_data(data_file: str) -> None:
+"""
+SENTENCEPIECE UTILS
+"""
+def process_data_for_spm(data_file: str, mode: str) -> None:
     """
-    Processes a data file into different data sets for various training and testing purposes
+    Processes a data file into SentencePiece-formatted datasets
     """
     with open(data_file, "rb") as f:
         dataset = pickle.load(f)
@@ -68,29 +87,31 @@ def process_data(data_file: str) -> None:
     validation_data = dataset["val"]
     
     # Smush train and valid observations together for vocab-building
-    with open(SPM_OBS_TRAINING_FILE, "w") as f:
-        for ds in [training_data, validation_data]:
-            obs_list = preprocess_obs_list(ds)
-            for obs in obs_list:
-                f.write(obs + "\n")
-    
+    if mode == "obs":
+        with open(SPM_OBS_TRAINING_FILE, "w") as f:
+            for ds in [training_data, validation_data]:
+                obs_list = preprocess_obs_list(ds)
+                for obs in obs_list:
+                    f.write(obs + "\n")
     # TODO: add another for the other
 
 
-def build_vocab() -> None:
+def build_vocab(mode: str) -> None:
     """
     Trains SentencePiece on the input vocabularies
     """
-    spm.SentencePieceTrainer.train(
-        input = SPM_OBS_TRAINING_FILE,
-        model_prefix = SPM_OBS_PREFIX,
-        vocab_size = INPUT_OBS_VOCAB_SIZE,
-        pad_id = PAD_ID,
-        bos_id = BOS_ID,
-        eos_id = EOS_ID,
-        unk_id = UNK_ID
-    )
-    # TODO: add another for the other?
+    if mode == "obs":
+        spm.SentencePieceTrainer.train(
+            input = SPM_OBS_TRAINING_FILE,
+            model_prefix = SPM_OBS_PREFIX,
+            vocab_size = INPUT_OBS_VOCAB_SIZE,
+            pad_id = PAD_ID,
+            bos_id = BOS_ID,
+            eos_id = EOS_ID,
+            unk_id = UNK_ID,
+            model_type = "bpe"
+        )
+    # TODO: add another for the other
 
 
 def tokenize_observations(observations: List[str], obs_spp: SentencePieceProcessor) -> List[List[int]]:
@@ -118,6 +139,9 @@ def tokenize_observations(observations: List[str], obs_spp: SentencePieceProcess
 #     return in_tokens, out_tokens
 
 
+"""
+COMMON UTILS
+"""
 def standardize_length(tokens: List[int], mode: str) -> List[int]:
     """
     Ensure sequences are all of same length
@@ -140,14 +164,14 @@ def build_data_loaders(file_path: str, spp: SentencePieceProcessor, mode: str, t
     """
     assert mode in ["obs", "traj"]
 
-    with open(data_file, "rb") as f:
+    with open(file_path, "rb") as f:
         dataset = pickle.load(f)
     dataloaders = []
     if mode == "obs":
         for key in ["train", "val"] if training else ["test"]:
             obs_list = preprocess_obs_list(dataset[key])
             all_action_ints = preprocess_action_list(dataset[key])
-            assert len(obs_list) == len(act_list), f"(s, a) pairs don't match up for {key} set: {len(obs_list)} observations and {len(all_action_ints)} actions"
+            assert len(obs_list) == len(all_action_ints), f"(s, a) pairs don't match up for {key} set: {len(obs_list)} observations and {len(all_action_ints)} actions"
             all_obs_tokens = tokenize_observations(obs_list, spp)
             dataholder = ObservationDataHolder(all_obs_tokens, all_action_ints)
             dataloader = DataLoader(dataholder, batch_size = BATCH_SIZE, shuffle = True)

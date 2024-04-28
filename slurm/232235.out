@@ -1,0 +1,2 @@
+srun: error: cirl.ist.berkeley.edu: task 0: Exited with exit code 8
+slurmstepd: error: execve(): baselines/transformer_baseline.py: Exec format error

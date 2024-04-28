@@ -251,7 +251,7 @@ def build_data_loaders(file_path: str, spps: List[SentencePieceProcessor], mode:
 
             all_obs_tokens = tokenize_observations(obs_list, spp)
             dataholder = ObservationDataHolder(all_obs_tokens, all_action_ints)
-            dataloader = DataLoader(dataholder, batch_size = BATCH_SIZE, shuffle = True)
+            dataloader = DataLoader(dataholder, batch_size = BATCH_SIZE[mode], shuffle = True)
             dataloaders.append(dataloader)
     else:
         traj_spp = spps[0]
@@ -264,7 +264,7 @@ def build_data_loaders(file_path: str, spps: List[SentencePieceProcessor], mode:
             all_traj_tokens = tokenize_trajectories(traj_list, traj_spp)
             in_skill_tokens, out_skill_tokens = tokenize_skills(skill_list, skill_spp)
             dataholder = TrajectoryDataHolder(all_traj_tokens, in_skill_tokens, out_skill_tokens)
-            dataloader = DataLoader(dataholder, batch_size = BATCH_SIZE, shuffle = True)
+            dataloader = DataLoader(dataholder, batch_size = BATCH_SIZE[mode], shuffle = True)
             dataloaders.append(dataloader)
     
     return tuple(dataloaders)

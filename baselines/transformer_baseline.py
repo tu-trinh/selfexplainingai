@@ -9,6 +9,8 @@ import argparse
 # from torchinfo import summary
 import sentencepiece as spm
 from typing import Any, List, Tuple, Union
+import pickle
+from sklearn.metrics import accuracy_score
 
 
 class ModelWrapper:
@@ -20,17 +22,19 @@ class ModelWrapper:
         if mode == "obs":
             self.obs_spp = spm.SentencePieceProcessor()
             self.obs_spp.load(f"baselines/{SPM_OBS_PREFIX}.model")
-            dataloaders = build_data_loaders("datasets/intention_datasets.pkl", [self.obs_spp], "obs", training)
-            self.train_data_loader = dataloaders[0]
-            self.valid_data_loader = dataloaders[1]
+            if training:
+                dataloaders = build_data_loaders("datasets/intention_datasets.pkl", [self.obs_spp], "obs", training)
+                self.train_data_loader = dataloaders[0]
+                self.valid_data_loader = dataloaders[1]
         else:
             self.traj_spp = spm.SentencePieceProcessor()
             self.traj_spp.load(f"baselines/{SPM_TRAJ_PREFIX}.model")
             self.skill_spp = spm.SentencePieceProcessor()
             self.skill_spp.load(f"baselines/{SPM_SKILL_PREFIX}.model")
-            dataloaders = build_data_loaders("datasets/intention_datasets.pkl", [self.traj_spp, self.skill_spp], "traj", training)
-            self.train_data_loader = dataloaders[0]
-            self.valid_data_loader = dataloaders[1]
+            if training:
+                dataloaders = build_data_loaders("datasets/intention_datasets.pkl", [self.traj_spp, self.skill_spp], "traj", training)
+                self.train_data_loader = dataloaders[0]
+                self.valid_data_loader = dataloaders[1]
 
         # Model initialization
         if mode == "obs":
@@ -156,24 +160,45 @@ class ModelWrapper:
         return valid_loss
     
     
-    def infer(self, input_data: Union[List[str]]) -> Union[List[int]]:
+    def infer(self, input_data: Union[List[str]], expected_outputs: Union[List[int]]) -> Union[List[int]]:
         """
         Run inference with the model (test time)
         """
         self.model.eval()
+        grand_outputs = ""
 
         # Process input observation and run through encoder side
         if self.mode == "obs":
             if isinstance(input_data, str):
                 input_data = [input_data]
 
-            observations = tokenize_observations(input_data, self.obs_spp)
-            observations = torch.LongTensor(observations).to(DEVICE)
-            masks = (observations != PAD_ID).unsqueeze(1).to(DEVICE)
-            with torch.no_grad():
-                action_dists = self.model(observations, masks)
-                action_preds = action_dists.argmax(dim = -1)
-            return action_preds.tolist()
+            num_batches = len(input_data) // BATCH_SIZE[self.mode] + 1
+            all_action_preds = []
+            for i in range(num_batches):  # NOTE: tqdm?
+                start = i * BATCH_SIZE[self.mode]
+                end = (i + 1) * BATCH_SIZE[self.mode]
+                input_obs = input_data[start : end]
+                expected_acts = expected_outputs[start : end]
+                if len(input_obs) > 0:
+                    observations = tokenize_observations(input_obs, self.obs_spp)
+                    observations = torch.LongTensor(observations).to(DEVICE)
+                    masks = (observations != PAD_ID).unsqueeze(1).to(DEVICE)
+                    with torch.no_grad():
+                        action_dists = self.model(observations, masks)
+                        action_preds = action_dists.argmax(dim = -1).tolist()
+                    for j in range(start, end):
+                        try:
+                            grand_outputs += f"OBSERVATION {j}: {input_obs[j]}\n"
+                            grand_outputs += f"CORRECT ACTION: {expected_acts[j]}\n"
+                            grand_outputs += f"MODEL SAID: {action_preds[j]}\n\n"
+                        except IndexError:
+                            break
+                    all_action_preds.extend(action_preds)
+            accuracy = accuracy_score(expected_outputs, all_action_preds)
+            grand_outputs += f"TOTAL ACCURACY: {accuracy}\n"
+            with open("baselines/transformer_baseline_intention_listener.txt", "w") as f:
+                f.write(grand_outputs)
+            return accuracy
         
         # Process input trajectory and run through model
         else:
@@ -193,15 +218,15 @@ class ModelWrapper:
         self.best_loss = state_dict["validation_loss"]
     
     
-    def load_model(self, model_file: str) -> None:
+    def load_model(self, checkpoint_file: str) -> None:
         """
         Sets only model weights to be the one saved prior
         """
         if DEVICE == torch.device("cuda"):
-            state_dict = torch.load(model_file)
+            state_dict = torch.load(checkpoint_file)
         else:
             state_dict = torch.load(model_file, map_location = torch.device("cpu"))
-        self.model.load_state_dict(state_dict)
+        self.model.load_state_dict(state_dict["model_dict"])
 
 
 if __name__ == "__main__":
@@ -209,14 +234,28 @@ if __name__ == "__main__":
     parser.add_argument("--mode", "-m", type = str, required = True)
     parser.add_argument("--setup", "-s", action = "store_true")
     parser.add_argument("--train", "-t", action = "store_true")
+    parser.add_argument("--eval", "-e", action = "store_true")
     args = parser.parse_args()
 
     if args.setup:
         process_data_for_spm("datasets/intention_datasets.pkl", args.mode)
         build_vocab(args.mode)
     elif args.train:
+        print("STARTING TO TRAIN!!!")
         wrapper = ModelWrapper(args.mode, True)
         # print(summary(wrapper.model, [(BATCH_SIZE, MAX_SEQ_LEN), (BATCH_SIZE, MAX_SEQ_LEN), (BATCH_SIZE, 1, MAX_SEQ_LEN),
         #                               (BATCH_SIZE, MAX_SEQ_LEN, MAX_SEQ_LEN)],
         #                               dtypes = [torch.long, torch.long, torch.long, torch.long]))
         wrapper.train_model()
+    elif args.eval:
+        print("STARTING EVALUATION!!!")
+        wrapper = ModelWrapper(args.mode, False)
+        wrapper.load_model(f"baselines/intention_{'listener' if args.mode == 'obs' else 'speaker'}_checkpoint.tar")
+        with open("datasets/intention_datasets.pkl", "rb") as f:
+            test_data = pickle.load(f)["test"]
+        test_obs = preprocess_obs_list(test_data)
+        test_acts = preprocess_action_list(test_data)
+        assert len(test_obs) == len(test_acts), f"Mismatched evaluation samples: {len(test_obs)} observations and {len(test_acts)} actions"
+        accuracy = wrapper.infer(test_obs, test_acts)
+        print("Accuracy:", accuracy)
+

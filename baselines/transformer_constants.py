@@ -30,7 +30,7 @@ OUTPUT_SKILL_VOCAB_SIZE = len(SKILL_PHRASES)*3 + len(COLOR_NAMES) + len(OBJ_NAME
 
 ### Model Hyperparameters ###
 LEARNING_RATE = 1e-3
-BATCH_SIZE = 64
+BATCH_SIZE = {"obs": 64, "traj": 1}
 NUM_EPOCHS = 100
 
 ### Architecture Constants ###

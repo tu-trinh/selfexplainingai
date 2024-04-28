@@ -172,7 +172,8 @@ class TrajectoryTransformer(nn.Module):
         # Initialize layers
         self.input_embedding = nn.Embedding(input_vocab_size, D_MODEL[self.mode])
         self.output_embedding = nn.Embedding(output_vocab_size, D_MODEL[self.mode])
-        self.positional_encoding = PositionalEncoding(MAX_SEQ_LEN, self.mode)
+        self.input_positional_encoding = PositionalEncoding(MAX_TRAJ_LEN, self.mode)
+        self.output_positional_encoding = PositionalEncoding(MAX_SKILL_LEN, self.mode)
         self.encoder = TransformerEncoder(self.mode)
         self.decoder = TransformerDecoder(self.mode)
         self.linear = nn.Linear(D_MODEL[self.mode], output_vocab_size)
@@ -185,9 +186,9 @@ class TrajectoryTransformer(nn.Module):
         enc_mask = enc_mask.to(DEVICE)
         dec_mask = dec_mask.to(DEVICE)
         enc_x = self.input_embedding(enc_x)
-        enc_x = self.positional_encoding(enc_x)
+        enc_x = self.input_positional_encoding(enc_x)
         dec_x = self.output_embedding(dec_x)
-        dec_x = self.positional_encoding(dec_x)
+        dec_x = self.output_positional_encoding(dec_x)
 
         # Feed into model
         enc_output = self.encoder(enc_x, enc_mask)

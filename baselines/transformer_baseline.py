@@ -8,8 +8,7 @@ from transformer_utils import *
 import argparse
 # from torchinfo import summary
 import sentencepiece as spm
-from typing import Any, List, Tuple, Dict, Union
-from torch.utils.data import DataLoader
+from typing import Any, List, Tuple, Union
 
 
 class ModelWrapper:
@@ -21,36 +20,39 @@ class ModelWrapper:
         if mode == "obs":
             self.obs_spp = spm.SentencePieceProcessor()
             self.obs_spp.load(f"baselines/{SPM_OBS_PREFIX}.model")
-            dataloaders = build_data_loaders("datasets/intention_datasets.pkl", self.obs_spp, "obs", training)
+            dataloaders = build_data_loaders("datasets/intention_datasets.pkl", [self.obs_spp], "obs", training)
             self.train_data_loader = dataloaders[0]
             self.valid_data_loader = dataloaders[1]
         else:
-            pass  # TODO: add another for the other
+            self.traj_spp = spm.SentencePieceProcessor()
+            self.traj_spp.load(f"baselines/{SPM_TRAJ_PREFIX}.model")
+            self.skill_spp = spm.SentencePieceProcessor()
+            self.skill_spp.load(f"baselines/{SPM_SKILL_PREFIX}.model")
+            dataloaders = build_data_loaders("datasets/intention_datasets.pkl", [self.traj_spp, self.skill_spp], "traj", training)
+            self.train_data_loader = dataloaders[0]
+            self.valid_data_loader = dataloaders[1]
 
         # Model initialization
         if mode == "obs":
             self.model = ObservationTransformer(INPUT_OBS_VOCAB_SIZE, OUTPUT_ACTION_SIZE).to(DEVICE)
-            self.optimizer = torch.optim.Adam(self.model.parameters(), lr = LEARNING_RATE)
-            self.loss_func = nn.CrossEntropyLoss()
-            self.best_loss = float("inf")
         else:
-            pass  # TODO: add another for the other
+            self.model = TrajectoryTransformer(INPUT_TRAJ_VOCAB_SIZE, OUTPUT_SKILL_VOCAB_SIZE).to(DEVICE)
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr = LEARNING_RATE)
+        self.loss_func = nn.CrossEntropyLoss()
+        self.best_loss = float("inf")
     
     
     def mask(self, input_data: Any, desired_output: Any = None) -> Tuple[torch.Tensor, torch.Tensor]:
         """
-        Creates masks on model inputs and expected outputs
+        Creates masks on model inputs and expected outputs, if needed
         """
         enc_mask, dec_mask = None, None
-        if self.mode == "obs":
-            enc_mask = (input_data != PAD_ID).unsqueeze(1).to(DEVICE)
-        else:
-            pass  # TODO: add another for the other
-        # enc_mask = (func_data != PAD_ID).unsqueeze(1).to(DEVICE)
-        # dec_mask = (deriv_data != PAD_ID).unsqueeze(1).to(DEVICE)
-        # helper_mask = torch.ones([1, MAX_SEQ_LEN, MAX_SEQ_LEN], dtype = torch.bool)
-        # helper_mask = torch.tril(helper_mask).to(DEVICE)
-        # dec_mask = dec_mask & helper_mask
+        enc_mask = (input_data != PAD_ID).unsqueeze(1).to(DEVICE)
+        if self.mode == "traj":
+            dec_mask = (desired_output != PAD_ID).unsqueeze(1).to(DEVICE)
+            helper_mask = torch.ones([1, MAX_SKILL_LEN, MAX_SKILL_LEN], dtype = torch.bool)
+            helper_mask = torch.tril(helper_mask).to(DEVICE)
+            dec_mask = dec_mask & helper_mask
         return enc_mask, dec_mask
 
     
@@ -61,7 +63,7 @@ class ModelWrapper:
         for epoch in range(NUM_EPOCHS):
             self.model.train()
             losses = []
-            for batch in tqdm(self.train_data_loader):
+            for batch in self.train_data_loader:  # NOTE: removed tqdm for now to not clog outputs since no wandb yet
                 if self.mode == "obs":
                     states, actions = batch
                     states = states.to(DEVICE)
@@ -69,17 +71,21 @@ class ModelWrapper:
                     enc_mask, _ = self.mask(states)
                     action_dist = self.model(states, enc_mask)
                 else:
-                    pass  # TODO: add another for the other                
+                    trajs, in_skills, out_skills = batch
+                    trajs = trajs.to(DEVICE)
+                    in_skills = in_skills.to(DEVICE)
+                    out_skills = out_skills.to(DEVICE)
+                    enc_mask, dec_mask = self.mask(trajs, in_skills)
+                    skill_dist = self.model(trajs, in_skills, enc_mask, dec_mask)
 
                 self.optimizer.zero_grad()
                 if self.mode == "obs":
                     loss = self.loss_func(action_dist, actions)
                 else:
                     loss = self.loss_func(
-                        action_dist.view(-1, OUTPUT_ACTION_SIZE),
-                        deriv_out.view(deriv_out.shape[0] * deriv_out.shape[1])
+                        skill_dist.view(-1, OUTPUT_SKILL_VOCAB_SIZE),
+                        out_skills.view(out_skills.shape[0] * out_skills.shape[1])
                     )
-                    pass  # TODO: add another for the other
                 loss.backward()
                 self.optimizer.step()
                 losses.append(loss.item())
@@ -87,7 +93,7 @@ class ModelWrapper:
                 if self.mode == "obs":
                     del states, actions, enc_mask, action_dist
                 else:
-                    pass  # TODO: add another for the other
+                    del trajs, in_skills, out_skills, enc_mask, dec_mask, skill_dist
                 if DEVICE == torch.device("cuda"):
                     torch.cuda.empty_cache()
             
@@ -115,7 +121,7 @@ class ModelWrapper:
         self.model.eval()
         losses = []
         with torch.no_grad():
-            for batch in tqdm(self.valid_data_loader):
+            for batch in self.valid_data_loader:  # NOTE: removed tqdm for now to not clog outputs since no wandb yet
                 if self.mode == "obs":
                     states, actions = batch
                     states = states.to(DEVICE)
@@ -123,18 +129,26 @@ class ModelWrapper:
                     enc_mask, _ = self.mask(states)
                     action_dist = self.model(states, enc_mask)
                 else:
-                    pass  # TODO: add another for the other
+                    trajs, in_skills, out_skills = batch
+                    trajs = trajs.to(DEVICE)
+                    in_skills = in_skills.to(DEVICE)
+                    out_skills = out_skills.to(DEVICE)
+                    enc_mask, dec_mask = self.mask(trajs, in_skills)
+                    skill_dist = self.model(trajs, in_skills, enc_mask, dec_mask)
 
                 if self.mode == "obs":
                     loss = self.loss_func(action_dist, actions)
                 else:
-                    pass  # TODO: add another for the other
+                    loss = self.loss_func(
+                        skill_dist.view(-1, OUTPUT_SKILL_VOCAB_SIZE),
+                        out_skills.view(out_skills.shape[0] * out_skills.shape[1])
+                    )
                 losses.append(loss.item())
 
                 if self.mode == "obs":
                     del states, actions, enc_mask, action_dist
                 else:
-                    pass  # TODO: add another for the other
+                    del trajs, in_skills, out_skills, enc_mask, dec_mask, skill_dist
                 if DEVICE == torch.device("cuda"):
                     torch.cuda.empty_cache()
         
@@ -148,7 +162,7 @@ class ModelWrapper:
         """
         self.model.eval()
 
-        # Process input and run through encoder side
+        # Process input observation and run through encoder side
         if self.mode == "obs":
             if isinstance(input_data, str):
                 input_data = [input_data]
@@ -160,6 +174,10 @@ class ModelWrapper:
                 action_dists = self.model(observations, masks)
                 action_preds = action_dists.argmax(dim = -1)
             return action_preds.tolist()
+        
+        # Process input trajectory and run through model
+        else:
+            pass  # TODO: add another for the other
     
 
     def load_state(self, checkpoint_file: str) -> None:

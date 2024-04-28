@@ -1,0 +1,1083 @@
+navigate_to_brown_box
+head_towards_brown_box
+navigate_to_purple_ball
+head_towards_purple_ball
+navigate_to_yellow_goal
+head_towards_yellow_goal
+navigate_to_purple_ball
+head_towards_purple_ball
+turn left
+turn left
+step forward
+proceed_towards_purple_box
+head_towards_purple_box
+proceed_towards_yellow_ball
+head_towards_yellow_ball
+proceed_towards_red_goal
+head_towards_red_goal
+left
+go forward
+left
+go forward
+left
+right
+go forward
+navigate_to_purple_box
+head_towards_purple_box
+right
+make a left turn
+go forward
+navigate_to_grey_ball
+head_towards_grey_ball
+make a left turn
+make a left turn
+right
+go forward
+head_towards_red_door
+proceed_towards_red_door
+make a left turn
+toggle
+open_up_grey_door
+head_towards_red_ball
+proceed_towards_red_ball
+head_towards_grey_goal
+proceed_towards_grey_goal
+open_up_red_door
+go forward
+turn right
+head_towards_red_door
+proceed_towards_red_door
+toggle
+turn right
+make a left turn
+toggle
+go forward
+turn right
+make a left turn
+toggle
+go forward
+go forward
+lay down
+open_yellow_door
+left
+grab
+fetch_red_ball
+pickup_red_ball
+go forward
+make a right turn
+put_down_red_ball
+place_red_ball_down
+open_red_door
+go forward
+lay down
+make a right turn
+left
+toggle
+grab
+fetch_yellow_key
+pickup_yellow_key
+put_down_yellow_key
+place_yellow_key_down
+go forward
+make a right turn
+proceed_5_steps
+move_5_steps_forward
+toggle
+go forward
+lay down
+make a right turn
+left
+toggle
+grab
+go forward
+lay down
+make a right turn
+left
+toggle
+grab
+approach_yellow_door
+make_way_towards_yellow_door
+grab
+turn left
+go forward
+activate
+fetch_blue_key
+retrieve_blue_key
+right
+go forward
+swing_open_blue_door
+approach_blue_goal
+make_way_towards_blue_goal
+swing_open_yellow_door
+fetch_yellow_key
+retrieve_yellow_key
+approach_yellow_door
+make_way_towards_yellow_door
+right
+grab
+advance_6_steps
+move_6_steps_forward
+go forward
+activate
+right
+grab
+turn left
+go forward
+activate
+go forward
+turn left
+activate
+grab
+proceed_5_steps
+move_5_steps_forward
+grab
+make a left turn
+open_grey_door
+toggle
+open_grey_box
+navigate_to_grey_ball
+head_towards_grey_ball
+open_red_door
+grab
+proceed_5_steps
+move_5_steps_forward
+right
+grab
+make a left turn
+go forward
+toggle
+proceed_5_steps
+move_5_steps_forward
+navigate_to_grey_door
+head_towards_grey_door
+right
+grab
+go forward
+toggle
+right
+grab
+make a left turn
+go forward
+toggle
+go forward
+make a left turn
+toggle
+grab
+make_way_towards_grey_box
+go_to_grey_box
+make_way_towards_yellow_door
+go_to_yellow_door
+toggle
+toggle
+forward
+forward
+progress_6_steps_forward
+advance_6_steps
+make a right turn
+progress_5_steps_forward
+advance_5_steps
+toggle
+make_way_towards_grey_door
+go_to_grey_door
+make_way_towards_purple_ball
+go_to_purple_ball
+toggle
+open_grey_door
+forward
+make a left turn
+make a right turn
+make a left turn
+toggle
+forward
+right
+go forward
+open_red_door
+right
+make a left turn
+go forward
+open_grey_door
+go forward
+go forward
+make a left turn
+open_grey_door
+go forward
+right
+navigate_to_purple_box
+head_towards_purple_box
+toggle
+right
+go forward
+pickup
+turn backward
+proceed_towards_purple_box
+head_towards_purple_box
+open_up_grey_door
+turn backward
+toggle
+make a left turn
+pickup_grey_key
+procure_grey_key
+forward
+pickup
+make a left turn
+make a right turn
+toggle
+proceed_towards_grey_ball
+head_towards_grey_ball
+forward
+pickup
+toggle
+make a left turn
+make a right turn
+forward
+pickup
+make a left turn
+proceed_towards_grey_key
+head_towards_grey_key
+open_up_grey_door
+forward
+approach_brown_box
+head_towards_brown_box
+turn left
+approach_blue_goal
+head_towards_blue_goal
+move_5_steps_right
+proceed_right_5_steps
+approach_brown_box
+head_towards_brown_box
+forward
+turn left
+turn right
+fetch_red_box
+pickup_red_box
+fetch_brown_ball
+pickup_brown_ball
+fetch_yellow_box
+pickup_yellow_box
+fetch_brown_box
+pickup_brown_box
+pickup
+navigate_to_red_box
+head_towards_red_box
+left
+forward
+pickup
+procure_purple_box
+retrieve_purple_box
+procure_grey_ball
+retrieve_grey_ball
+procure_yellow_box
+retrieve_yellow_box
+left
+right
+go forward
+snatch up
+left
+go forward
+snatch up
+left
+right
+go forward
+snatch up
+pickup_grey_box
+obtain_grey_box
+grab
+make_way_towards_purple_ball
+go_to_purple_ball
+make a left turn
+forward
+grab
+grab
+make_way_towards_purple_box
+go_to_purple_box
+make_way_towards_grey_box
+go_to_grey_box
+grab
+make a left turn
+make a right turn
+forward
+grab
+make_way_towards_brown_box
+go_to_brown_box
+make_way_towards_yellow_door
+go_to_yellow_door
+toggle
+grab
+open_purple_door
+pickup_yellow_ball
+obtain_yellow_ball
+pickup_purple_box
+obtain_purple_box
+open_yellow_door
+make_way_towards_yellow_box
+go_to_yellow_box
+make_way_towards_yellow_door
+go_to_yellow_door
+toggle
+grab
+forward
+make a right turn
+left
+toggle
+grab
+forward
+make a right turn
+left
+toggle
+grab
+open_grey_door
+lay down
+make a left turn
+proceed_5_steps
+move_5_steps_forward
+grab
+fetch_red_ball
+pickup_red_ball
+navigate_to_grey_ball
+head_towards_grey_ball
+put_down_red_ball
+place_red_ball_down
+grab
+open_red_door
+go forward
+lay down
+right
+proceed_5_steps
+move_5_steps_forward
+make a left turn
+toggle
+grab
+fetch_grey_key
+pickup_grey_key
+go forward
+put_down_grey_key
+place_grey_key_down
+right
+navigate_to_grey_box
+head_towards_grey_box
+toggle
+grab
+go forward
+lay down
+right
+make a left turn
+toggle
+grab
+go forward
+lay down
+right
+toggle
+grab
+grab
+drop
+forward
+pickup_grey_box
+obtain_grey_box
+make_way_towards_purple_door
+go_to_purple_door
+toggle
+drop
+grab
+open_yellow_door
+forward
+pickup_yellow_key
+obtain_yellow_key
+put_purple_key_on_floor
+put_purple_key_away
+pickup_yellow_box
+obtain_yellow_box
+pickup_purple_key
+obtain_purple_key
+open_purple_door
+make a right turn
+grab
+drop
+make a left turn
+forward
+make_way_towards_purple_door
+go_to_purple_door
+toggle
+make a right turn
+grab
+drop
+make a left turn
+forward
+toggle
+make_way_towards_yellow_box
+go_to_yellow_box
+grab
+drop
+make a left turn
+forward
+toggle
+pickup
+drop
+open_yellow_door
+obtain_red_box
+retrieve_red_box
+activate
+right
+pickup
+open_purple_door
+step forward
+place_purple_key_down
+lay_purple_key_down
+open_purple_box
+make_way_towards_purple_box
+go_to_purple_box
+pickup
+drop
+make a left turn
+activate
+make_way_towards_yellow_box
+go_to_yellow_box
+pickup
+drop
+make a left turn
+step forward
+activate
+right
+pickup
+drop
+make a left turn
+step forward
+activate
+right
+pickup
+drop
+make a left turn
+step forward
+activate
+make_way_towards_purple_door
+go_to_purple_door
+toggle
+pickup_brown_box
+obtain_brown_box
+pickup_yellow_ball
+obtain_yellow_ball
+toggle
+make_way_towards_purple_box
+go_to_purple_box
+toggle
+grab
+pickup_yellow_box
+obtain_yellow_box
+make_way_towards_brown_door
+go_to_brown_door
+toggle
+open_brown_door
+left
+progress_5_steps_forward
+advance_5_steps
+grab
+forward
+make a right turn
+left
+toggle
+grab
+open_yellow_door
+make a right turn
+grab
+forward
+make a left turn
+grab
+open_purple_door
+make a left turn
+grab
+make_way_towards_purple_box
+go_to_purple_box
+grab
+forward
+open_purple_door
+pickup_grey_box
+obtain_grey_box
+make a right turn
+toggle
+grab
+forward
+progress_5_steps_right
+advance_5_steps_rightward
+make a right turn
+grab
+open_yellow_door
+put_yellow_key_on_floor
+put_yellow_key_away
+make_way_towards_brown_box
+go_to_brown_box
+turn backward
+pickup_yellow_ball
+obtain_yellow_ball
+grab
+toggle
+left
+make a right turn
+drop
+pickup_yellow_key
+obtain_yellow_key
+forward
+grab
+put_brown_key_on_floor
+put_brown_key_away
+left
+make a right turn
+toggle
+make_way_towards_yellow_box
+go_to_yellow_box
+forward
+grab
+toggle
+left
+make a right turn
+drop
+forward
+grab
+open_yellow_door
+make_way_towards_yellow_key
+go_to_yellow_key
+left
+drop
+forward
+obtain_red_box
+retrieve_red_box
+pickup
+turn backward
+obtain_yellow_box
+retrieve_yellow_box
+pickup
+make_way_towards_blue_box
+go_to_blue_box
+obtain_red_box
+retrieve_red_box
+pickup
+step forward
+make a left turn
+right
+proceed_towards_green_box
+go_to_green_box
+proceed_towards_red_ball
+go_to_red_ball
+navigate_to_purple_ball
+head_towards_purple_ball
+make a right turn
+step forward
+proceed_towards_green_box
+go_to_green_box
+proceed_towards_red_ball
+go_to_red_ball
+make_way_towards_green_box
+go_to_green_box
+make_way_towards_grey_ball
+go_to_grey_ball
+proceed_towards_red_goal
+head_towards_red_goal
+make_way_towards_green_box
+go_to_green_box
+step forward
+make_way_towards_blue_box
+proceed_towards_blue_box
+make a right turn
+step forward
+make a left turn
+go forward
+make a left turn
+go forward
+make_way_towards_blue_box
+proceed_towards_blue_box
+make a right turn
+step forward
+make_way_towards_yellow_box
+go_to_yellow_box
+make_way_towards_green_door
+go_to_green_door
+activate
+open_green_door
+make_way_towards_green_ball
+go_to_green_ball
+go forward
+open_up_red_door
+go forward
+make a left turn
+toggle
+right
+activate
+forward
+right
+make_way_towards_green_ball
+go_to_green_ball
+activate
+forward
+open_up_purple_door
+lay_grey_ball_down
+set_down_grey_ball
+make a left turn
+make_way_towards_grey_box
+proceed_towards_grey_box
+snatch up
+open_up_purple_door
+lay_grey_key_down
+set_down_grey_key
+make_way_towards_purple_ball
+proceed_towards_purple_ball
+snatch up
+put_down_red_key
+place_red_key_down
+go forward
+left
+toggle
+grab
+go forward
+navigate_to_brown_door
+head_towards_brown_door
+put_down_brown_box
+place_brown_box_down
+toggle
+grab
+forward
+drop
+right
+make a left turn
+activate
+acquire_purple_key
+retrieve_purple_key
+forward
+drop
+open_up_purple_door
+walk_6_cells_forward
+progress_6_steps_forward
+right
+snatch up
+proceed_5_steps
+walk_5_cells_forward
+pickup
+open_purple_door
+forward
+turn right
+pickup_purple_key
+acquire_purple_key
+open_purple_door
+go forward
+approach_yellow_door
+make_way_towards_yellow_door
+activate
+fetch_yellow_key
+retrieve_yellow_key
+approach_grey_door
+make_way_towards_grey_door
+grab
+turn left
+go forward
+activate
+forward
+turn right
+switch
+pickup
+proceed_5_steps
+walk_5_cells_forward
+turn right
+pickup
+make a left turn
+forward
+navigate_to_purple_door
+go_to_purple_door
+switch
+snatch up
+turn left
+activate
+make_way_towards_blue_box
+proceed_towards_blue_box
+make_way_towards_green_ball
+proceed_towards_green_ball
+open_up_blue_box
+open_up_green_door
+snatch up
+grab
+make a left turn
+go forward
+open_grey_box
+toggle
+grab
+open_red_box
+go forward
+navigate_to_purple_door
+head_towards_purple_door
+toggle
+step forward
+open_up_blue_door
+activate
+snatch up
+walk_7_cells_forward
+progress_7_steps_forward
+make a right turn
+snatch up
+turn left
+step forward
+make_way_towards_green_door
+proceed_towards_green_door
+activate
+proceed_towards_red_box
+head_towards_red_box
+proceed_towards_brown_door
+head_towards_brown_door
+switch
+switch
+step forward
+open_grey_door
+forward
+make a left turn
+make a left turn
+toggle
+forward
+left
+switch
+step forward
+step forward
+right
+switch
+make a right turn
+open_up_green_door
+step forward
+make a right turn
+turn left
+step forward
+go forward
+right
+navigate_to_red_goal
+head_towards_red_goal
+make a right turn
+step forward
+step forward
+turn left
+activate
+open_yellow_door
+acquire_yellow_key
+fetch_yellow_key
+make_way_towards_green_box
+go_to_green_box
+left
+pickup
+make a left turn
+toggle
+proceed_towards_grey_ball
+head_towards_grey_ball
+proceed_towards_grey_door
+head_towards_grey_door
+forward
+make a left turn
+grab
+switch
+left
+turn right
+go forward
+grab
+make_way_towards_yellow_door
+go_to_yellow_door
+make_way_towards_yellow_ball
+go_to_yellow_ball
+switch
+turn right
+lay down
+go forward
+make_way_towards_red_box
+navigate_to_red_box
+turn backward
+turn left
+turn right
+forward
+approach_blue_goal
+head_towards_blue_goal
+make_way_towards_red_box
+navigate_to_red_box
+right
+go forward
+acquire_purple_box
+retrieve_purple_box
+acquire_blue_ball
+retrieve_blue_ball
+fetch_brown_box
+pickup_brown_box
+make a right turn
+forward
+pickup
+acquire_purple_box
+retrieve_purple_box
+acquire_blue_ball
+retrieve_blue_ball
+fetch_red_box
+acquire_red_box
+fetch_green_ball
+acquire_green_ball
+proceed_towards_grey_box
+head_towards_grey_box
+snatch up
+procure_yellow_ball
+retrieve_yellow_ball
+fetch_red_box
+acquire_red_box
+step forward
+turn right
+advance_5_steps
+proceed_5_steps
+grab
+procure_red_box
+retrieve_red_box
+pickup
+right
+grab
+make_way_towards_purple_box
+go_to_purple_box
+pickup_yellow_ball
+obtain_yellow_ball
+procure_red_box
+retrieve_red_box
+pickup
+step forward
+procure_green_box
+retrieve_green_box
+proceed_towards_red_door
+head_towards_red_door
+switch
+procure_red_ball
+retrieve_red_ball
+open_up_red_door
+open_yellow_door
+grab
+forward
+forward
+left
+pickup_purple_ball
+obtain_purple_ball
+toggle
+turn right
+pickup
+switch
+go forward
+procure_red_ball
+retrieve_red_ball
+turn right
+switch
+go forward
+lay_blue_ball_down
+set_down_blue_ball
+open_up_green_door
+acquire_blue_box
+retrieve_blue_box
+turn left
+snatch up
+lay_blue_key_down
+set_down_blue_key
+open_up_green_door
+acquire_green_ball
+retrieve_green_ball
+snatch up
+go forward
+lay down
+fetch_grey_ball
+pickup_grey_ball
+make a left turn
+toggle
+grab
+go forward
+navigate_to_purple_door
+head_towards_purple_door
+put_down_purple_box
+place_purple_box_down
+toggle
+grab
+step forward
+acquire_green_key
+retrieve_green_key
+drop
+make a right turn
+acquire_blue_box
+retrieve_blue_box
+turn left
+activate
+step forward
+drop
+make a right turn
+open_up_green_door
+make_way_towards_green_ball
+proceed_towards_green_ball
+snatch up
+open_up_brown_door
+pickup
+set down
+procure_red_box
+retrieve_red_box
+open_up_brown_door
+set down
+pickup
+step forward
+procure_brown_key
+retrieve_brown_key
+pickup_purple_key
+obtain_purple_key
+grab
+drop
+make a left turn
+forward
+make_way_towards_purple_door
+go_to_purple_door
+toggle
+make_way_towards_grey_door
+go_to_grey_door
+put_grey_key_on_floor
+put_grey_key_away
+grab
+pickup_yellow_ball
+obtain_yellow_ball
+make a left turn
+forward
+toggle
+right
+pickup
+set down
+left
+step forward
+switch
+pickup
+set down
+left
+step forward
+proceed_towards_brown_door
+head_towards_brown_door
+proceed_towards_brown_ball
+head_towards_brown_ball
+switch
+turn right
+snatch up
+left
+set_down_blue_key
+put_blue_key_away
+go forward
+switch
+turn right
+snatch up
+open_up_blue_door
+set_down_blue_key
+put_blue_key_away
+go forward
+open_up_blue_box
+pickup
+place_yellow_key_down
+lay_yellow_key_down
+make a left turn
+step forward
+activate
+open_purple_box
+right
+make_way_towards_red_door
+go_to_red_door
+pickup
+drop
+open_red_box
+make a left turn
+step forward
+activate
+snatch up
+lay down
+left
+go forward
+open_up_grey_door
+switch
+approach_blue_door
+navigate_to_blue_door
+snatch up
+lay down
+left
+go forward
+approach_blue_ball
+navigate_to_blue_ball
+switch
+procure_green_box
+retrieve_green_box
+proceed_towards_red_door
+head_towards_red_door
+switch
+procure_red_ball
+retrieve_red_ball
+switch
+open_brown_door
+left
+grab
+forward
+forward
+left
+toggle
+grab
+pickup
+make a left turn
+switch
+go forward
+procure_red_ball
+retrieve_red_ball
+turn right
+switch
+go forward
+open_up_brown_door
+right
+pickup
+step forward
+left
+pickup
+grab
+make a right turn
+pickup_yellow_ball
+obtain_yellow_ball
+pickup
+step forward
+right
+step forward
+left
+switch
+pickup
+pickup
+set_down_red_key
+place_red_key_down
+open_up_red_door
+procure_red_key
+retrieve_red_key
+proceed_towards_green_box
+head_towards_green_box
+pickup
+make a left turn
+grab
+make_way_towards_yellow_door
+go_to_yellow_door
+put_yellow_key_on_floor
+put_yellow_key_away
+left
+toggle
+pickup_yellow_box
+obtain_yellow_box
+grab
+left
+forward
+pickup
+switch
+make a left turn
+turn right
+set down
+go forward
+pickup
+proceed_towards_red_door
+head_towards_red_door
+switch
+turn right
+set down
+procure_red_ball
+retrieve_red_ball
+go forward
+fetch_purple_box
+procure_purple_box
+fetch_brown_ball
+procure_brown_ball
+obtain_blue_box
+retrieve_blue_box
+obtain_yellow_ball
+retrieve_yellow_ball
+fetch_purple_box
+procure_purple_box
+snatch up
+approach_brown_ball
+navigate_to_brown_ball

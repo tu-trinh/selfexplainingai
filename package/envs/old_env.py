@@ -107,19 +107,19 @@ class Environment(MiniGridEnv):
         # Special case of orientation variant
         if Variant.ORIENTATION in self.disallowed:
             self._gen_rotated_room(random.choice([90, 180, 270]), ref_env = self.disallowed[Variant.ORIENTATION])
-    
+
     """
     Public Methods
     """
     def step(self, action: int):
         obs, reward, terminated, truncated, info = super().step(action)
         return obs, 0, terminated, truncated, info
-    
+
 
     def bind_wrapper(self, wrapper: EnvironmentWrapper):
         self.env_wrapper = wrapper
-    
-    
+
+
     def reset(self, seed: int = None, **kwargs):
         if not seed:
             return super().reset()
@@ -130,7 +130,7 @@ class Environment(MiniGridEnv):
             else:
                 info["new_inst"] = self.env_wrapper.retrieve_seeded_env(seed)
             return obs, info
-    
+
 
     def set_allowable_skills(self):
         skills = {}  # maps skill name to function
@@ -183,7 +183,7 @@ class Environment(MiniGridEnv):
                         can_pickup_and_drop = True
                         skills.setdefault(f"pickup_{color}_{obj}", pickup_color_object_hof(color, obj))
                         skills.setdefault(f"put_down_{color}_{obj}", put_down_color_object_hof(color, obj))
-        
+
         # Primitive Minigrid skills + backward
         skills["left"] = left
         skills["right"] = right
@@ -194,9 +194,9 @@ class Environment(MiniGridEnv):
             skills["drop"] = drop
         if can_toggle:
             skills["toggle"] = toggle
-        
+
         self.allowable_skills = skills
-    
+
 
     def change_room_size(self, new_size: int = None):
         if not new_size:
@@ -211,7 +211,7 @@ class Environment(MiniGridEnv):
                 return (x + x_offset, y + y_offset)
             else:
                 return (x - offset, y - offset)
-        
+
         def is_valid_position(pos, for_door = False):
             x, y = pos
             in_bounds = 1 <= x < new_size - 1 and 1 <= y < new_size - 1
@@ -220,7 +220,7 @@ class Environment(MiniGridEnv):
             else:
                 not_taken = pos not in [p for _, p in new_doors + new_keys + new_walls + new_objs]
             return in_bounds and not_taken
-        
+
         def find_next_available_position(pos, for_door = False):
             for dx in [-1, 0, 1]:
                 for dy in [-1, 0, 1]:
@@ -228,7 +228,7 @@ class Environment(MiniGridEnv):
                     if is_valid_position(new_pos, for_door = for_door):
                         return new_pos
             return None
-        
+
         def calculate_new_wall_assignments(wall_detection):
             num_walls = np.count_nonzero(wall_detection)
             ratios = []
@@ -273,7 +273,7 @@ class Environment(MiniGridEnv):
                 else:
                     new_assignments.append((new_size - 2 - sum([cells for cells, _ in new_assignments]), ratios[-1][1]))
             return new_assignments
-        
+
         def calculate_new_wall_positions(wall_distribution):
             all_sections = []
             non_wall_section = []
@@ -300,7 +300,7 @@ class Environment(MiniGridEnv):
                 else:
                     break
             return all_sections
-        
+
         def fill_new_walls(sections, assignments, is_horizontal_walls):
             sections = flatten_list(sections)
             j = 0
@@ -319,7 +319,7 @@ class Environment(MiniGridEnv):
                         j += 1
                     except IndexError:
                         return
-        
+
         # Handle repositioning of walls
         if size_delta < 0:  # shrinking
             for _, (x, y) in self.walls:
@@ -372,7 +372,7 @@ class Environment(MiniGridEnv):
             new_agent_start_pos = find_next_available_position(new_agent_start_pos)
             if not new_agent_start_pos:
                 raise ValueError("Unable to find suitable positions for all objects when changing room size")
-            
+
         self.doors, self.keys, self.objs, self.walls = new_doors, new_keys, new_objs, new_walls
         self.agent_start_pos = new_agent_start_pos
         self.room_size = new_size
@@ -380,13 +380,13 @@ class Environment(MiniGridEnv):
         self.height = new_size
         self._gen_grid(new_size, new_size)
 
-    
+
     def change_room_orientation(self, rotate_degrees: int = None):
         if not rotate_degrees:
             rotate_degrees = random.choice([90, 180, 270])
         self._gen_rotated_room(rotate_degrees)
         self._gen_grid(self.room_size, self.room_size)
-    
+
 
     def change_target_color(self, new_color1 = None, new_color2 = None):
         assert self.task != Task.CLUSTER, "CLUSTER tasks do not have a singular target color to change"
@@ -405,7 +405,7 @@ class Environment(MiniGridEnv):
                     to.color = new_color1
         self._gen_grid(self.room_size, self.room_size)
 
-    
+
     def hide_targets(self):
         if self.task in [Task.GOTO, Task.PICKUP]:
             if type(self.target_obj) != Box:
@@ -423,7 +423,7 @@ class Environment(MiniGridEnv):
                     self.objs.remove((to, top))
                     self.objs.append((box, top))
         self._gen_grid(self.room_size, self.room_size)
-    
+
 
     def hide_keys(self):
         if len(self.keys) == 0:
@@ -435,7 +435,7 @@ class Environment(MiniGridEnv):
             self.keys.remove((key, pos))
             self.objs.append((box, pos))
         self._gen_grid(self.room_size, self.room_size)
-    
+
 
     def remove_keys(self):
         if len(self.keys) == 0:
@@ -445,7 +445,7 @@ class Environment(MiniGridEnv):
         for door, _ in self.doors:
             door.is_locked = False
         self._gen_grid(self.room_size, self.room_size)
-    
+
 
     def change_field_of_vision(self, new_fov = None):
         if not new_fov:
@@ -453,7 +453,7 @@ class Environment(MiniGridEnv):
         self.agent_view_size = new_fov
         self._gen_grid(self.room_size, self.room_size)
 
-    
+
     def toggle_doors(self):
         if len(self.doors) == 0:
             warnings.warn("Cannot toggle doors for environment without doors")
@@ -461,8 +461,8 @@ class Environment(MiniGridEnv):
         for door, _ in self.doors:
             door.is_locked = not door.is_locked
         self._gen_grid(self.room_size, self.room_size)
-    
-    
+
+
     """
     Private Methods
     """
@@ -506,7 +506,7 @@ class Environment(MiniGridEnv):
             self.agent_dir = self.agent_start_dir
         else:
             self.place_agent()
-    
+
 
     def _gen_rotated_room(self, degrees, ref_env = None):
         room_size = ref_env.room_size if ref_env is not None else self.room_size
@@ -531,7 +531,7 @@ class Environment(MiniGridEnv):
                         self.target_objs_pos[i][j] = delta_func(*self.target_objs_pos[i][j])
             else:
                 self.target_objs_pos = [delta_func(*obj_pos) for obj_pos in self.target_objs_pos]
-        
+
         else:
             ref_objs = ref_env.objs
             ref_walls = ref_env.walls

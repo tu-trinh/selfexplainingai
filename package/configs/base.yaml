@@ -17,8 +17,9 @@ human:
     - toggle
     - done
   world_model:
+    task: PICKUP
     layout: ROOM_DOOR_KEY
-    edits: [NONE]
+    edits: [FLIP_VERTICAL, DOUBLE_GRID_SIZE, CHANGE_TARGET_COLOR, HIDE_TARGETS_IN_BOXES, CHANGE_AGENT_VIEW_SIZE, PUT_AGENT_IN_ROOM, ADD_OPENING_TO_WALL, ADD_DOOR, TOGGLE_DOORS, BLOCK_DOORS]
     seed: 1
     allowed_object_colors: ["green", "blue"]
 ai:
@@ -35,7 +36,8 @@ ai:
     - toggle
     - done
   world_model:
-    layout: ROOM_DOOR_KEY
-    edits: [NONE]
-    seed: 1
+    task: PICKUP
+    layout: TREASURE_ISLAND
+    edits: [FLIP_VERTICAL, DOUBLE_GRID_SIZE, CHANGE_TARGET_COLOR, HIDE_TARGETS_IN_BOXES, CHANGE_AGENT_VIEW_SIZE, PUT_AGENT_ON_ISLAND, ADD_BRIDGE, MAKE_LAVA_SAFE, ADD_FIREPROOF_SHOES, BLOCK_BRIDGES]
+    seed: 23
     allowed_object_colors: ["green", "blue"]

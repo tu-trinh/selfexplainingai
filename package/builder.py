@@ -94,18 +94,27 @@ def make_env(config):
     layout = to_enum(Layout, config.layout)
     edits = [to_enum(Edit, edit) for edit in config.edits]
     cls = create_env_class(task, layout)
-    human_env = cls(
+    env = cls(
         config.seed,
         task,
         layout,
+        edits,
         allowed_object_colors=config.allowed_object_colors,
+        render_mode="human",
     )
+    return env
+
 
 def create_env_class(task: Task, layout: Layout):
     class_name = f"{task.value}_{layout.value}_Env"
     new_class = type(
         class_name,
-        (Environment, task_class_mapping[task], layout_class_mapping[layout]),
+        (
+            Environment,
+            task_class_mapping[task],
+            layout_class_mapping[layout],
+            editor_class_mapping[layout],
+        ),
         {"__init__": _custom_init},
     )
     return new_class
@@ -116,12 +125,13 @@ def _custom_init(
     env_seed: int,
     task: Task,
     layout: Layout,
-    target_obj: WorldObj = None,
-    target_objs: List[WorldObj] = None,
-    disallowed: Dict[Variant, Any] = None,
+    edits: List[Edit],
+    # target_obj: WorldObj = None,
+    # target_objs: List[WorldObj] = None,
+    # disallowed: Dict[Variant, Any] = None,
     allowed_object_colors: List[str] = COLOR_NAMES,
-    max_steps: int = 32,
-    agent_view_size: int = 5,
+    # max_steps: int = None,
+    # agent_view_size: int = None,
     render_mode=None,
     **kwargs,
 ):
@@ -130,24 +140,32 @@ def _custom_init(
         env_seed,
         task,
         layout,
-        target_obj,
-        target_objs,
-        disallowed,
-        allowed_object_colors,
-        max_steps,
-        agent_view_size,
-        render_mode,
+        edits,
+        # target_obj,
+        # target_objs,
+        # disallowed,
+        allowed_object_colors=allowed_object_colors,
+        # max_steps=max_steps,
+        # agent_view_size=agent_view_size,
+        render_mode=render_mode,
         **kwargs,
     )
-    task_cls = task_class_mapping[task]
-    layout_cls = layout_class_mapping[layout]
-    task_cls.__init__(self)
-    layout_cls.__init__(self)
-    self.initialize_layout()
-    self._gen_grid(self.room_size, self.room_size)
-    self.set_mission()
+    task_class_mapping[task].__init__(self)
+    layout_class_mapping[layout].__init__(self)
+    editor_class_mapping[layout].__init__(self)
+
+    print(layout, layout_class_mapping[layout])
+
+    self._init_task()
+    self._init_layout()
+    for e in self.edits:
+        getattr(self, e.value)()
+
+    # self.initialize_layout()
+    # self._gen_grid(self.room_size, self.room_size)
+    # self.set_mission()
     # self.set_allowable_skills()
-    layout_cls.assert_successful_creation(self)
+    # layout_cls.assert_successful_creation(self)
 
 
 """

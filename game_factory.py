@@ -1,5 +1,5 @@
 from package.enums import Task, Level
-from package.game import DiscussionGame
+from package.discussion import Discussion
 from package.infrastructure.config_utils import make_config
 from package.infrastructure.basic_utils import debug, format_seconds
 from package.infrastructure.env_constants import (
@@ -45,8 +45,14 @@ def create_skillset_mismatch_games():
 
     config = make_config(file_path="package/configs/base.yaml")
     print(config)
-    game = DiscussionGame(config)
+    game = Discussion(config)
 
+    game.ai.world_model.reset()
+    print('asfd', game.human.world_model.target_objects[0].color)
+    print('sd', game.human.world_model.width)
+    game.ai.world_model.render()
+
+    input()
     pass
 
 

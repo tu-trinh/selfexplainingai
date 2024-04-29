@@ -49,7 +49,6 @@ def make_config(file_path: str = None, config_str = None):
     config = ConfigDict(**config)
     # some modifications
     config.dict_format = config_dict
-    config.human.world_model.task = config.ai.world_model.task = config.task
     return config
 
 def check(config: Dict):

@@ -8,7 +8,7 @@ from package.message import Message
 from minigrid.minigrid_env import MiniGridEnv
 
 
-class DiscussionGame:
+class Discussion:
     def __init__(self, config: ConfigDict):
         self.human = Human(config.human)
         self.ai = AI(config.ai)

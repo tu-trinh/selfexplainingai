@@ -32,7 +32,7 @@ editor_class_mapping = {
 }
 
 
-class Environment(MiniGridEnv):
+class MindGridEnv(MiniGridEnv):
     def __init__(
         self,
         seed: int,
@@ -72,7 +72,7 @@ class Environment(MiniGridEnv):
         # Unique environment configs
         self.env_id = f"{self.task}-{self.layout}-{self.seed}"
 
-    def reset(self):
+    def reset(self, seed=None, options=None):
 
         self._gen_grid(self.width, self.height)
 
@@ -172,3 +172,14 @@ class Environment(MiniGridEnv):
         obs = self.gen_obs()
 
         return obs, reward, terminated, truncated, {}
+
+    def gen_simple_2d_map(self):
+        ret = np.zeros((self.width, self.height), dtype=np.int32)
+        for i in range(self.width):
+            for j in range(self.height):
+                o = self.grid.get(i, j)
+                if o is not None:
+                    ret[i][j] = int(isinstance(o, Lava) or not o.can_overlap())
+        return ret
+
+

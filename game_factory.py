@@ -48,9 +48,8 @@ def create_skillset_mismatch_games():
     game = Discussion(config)
 
     game.ai.world_model.reset()
-    print('asfd', game.human.world_model.target_objects[0].color)
-    print('sd', game.human.world_model.width)
     game.ai.world_model.render()
+    #print(game.ai.world_model.gen_navigation_map())
 
     input()
     pass

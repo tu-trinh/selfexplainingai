@@ -10,7 +10,7 @@ class EnvironmentWrapper:
         self.arguments = arguments
         if env is not None:
             self.seeds_and_envs[env.env_seed] = env
-    
+
 
     def reset(self, seed: int):
         for s, e in self.seeds_and_envs.items():
@@ -21,7 +21,7 @@ class EnvironmentWrapper:
         sprout.bind_wrapper(self)
         self.seeds_and_envs[seed] = sprout
         return sprout.reset()
-    
+
 
     def retrieve_seeded_env(self, seed: int):
         return self.seeds_and_envs[seed]

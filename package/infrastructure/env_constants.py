@@ -6,9 +6,15 @@ from minigrid.core.constants import OBJECT_TO_IDX, IDX_TO_OBJECT, COLORS, COLOR_
 import numpy as np
 
 
+VEC_TO_DIR = {(1, 0): 0, (0, 1): 1, (-1, 0): 2, (0, -1): 3}
+DIR_TO_VEC = {0: (1, 0), 1: (0, 1), 2: (-1, 0), 3: (0, -1)}
+
 OBJECT_TO_IDX["heavy_door"] = 11
 OBJECT_TO_IDX["bridge"] = 12
 OBJECT_TO_IDX["fireproof_shoes"] = 13
+OBJECT_TO_IDX["hammer"] = 14
+OBJECT_TO_IDX["passage"] = 15
+
 IDX_TO_OBJECT = {v: k for k, v in OBJECT_TO_IDX.items()}
 
 COLORS["brown"] = np.array([119, 70, 20])
@@ -25,9 +31,9 @@ IDX_TO_DIR = {
 }
 ACTION_TO_IDX = {
     "left": 0,
-    "right": 1, 
+    "right": 1,
     "forward": 2,
-    "pickup": 3, 
+    "pickup": 3,
     "drop": 4,
     "toggle": 5
 }

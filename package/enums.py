@@ -37,22 +37,17 @@ class Edit(Enum):
     CHANGE_TARGET_COLOR = "change_target_color"
     HIDE_TARGETS_IN_BOXES = "hide_targets_in_boxes"
     CHANGE_AGENT_VIEW_SIZE = "change_agent_view_size"
-
-    # room_door_key only
-    PUT_AGENT_IN_ROOM = "put_agent_in_room"
-    ADD_OPENING_TO_WALL = "add_opening_to_wall"
-    ADD_DOOR = "add_door"
-    HIDE_KEY_IN_BOX = "hide_key_in_box"
-    REMOVE_KEY = "remove_key"
-    BLOCK_DOORS = "block_doors"
-    TOGGLE_DOORS = "toggle_doors"
+    ADD_OPENING = "add_opening"
+    TOGGLE_OPENING = "toggle_opening"
+    ADD_PASSAGE = "add_passage"
+    BLOCK_OPENING = "block_opening"
+    PUT_AGENT_INSIDE_SECTION = "put_agent_inside_section"
+    HIDE_TOOL_IN_BOX = "hide_tool_in_box"
+    REMOVE_TOOL = "remove_tool"
 
     # treasure_island only
-    PUT_AGENT_ON_ISLAND = "put_agent_on_island"
-    ADD_BRIDGE = "add_bridge"
     MAKE_LAVA_SAFE = "make_lava_safe"
     ADD_FIREPROOF_SHOES = "add_fireproof_shoes"
-    BLOCK_BRIDGES = "block_bridges"
 
     @classmethod
     def has_value(cls, value):

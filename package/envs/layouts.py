@@ -1,5 +1,5 @@
 from package.enums import Variant, Task, Layout
-from package.envs.modifications import HeavyDoor, Bridge, FireproofShoes
+from package.envs.modifications import DoorWithDirection, Bridge, FireproofShoes, Hammer
 from package.infrastructure.env_constants import MAX_NUM_LOCKED_DOORS
 from package.infrastructure.obj_constants import (
     TANGIBLE_OBJS,
@@ -13,7 +13,7 @@ from package.infrastructure.basic_utils import (
     get_adjacent_cells,
 )
 
-from minigrid.core.world_object import WorldObj, Door, Key, Goal, Wall, Lava, Box, Ball
+from minigrid.core.world_object import WorldObj, Key, Goal, Wall, Lava, Box, Ball
 from minigrid.wrappers import NoDeath
 
 import numpy as np
@@ -33,43 +33,33 @@ class BaseLayout(ABC):
         self, obstacle_cls: bool = None
     ) -> Tuple[set[Tuple[int, int]], set[Tuple[int, int]]]:
 
-        on_left = 0
-        on_top = 0
-        horizontal_length = self.random.randint(3, self.width - 4)
-        vertical_length = self.random.randint(3, self.height - 4)
-        if on_top:
-            row = vertical_length
-            y_lb = 1
-        else:
-            row = self.height - 1 - vertical_length
-            y_lb = row
-        y_ub = y_lb + vertical_length
-        if on_left:
-            col = horizontal_length
-            x_lb = 1
-        else:
-            col = self.width - 1 - horizontal_length
-            x_lb = col
-        x_ub = x_lb + horizontal_length
+        assert self.obstacle_thickness == 1
 
-        obstacle_cells = [(x, row) for x in range(x_lb, x_ub)] + [
-            (col, y) for y in range(y_lb, y_ub)
-        ]
+        section_height = self.random.randint(3, self.width - 4)
+        section_width = self.random.randint(3, self.height - 4)
+
+        # section is always at the BOTTOM RIGHT corner
+        y_min = self.height - 1 - section_height
+        y_max = self.height - 1
+        x_min = self.width - 1 - section_width
+        x_max = self.width - 1
+
+        self.divider_cells = set(
+            [(x, y_min) for x in range(x_min, x_max)]
+            + [(x_min, y) for y in range(y_min, y_max)]
+        )
         self.obstacles = []
-        self.obstacle_positions = set()
-        for pos in obstacle_cells:
+        for pos in self.divider_cells:
             self.obstacles.append(self.obstacle_cls())
             self.obstacles[-1].init_pos = pos
-            self.obstacle_positions.add(pos)
-        self.all_possible_pos -= set(obstacle_cells)
+        self.all_possible_pos -= self.divider_cells
 
         self.inner_cells = set()
         self.outer_cells = set()
-        t = self.obstacle_thickness
         for x, y in self.all_possible_pos:
-            if x_lb + t <= x <= x_ub - t and y_lb + t <= y <= y_ub - t:
+            if x_min + 1 <= x <= x_max - 1 and y_min + 1 <= y <= y_max - 1:
                 self.inner_cells.add((x, y))
-            if not (x_lb <= x <= x_ub - t and y_lb <= y <= y_ub - t):
+            if not (x_min <= x <= x_max and y_min <= y <= y_max):
                 self.outer_cells.add((x, y))
 
     def _set_agent_position(self, allowed_positions: set = None) -> None:
@@ -143,7 +133,8 @@ class RoomDoorKeyLayout(BaseLayout):
         self._set_agent_position(self.outer_cells)
 
         # key must be outside room
-        self.keys = []
+        self.tools = self.keys = []
+        self.tool_cls = Key
         key_pos = self.random.choice(list(self.outer_cells))
         self.all_possible_pos -= set([key_pos]) | get_adjacent_cells(key_pos)
         self.keys.append(Key(color=self.doors[-1].color))
@@ -160,9 +151,11 @@ class RoomDoorKeyLayout(BaseLayout):
         )
 
     def _add_door(self):
-        self.doors = []
+        self.openings = self.doors = []
+        self.opening_cls = DoorWithDirection
+        # pick door position
         valid_pos = []
-        for pos in list(self.obstacle_positions):
+        for pos in list(self.divider_cells):
             adj_cells = get_adjacent_cells(pos, ret_as_list=True)
             left, right, above, below = (
                 adj_cells[1],
@@ -170,23 +163,36 @@ class RoomDoorKeyLayout(BaseLayout):
                 adj_cells[2],
                 adj_cells[3],
             )
-            if (
-                left in self.obstacle_positions and right in self.obstacle_positions
-            ) or (
-                above in self.obstacle_positions and below in self.obstacle_positions
+            if (left in self.divider_cells and right in self.divider_cells) or (
+                above in self.divider_cells and below in self.divider_cells
             ):
                 valid_pos.append(pos)
         pos = self.random.choice(valid_pos)
+
+        # find direction vector of door
+        for i in [-1, 0, 1]:
+            for j in [-1, 0, 1]:
+                if (i == 0 or j == 0) and not (i == 0 and j == 0):
+                    n_pos = (pos[0] + i, pos[1] + j)
+                    if n_pos in self.inner_cells:
+                        dir_vec = (i, j)
         # doors can't be open and locked (1, 1)
         door_state = self.random.choice(((0, 0), (0, 1), (1, 0)))
         self.doors.append(
-            Door(
+            self.opening_cls(
+                self.random.choice(self.allowed_object_colors),
+                dir_vec,
                 is_open=door_state[0],
                 is_locked=door_state[1],
-                color=self.random.choice(self.allowed_object_colors),
             ),
         )
         self.doors[-1].init_pos = pos
+
+        for i, o in enumerate(self.obstacles):
+            if o.init_pos == pos:
+                del self.obstacles[i]
+                break
+
         self.all_possible_pos -= get_adjacent_cells(pos)
 
 
@@ -216,6 +222,14 @@ class TreasureIslandLayout(BaseLayout):
         # agent starts from outside island
         self._set_agent_position(self.outer_cells)
 
+        # hammer must be outside room
+        self.tools = self.hammers = []
+        self.tool_cls = Hammer
+        hammer_pos = self.random.choice(list(self.outer_cells))
+        self.all_possible_pos -= set([hammer_pos]) | get_adjacent_cells(hammer_pos)
+        self.hammers.append(Hammer())
+        self.hammers[-1].init_pos = hammer_pos
+
         # target object position (before editting, there is only one target)
         self._set_target_position(self.inner_cells)
 
@@ -225,9 +239,10 @@ class TreasureIslandLayout(BaseLayout):
         self.objects = self.bridges + self.target_objects + self.distractor_objects
 
     def _add_bridge(self):
-        self.bridges = []
+        self.openings = self.bridges = []
+        self.opening_cls = Bridge
         valid_pos = []
-        for pos in list(self.obstacle_positions):
+        for pos in list(self.divider_cells):
             adj_cells = get_adjacent_cells(pos, ret_as_list=True)
             left, right, above, below = (
                 adj_cells[1],
@@ -235,13 +250,20 @@ class TreasureIslandLayout(BaseLayout):
                 adj_cells[2],
                 adj_cells[3],
             )
-            if (
-                left in self.obstacle_positions and right in self.obstacle_positions
-            ) or (
-                above in self.obstacle_positions and below in self.obstacle_positions
+            if (left in self.divider_cells and right in self.divider_cells) or (
+                above in self.divider_cells and below in self.divider_cells
             ):
                 valid_pos.append(pos)
         pos = self.random.choice(valid_pos)
-        self.bridges.append(Bridge())
+
+        # find direction vector of bridge
+        for i in [-1, 0, 1]:
+            for j in [-1, 0, 1]:
+                if (i == 0 or j == 0) and not (i == 0 and j == 0):
+                    n_pos = (pos[0] + i, pos[1] + j)
+                    if n_pos in self.inner_cells:
+                        dir_vec = (i, j)
+
+        self.bridges.append(self.opening_cls(dir_vec))
         self.bridges[-1].init_pos = pos
         self.all_possible_pos -= get_adjacent_cells(pos)

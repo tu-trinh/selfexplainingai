@@ -13,6 +13,7 @@ from package.envs.env_wrapper import EnvironmentWrapper
 
 from minigrid.manual_control import ManualControl
 from minigrid.minigrid_env import MiniGridEnv
+from minigrid.wrappers import ImgObsWrapper, FullyObsWrapper
 
 from typing import List, Dict, Any
 import yaml
@@ -88,7 +89,7 @@ def make_env(config):
     assert Task.has_value(config.task), "Task name {config.task} is invalid!"
     assert Layout.has_value(config.layout), "Layout name {config.layout} is invalid!"
     for edit in config.edits:
-        assert Edit.has_value(edit), "Edit name {edit} is invalid!"
+        assert Edit.has_value(edit), f"Edit name {edit} is invalid!"
 
     task = to_enum(Task, config.task)
     layout = to_enum(Layout, config.layout)
@@ -102,6 +103,7 @@ def make_env(config):
         allowed_object_colors=config.allowed_object_colors,
         render_mode="human",
     )
+    #env = ImgObsWrapper(env)
     return env
 
 
@@ -110,7 +112,7 @@ def create_env_class(task: Task, layout: Layout):
     new_class = type(
         class_name,
         (
-            Environment,
+            MindGridEnv,
             task_class_mapping[task],
             layout_class_mapping[layout],
             editor_class_mapping[layout],
@@ -135,7 +137,7 @@ def _custom_init(
     render_mode=None,
     **kwargs,
 ):
-    Environment.__init__(
+    MindGridEnv.__init__(
         self,
         env_seed,
         task,
@@ -154,18 +156,10 @@ def _custom_init(
     layout_class_mapping[layout].__init__(self)
     editor_class_mapping[layout].__init__(self)
 
-    print(layout, layout_class_mapping[layout])
-
     self._init_task()
     self._init_layout()
     for e in self.edits:
         getattr(self, e.value)()
-
-    # self.initialize_layout()
-    # self._gen_grid(self.room_size, self.room_size)
-    # self.set_mission()
-    # self.set_allowable_skills()
-    # layout_cls.assert_successful_creation(self)
 
 
 """

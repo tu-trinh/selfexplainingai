@@ -5,6 +5,14 @@ from enum import Enum
 from typing import Union, List, Tuple, Dict
 
 
+class CustomEnum(Enum):
+
+    @classmethod
+    def has_value(cls, value):
+        if isinstance(value, Enum):
+            return value in cls
+        return any(value == item.name for item in cls)
+
 def format_seconds(seconds: int) -> str:
     hours, remainder = divmod(seconds, 3600)
     minutes, seconds = divmod(remainder, 60)

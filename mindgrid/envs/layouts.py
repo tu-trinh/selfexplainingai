@@ -1,26 +1,18 @@
-from package.enums import Variant, Task, Layout
-from package.envs.modifications import DoorWithDirection, Bridge, FireproofShoes, Hammer
-from package.infrastructure.env_constants import MAX_NUM_LOCKED_DOORS
-from package.infrastructure.obj_constants import (
-    TANGIBLE_OBJS,
-    PLAYABLE_OBJS,
-    DISTRACTOR_OBJS,
-)
-from package.infrastructure.basic_utils import (
-    flatten_list,
-    debug,
-    get_diagonally_adjacent_cells,
-    get_adjacent_cells,
-)
+from __future__ import annotations
 
-from minigrid.core.world_object import WorldObj, Key, Goal, Wall, Lava, Box, Ball
-from minigrid.wrappers import NoDeath
-
-import numpy as np
-import random
-import copy
+from abc import ABC
 from typing import List, Tuple, Type
-from abc import ABC, abstractmethod
+
+from minigrid.core.world_object import Ball, Key, Lava, Wall
+
+from mindgrid.envs.editors import Edit, RoomDoorKeyEditor, TreasureIslandEditor
+from mindgrid.envs.objects import Bridge, DoorWithDirection, Hammer
+from mindgrid.envs.solvers import RoomDoorKeySolver, TreasureIslandSolver
+from mindgrid.infrastructure.basic_utils import (
+    CustomEnum,
+    get_adjacent_cells,
+    get_diagonally_adjacent_cells,
+)
 
 
 class BaseLayout(ABC):
@@ -28,6 +20,10 @@ class BaseLayout(ABC):
     def _init_layout(self):
         self.agent_dir = self.random.randint(0, 3)
         self.obstacle_thickness = 1
+
+    def edit(self, edits: List[Edit]):
+        for e in edits:
+            getattr(self, e.value)()
 
     def _generate_rectangular_section(
         self, obstacle_cls: bool = None
@@ -109,6 +105,8 @@ class BaseLayout(ABC):
 class RoomDoorKeyLayout(BaseLayout):
 
     layout_name = "room_door_key"
+    editor = RoomDoorKeyEditor
+    solver = RoomDoorKeySolver
 
     def _init_layout(self):
 
@@ -199,6 +197,8 @@ class RoomDoorKeyLayout(BaseLayout):
 class TreasureIslandLayout(BaseLayout):
 
     layout_name = "treasure_island"
+    editor = TreasureIslandEditor
+    solver = TreasureIslandSolver
 
     def _init_layout(self):
 
@@ -236,7 +236,9 @@ class TreasureIslandLayout(BaseLayout):
         # generator distractors
         self._make_distractor_objects([Ball, Wall])
 
-        self.objects = self.bridges + self.target_objects + self.distractor_objects
+        self.objects = (
+            self.bridges + self.hammers + self.target_objects + self.distractor_objects
+        )
 
     def _add_bridge(self):
         self.openings = self.bridges = []
@@ -267,3 +269,9 @@ class TreasureIslandLayout(BaseLayout):
         self.bridges.append(self.opening_cls(dir_vec))
         self.bridges[-1].init_pos = pos
         self.all_possible_pos -= get_adjacent_cells(pos)
+
+
+class Layout(CustomEnum):
+
+    ROOM_DOOR_KEY = RoomDoorKeyLayout
+    TREASURE_ISLAND = TreasureIslandLayout

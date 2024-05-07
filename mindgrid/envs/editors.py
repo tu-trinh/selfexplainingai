@@ -1,12 +1,11 @@
-from package.infrastructure.basic_utils import get_adjacent_cells
-from package.envs.modifications import Bridge, Hammer, FireproofShoes, SafeLava, Passage, DoorWithDirection
-
-from minigrid.core.world_object import WorldObj, Wall, Box, Key, Ball, Goal
-from minigrid.core.grid import Grid
-
-import numpy as np
+from __future__ import annotations
 
 from typing import List
+
+from minigrid.core.world_object import Ball, Box, WorldObj
+
+from mindgrid.envs.objects import Bridge, FireproofShoes, Passage, SafeLava
+from mindgrid.infrastructure.basic_utils import CustomEnum, get_adjacent_cells
 
 
 class BaseEditor:
@@ -51,12 +50,14 @@ class BaseEditor:
                 self.objects.append(o)
                 continue
 
-            expand_cells = set([
-                (o.init_pos[0] + 0, o.init_pos[1] + 0),
-                (o.init_pos[0] + 1, o.init_pos[1] + 0),
-                (o.init_pos[0] + 0, o.init_pos[1] + 1),
-                (o.init_pos[0] + 1, o.init_pos[1] + 1),
-            ])
+            expand_cells = set(
+                [
+                    (o.init_pos[0] + 0, o.init_pos[1] + 0),
+                    (o.init_pos[0] + 1, o.init_pos[1] + 0),
+                    (o.init_pos[0] + 0, o.init_pos[1] + 1),
+                    (o.init_pos[0] + 1, o.init_pos[1] + 1),
+                ]
+            )
 
             for c in expand_cells:
                 cc = (c[0] + o.dir_vec[0], c[1] + o.dir_vec[1])
@@ -102,9 +103,7 @@ class BaseEditor:
 
         for o in self.objects:
             if hasattr(o, "dir_vec"):
-                print(o.dir_vec)
                 o.dir_vec = (-o.dir_vec[0], o.dir_vec[1])
-                print(o.dir_vec)
 
         return None
 
@@ -162,7 +161,21 @@ class BaseEditor:
         return removed_obstacles
 
     def block_opening(self):
-        o = self.random.choice(self.openings)
+        # find an opening that is not yet blocked
+        free_openings = []
+        for o in self.openings:
+            is_blocked = False
+            for oo in self.objects:
+                if oo.cur_pos in self.outer_cells and oo.cur_pos in get_adjacent_cells(
+                    o
+                ):
+                    is_blocked = True
+                    break
+            if not is_blocked:
+                free_openings.append(o)
+        if not free_openings:
+            return None
+        o = self.random.choice(free_openings)
         for n in get_adjacent_cells(o.init_pos):
             if n in self.outer_cells:
                 color = self.random.choice(
@@ -275,7 +288,6 @@ class BaseEditor:
 
 class RoomDoorKeyEditor(BaseEditor):
 
-
     def add_opening(self):
         # find cell to put door
         removed_obstacles, dir = self._try_drill_a_hole()
@@ -289,7 +301,6 @@ class RoomDoorKeyEditor(BaseEditor):
                 break
         assert pos is not None
 
-        print(pos, dir)
         # doors can't be open and locked (1, 1)
         door_state = self.random.choice(((0, 0), (0, 1), (1, 0)))
         door = self.opening_cls(
@@ -368,3 +379,24 @@ class TreasureIslandEditor(BaseEditor):
         self.objects.append(shoes)
         return shoes
 
+
+class Edit(CustomEnum):
+
+    # applicable to all environments
+    NONE = "none"
+    DOUBLE_GRID_SIZE = "double_grid_size"
+    FLIP_VERTICAL = "flip_vertical"
+    CHANGE_TARGET_COLOR = "change_target_color"
+    HIDE_TARGETS_IN_BOXES = "hide_targets_in_boxes"
+    CHANGE_AGENT_VIEW_SIZE = "change_agent_view_size"
+    ADD_OPENING = "add_opening"
+    TOGGLE_OPENING = "toggle_opening"
+    ADD_PASSAGE = "add_passage"
+    BLOCK_OPENING = "block_opening"
+    PUT_AGENT_INSIDE_SECTION = "put_agent_inside_section"
+    HIDE_TOOL_IN_BOX = "hide_tool_in_box"
+    REMOVE_TOOL = "remove_tool"
+
+    # treasure_island only
+    MAKE_LAVA_SAFE = "make_lava_safe"
+    ADD_FIREPROOF_SHOES = "add_fireproof_shoes"

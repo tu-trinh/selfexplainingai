@@ -1,5 +1,5 @@
-from package.agents import Human, AI
-from package.infrastructure.config_utils import ConfigDict
+from mindgrid.agents import Human, AI
+from mindgrid.infrastructure.config_utils import ConfigDict
 
 
 class Discussion:

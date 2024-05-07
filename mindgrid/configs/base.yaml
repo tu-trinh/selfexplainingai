@@ -1,0 +1,43 @@
+task: PICKUP
+roles: 
+  executor: human
+  observer: ai
+  solver: ai
+human:
+  model_source: gpt
+  query_source: openai
+  preference:
+    - reward_carry_object_hof: 1
+  skillset:
+    - left
+    - right
+    - forward
+    - pickup
+    - drop
+    - toggle
+    - done
+  world_model:
+    task: PICKUP
+    layout: ROOM_DOOR_KEY
+    edits: [DOUBLE_GRID_SIZE, HIDE_TARGETS_IN_BOXES, CHANGE_TARGET_COLOR, BLOCK_OPENING, BLOCK_OPENING, TOGGLE_OPENING, TOGGLE_OPENING, TOGGLE_OPENING] #[FLIP_VERTICAL, DOUBLE_GRID_SIZE, CHANGE_TARGET_COLOR, HIDE_TARGETS_IN_BOXES, CHANGE_AGENT_VIEW_SIZE, PUT_AGENT_IN_ROOM, ADD_OPENING_TO_WALL, ADD_DOOR, TOGGLE_DOOR, BLOCK_DOOR]
+    seed: 35
+    allowed_object_colors: ["green", "blue"]
+ai:
+  model_source: gpt
+  query_source: openai
+  preference:
+    - reward_carry_object_hof: 1
+  skillset:
+    - left
+    - right
+    - forward
+    - pickup
+    - drop
+    - toggle
+    - done
+  world_model:
+    task: PICKUP
+    layout: TREASURE_ISLAND
+    edits: [DOUBLE_GRID_SIZE, FLIP_VERTICAL, HIDE_TARGETS_IN_BOXES, CHANGE_TARGET_COLOR, TOGGLE_OPENING, HIDE_TOOL_IN_BOX, ADD_FIREPROOF_SHOES, BLOCK_OPENING]  #[FLIP_VERTICAL, DOUBLE_GRID_SIZE, CHANGE_TARGET_COLOR, HIDE_TARGETS_IN_BOXES, CHANGE_AGENT_VIEW_SIZE, PUT_AGENT_ON_ISLAND, ADD_BRIDGE, ADD_FIREPROOF_SHOES, BLOCK_BRIDGE, MAKE_LAVA_SAFE, ADD_TOOL, BREAK_BRIDGE]
+    seed: 52
+    allowed_object_colors: ["green", "blue"]

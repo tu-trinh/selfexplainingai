@@ -1,35 +1,17 @@
-from package.enums import Task, Layout, Edit
-from package.envs.tasks import *
-from package.envs.layouts import *
-from package.envs.editors import *
-from package.envs.modifications import FireproofShoes
-from package.envs.env_wrapper import EnvironmentWrapper
-from package.skills import *
-from package.infrastructure.env_constants import IDX_TO_OBJECT, IDX_TO_COLOR
-from package.infrastructure.basic_utils import debug
+from __future__ import annotations
 
-from minigrid.minigrid_env import MiniGridEnv
-from minigrid.core.grid import Grid
-from minigrid.wrappers import FullyObsWrapper
-from minigrid.core.world_object import Wall, Box, WorldObj, Door
-
-from typing import Dict, Any
-import numpy as np
 import random
-import warnings
+from typing import List
 
+import numpy as np
+from minigrid.core.grid import Grid
+from minigrid.minigrid_env import MiniGridEnv
 
-task_class_mapping = {
-    Task.PICKUP: PickUpTask,
-}
-layout_class_mapping = {
-    Layout.ROOM_DOOR_KEY: RoomDoorKeyLayout,
-    Layout.TREASURE_ISLAND: TreasureIslandLayout,
-}
-editor_class_mapping = {
-    Layout.ROOM_DOOR_KEY: RoomDoorKeyEditor,
-    Layout.TREASURE_ISLAND: TreasureIslandEditor,
-}
+from mindgrid.envs.editors import Edit
+from mindgrid.envs.layouts import Layout
+from mindgrid.envs.objects import FireproofShoes
+from mindgrid.envs.tasks import Task
+from mindgrid.infrastructure.env_constants import COLOR_NAMES
 
 
 class MindGridEnv(MiniGridEnv):
@@ -40,7 +22,7 @@ class MindGridEnv(MiniGridEnv):
         layout: Layout,
         edits: List[Edit],
         allowed_object_colors: List[str] = COLOR_NAMES,
-        max_steps: int = 32,
+        max_steps: int = 1000,
         agent_view_size: int = 5,
         render_mode=None,
         **kwargs,
@@ -57,8 +39,7 @@ class MindGridEnv(MiniGridEnv):
         self.is_single_target = True
 
         # Generate task mission space and super init
-        task_class = task_class_mapping[self.task]
-        mission_space = task_class.mission_space
+        mission_space = task.value.mission_space
         super().__init__(
             mission_space=mission_space,
             grid_size=self.room_size,
@@ -129,10 +110,17 @@ class MindGridEnv(MiniGridEnv):
             if fwd_cell is not None and fwd_cell.type == "goal":
                 terminated = True
                 reward = self._reward()
-            # IMPORTANT: terminte when stepping into lava only when without fireproof shoes
+            # NOTE: terminte when stepping into lava only when without fireproof shoes
             if fwd_cell is not None and (
                 fwd_cell.type == "lava"
                 and not isinstance(self.carrying, FireproofShoes)
+            ):
+                terminated = True
+            # NOTE: terminate when bridge is broken
+            if (
+                fwd_cell is not None
+                and fwd_cell.type == "bridge"
+                and not fwd_cell.is_intact
             ):
                 terminated = True
 
@@ -141,14 +129,14 @@ class MindGridEnv(MiniGridEnv):
             if fwd_cell and fwd_cell.can_pickup():
                 if self.carrying is None:
                     self.carrying = fwd_cell
-                    self.carrying.cur_pos = np.array([-1, -1])
+                    self.carrying.cur_pos = (-1, -1)
                     self.grid.set(fwd_pos[0], fwd_pos[1], None)
 
         # Drop an object
         elif action == self.actions.drop:
             if not fwd_cell and self.carrying:
                 self.grid.set(fwd_pos[0], fwd_pos[1], self.carrying)
-                self.carrying.cur_pos = fwd_pos
+                self.carrying.cur_pos = tuple(fwd_pos)
                 self.carrying = None
 
         # Toggle/activate an object
@@ -179,7 +167,19 @@ class MindGridEnv(MiniGridEnv):
             for j in range(self.height):
                 o = self.grid.get(i, j)
                 if o is not None:
-                    ret[i][j] = int(isinstance(o, Lava) or not o.can_overlap())
+                    ret[i][j] = not o.can_overlap()
+                    if o.type == "bridge":
+                        ret[i][j] = not o.is_intact
+                    if o.type == "lava":
+                        ret[i][j] = not isinstance(self.carrying, FireproofShoes)
         return ret
 
+    def get_state(self):
+        pass
 
+
+class MindGridEnvState:
+
+    def __init__(self, env: MindGridEnv):
+
+        pass

@@ -1,8 +1,7 @@
-from package.enums import Task, Level
-from package.discussion import Discussion
-from package.infrastructure.config_utils import make_config
-from package.infrastructure.basic_utils import debug, format_seconds
-from package.infrastructure.env_constants import (
+from mindgrid.discussion import Discussion
+from mindgrid.infrastructure.config_utils import make_config
+from mindgrid.infrastructure.basic_utils import debug, format_seconds
+from mindgrid.infrastructure.env_constants import (
     COLOR_NAMES,
     MIN_ROOM_SIZE,
     MAX_ROOM_SIZE,
@@ -43,7 +42,7 @@ def split_attributes(
 
 def create_skillset_mismatch_games():
 
-    config = make_config(file_path="package/configs/base.yaml")
+    config = make_config(file_path="mindgrid/configs/base.yaml")
     print(config)
     game = Discussion(config)
 
@@ -61,13 +60,5 @@ if __name__ == "__main__":
     COLORS = split_attributes(COLOR_NAMES)
     # TODO: what is the min value for steps?
     STEPS = split_attributes(list(range(2, MAX_ROOM_SIZE - 1)))
-
-    task_to_pref_mapping = {
-        Task.GOTO: "reward_reach_object_hof",
-        Task.PICKUP: "reward_carry_object_hof",
-        Task.PUT: "reward_adjacent_object_hof",
-        Task.COLLECT: "reward_adjacent_object_hof",
-        Task.CLUSTER: "reward_adjacent_object_hof",
-    }
 
     create_skillset_mismatch_games()

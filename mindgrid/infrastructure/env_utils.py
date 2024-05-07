@@ -1,10 +1,16 @@
-from package.infrastructure.env_constants import IDX_TO_OBJECT, IDX_TO_COLOR, IDX_TO_STATE, IDX_TO_DIR, AGENT_VIEW_SIZE, NUM_TO_WORD, NUM_TO_ORDERING
-
-from minigrid.minigrid_env import MiniGridEnv
-from minigrid.core.world_object import WorldObj
+from collections import deque
+from typing import Dict, List, Union
 
 import numpy as np
-from typing import Union, List, Dict
+from minigrid.core.actions import Actions
+from minigrid.core.world_object import WorldObj
+from minigrid.minigrid_env import MiniGridEnv
+
+from mindgrid.infrastructure.env_constants import (AGENT_VIEW_SIZE, DIR_TO_VEC,
+                                                   IDX_TO_COLOR, IDX_TO_DIR,
+                                                   IDX_TO_OBJECT, IDX_TO_STATE,
+                                                   NUM_TO_ORDERING,
+                                                   NUM_TO_WORD)
 
 
 def get_unit_desc(cell: Union[np.ndarray, List]) -> str:
@@ -30,7 +36,14 @@ def get_unit_desc(cell: Union[np.ndarray, List]) -> str:
     return desc
 
 
-def get_unit_location_desc(desc: str, img_row: int, img_col: int, left: bool = False, backwards: bool = False, right: bool = False) -> str:
+def get_unit_location_desc(
+    desc: str,
+    img_row: int,
+    img_col: int,
+    left: bool = False,
+    backwards: bool = False,
+    right: bool = False,
+) -> str:
     """
     Gets location-grounded descriptor phrase for a singular cell
     """
@@ -93,7 +106,14 @@ def get_unit_location_desc(desc: str, img_row: int, img_col: int, left: bool = F
     return loc_desc
 
 
-def get_obs_desc(obs: Dict, left_obs: Dict = None, backwards_obs: Dict = None, right_obs: Dict = None, detail: int = 3, carrying: WorldObj = None) -> str:
+def get_obs_desc(
+    obs: Dict,
+    left_obs: Dict = None,
+    backwards_obs: Dict = None,
+    right_obs: Dict = None,
+    detail: int = 3,
+    carrying: WorldObj = None,
+) -> str:
     """
     Detail levels:
     0 - TODO: list objects in the field of vision, grouped
@@ -147,21 +167,21 @@ def get_obs_desc(obs: Dict, left_obs: Dict = None, backwards_obs: Dict = None, r
                 for c in range(2):  # leave out the center overlaps
                     desc = get_unit_desc(img[r][c])
                     if "unknown" not in desc and "floor" not in desc:
-                        objs.append(get_unit_location_desc(desc, r, c, left = True))
+                        objs.append(get_unit_location_desc(desc, r, c, left=True))
         if backwards_obs is not None:
             img = backwards_obs["image"]
             for r in range(len(img)):
                 for c in range(len(img[0]) - 1):  # leave out the overlapping row
                     desc = get_unit_desc(img[r][c])
                     if "unknown" not in desc and "floor" not in desc:
-                        objs.append(get_unit_location_desc(desc, r, c, backwards = True))
+                        objs.append(get_unit_location_desc(desc, r, c, backwards=True))
         if right_obs is not None:
             img = right_obs["image"]
             for r in range(len(img)):
                 for c in range(2):  # leave out the center overlaps
                     desc = get_unit_desc(img[r][c])
                     if "unknown" not in desc and "floor" not in desc:
-                        objs.append(get_unit_location_desc(desc, r, c, right = True))
+                        objs.append(get_unit_location_desc(desc, r, c, right=True))
         if len(objs) > 0:
             if len(objs) == 1:
                 description += f" {objs[0]}."
@@ -176,7 +196,7 @@ def get_obs_desc(obs: Dict, left_obs: Dict = None, backwards_obs: Dict = None, r
     if detail == 3:
         description = f"You are facing {IDX_TO_DIR[obs['direction']]}. Your field of vision is a {AGENT_VIEW_SIZE}x{AGENT_VIEW_SIZE} square in which you are located at the bottom middle. In the following description, an \"unknown cell\" is one for which your vision is blocked, so you can't tell what is there. "
         img = obs["image"]
-        
+
         direct_left = get_unit_desc(img[1][4])
         farther_left = get_unit_desc(img[0][4])
         direct_right = get_unit_desc(img[3][4])
@@ -195,14 +215,20 @@ def get_obs_desc(obs: Dict, left_obs: Dict = None, backwards_obs: Dict = None, r
             description += f"Directly to your right is {direct_right}. "
             # if farther_right != "empty floor":
             description += f"Two cells to your right is {farther_right}. "
-        
+
         direct_front = get_unit_desc(img[2][3])
-        
-        for viewed_row in range(AGENT_VIEW_SIZE - 2, -1, -1):  # this is actually a column in the img
-            objs = np.array([get_unit_desc(img[i][viewed_row]) for i in range(AGENT_VIEW_SIZE)])
+
+        for viewed_row in range(
+            AGENT_VIEW_SIZE - 2, -1, -1
+        ):  # this is actually a column in the img
+            objs = np.array(
+                [get_unit_desc(img[i][viewed_row]) for i in range(AGENT_VIEW_SIZE)]
+            )
             if all(objs == "an unknown cell"):
                 if viewed_row == AGENT_VIEW_SIZE - 2:
-                    description += f"You cannot see what is in the row in front of you. "
+                    description += (
+                        f"You cannot see what is in the row in front of you. "
+                    )
                 else:
                     description += f"You cannot see {AGENT_VIEW_SIZE - 1 - viewed_row} rows in front of you. "
             # elif not all(objs == "empty floor"):
@@ -217,7 +243,7 @@ def get_obs_desc(obs: Dict, left_obs: Dict = None, backwards_obs: Dict = None, r
                         counter += 1
                         if objs[i] not in processed_set:
                             if "floor" not in row_view[-1]:
-                                row_view[-1]  = " ".join(row_view[-1].split()[1:]) + "s"
+                                row_view[-1] = " ".join(row_view[-1].split()[1:]) + "s"
                             processed_set.add(objs[i])
                     elif objs[i] != prev_obj:
                         if counter > 1:
@@ -237,17 +263,17 @@ def get_obs_desc(obs: Dict, left_obs: Dict = None, backwards_obs: Dict = None, r
                     description += f" (the {' '.join(direct_front.split()[1:])} is directly in front of you). "
                 else:
                     description += ". "
-        
+
         agent_obj = get_unit_desc(img[2][4])
         if agent_obj != "an unknown cell" and "floor" not in agent_obj:
             description += f"Finally, you are holding {agent_obj}."
-        
+
         return description
     if detail == 4:
         img = obs["image"]
         size = img.shape[-2]
         description = f"Description of room (sized {size - 2} x {size - 2}), going from leftmost column (Col 1) to rightmost column (Col {size - 2}), top cell to bottom cell for each column:\n"
-        
+
         for c in range(1, len(img) - 1):  # skip leftmost and rightmost columns of walls
             description += f"Col {c}: "
             for r in range(1, len(img[0]) - 1):  # skip top and bottom walls in column
@@ -256,7 +282,9 @@ def get_obs_desc(obs: Dict, left_obs: Dict = None, backwards_obs: Dict = None, r
                     actual_desc = "floor"
                 elif desc == "agent":
                     if carrying is not None:
-                        carry_addendum = f" and carrying a {carrying.color} {carrying.type}"
+                        carry_addendum = (
+                            f" and carrying a {carrying.color} {carrying.type}"
+                        )
                     else:
                         carry_addendum = ""
                     actual_desc = f"your location (you're facing {IDX_TO_DIR[obs['direction']]}{carry_addendum})"
@@ -275,7 +303,9 @@ def get_babyai_desc(env: MiniGridEnv, image: np.ndarray) -> str:
     """
     list_textual_descriptions = []
     if env.carrying is not None:
-        list_textual_descriptions.append("You carry a {} {}".format(env.carrying.color, env.carrying.type))
+        list_textual_descriptions.append(
+            "You carry a {} {}".format(env.carrying.color, env.carrying.type)
+        )
 
     agent_pos_vx, agent_pos_vy = env.get_view_coords(env.agent_pos[0], env.agent_pos[1])
 
@@ -299,7 +329,9 @@ def get_babyai_desc(env: MiniGridEnv, image: np.ndarray) -> str:
     while j >= 0 and not object_seen:
         if image[agent_pos_vx][j][0] != 0 and image[agent_pos_vx][j][0] != 1:
             if image[agent_pos_vx][j][0] == 2:
-                list_textual_descriptions.append(f"You see a wall {agent_pos_vy - j} step{'s' if agent_pos_vy - j > 1 else ''} forward")
+                list_textual_descriptions.append(
+                    f"You see a wall {agent_pos_vy - j} step{'s' if agent_pos_vy - j > 1 else ''} forward"
+                )
                 object_seen = True
             else:
                 object_seen = True
@@ -310,7 +342,9 @@ def get_babyai_desc(env: MiniGridEnv, image: np.ndarray) -> str:
     while i >= 0 and not object_seen:
         if image[i][agent_pos_vy][0] != 0 and image[i][agent_pos_vy][0] != 1:
             if image[i][agent_pos_vy][0] == 2:
-                list_textual_descriptions.append(f"You see a wall {agent_pos_vx - i} step{'s' if agent_pos_vx - i > 1 else ''} left")
+                list_textual_descriptions.append(
+                    f"You see a wall {agent_pos_vx - i} step{'s' if agent_pos_vx - i > 1 else ''} left"
+                )
                 object_seen = True
             else:
                 object_seen = True
@@ -321,7 +355,9 @@ def get_babyai_desc(env: MiniGridEnv, image: np.ndarray) -> str:
     while i < image.shape[0] and not object_seen:
         if image[i][agent_pos_vy][0] != 0 and image[i][agent_pos_vy][0] != 1:
             if image[i][agent_pos_vy][0] == 2:
-                list_textual_descriptions.append(f"You see a wall {i - agent_pos_vx} step{'s' if i - agent_pos_vx > 1 else ''} right")
+                list_textual_descriptions.append(
+                    f"You see a wall {i - agent_pos_vx} step{'s' if i - agent_pos_vx > 1 else ''} right"
+                )
                 object_seen = True
             else:
                 object_seen = True
@@ -347,12 +383,20 @@ def get_babyai_desc(env: MiniGridEnv, image: np.ndarray) -> str:
 
                 distances = []
                 if relative_position["x_axis"][0] in ["face", "en face"]:
-                    distances.append((relative_position["y_axis"][1], relative_position["y_axis"][0]))
+                    distances.append(
+                        (relative_position["y_axis"][1], relative_position["y_axis"][0])
+                    )
                 elif relative_position["y_axis"][1] == 0:
-                    distances.append((relative_position["x_axis"][1], relative_position["x_axis"][0]))
+                    distances.append(
+                        (relative_position["x_axis"][1], relative_position["x_axis"][0])
+                    )
                 else:
-                    distances.append((relative_position["x_axis"][1], relative_position["x_axis"][0]))
-                    distances.append((relative_position["y_axis"][1], relative_position["y_axis"][0]))
+                    distances.append(
+                        (relative_position["x_axis"][1], relative_position["x_axis"][0])
+                    )
+                    distances.append(
+                        (relative_position["y_axis"][1], relative_position["y_axis"][0])
+                    )
 
                 description = ""
                 if object[0] != 4:  # if it is not a door
@@ -391,3 +435,40 @@ def get_full_env_desc(full_obs: np.ndarray) -> str:
                 row_objs.append(obj_desc)
         description += ", ".join(row_objs) + "\n"
     return description.strip()
+
+
+def bfs(grid, init_dir, start_pos, end_pos):
+
+    state = (start_pos, init_dir)
+    queue = deque([state])
+    trace_back = {}
+    trace_back[state] = -1
+
+    while queue:
+        state = queue.popleft()
+        (x, y), dir = state
+
+        if (x, y) in end_pos:
+            actions = []
+            while trace_back[state] != -1:
+                state, action = trace_back[state]
+                actions.append(action)
+            return list(reversed(actions))
+
+        # forward
+        dir_vec = DIR_TO_VEC[dir]
+        nx, ny = x + dir_vec[0], y + dir_vec[1]
+        nstate = ((nx, ny), dir)
+        if grid[x, y] == 0 and nstate not in trace_back:
+            queue.append(nstate)
+            trace_back[nstate] = (state, Actions.forward)
+
+        # rotate
+        for d in [-1, 1]:
+            ndir = (dir + d + 4) % 4
+            nstate = ((x, y), ndir)
+            if nstate not in trace_back:
+                queue.append(nstate)
+                trace_back[nstate] = (state, Actions.left if d == -1 else Actions.right)
+
+    return None

@@ -18,7 +18,7 @@ from mindgrid.infrastructure.basic_utils import (
 class BaseLayout(ABC):
 
     def _init_layout(self):
-        self.agent_dir = self.random.randint(0, 3)
+        self.agent_init_dir = self.random.randint(0, 3)
         self.obstacle_thickness = 1
 
     def edit(self, edits: List[Edit]):
@@ -61,8 +61,8 @@ class BaseLayout(ABC):
     def _set_agent_position(self, allowed_positions: set = None) -> None:
         if allowed_positions is None:
             allowed_positions = self.all_possible_pos
-        self.agent_pos = self.random.choice(list(allowed_positions))
-        self.all_possible_pos -= set([self.agent_pos])
+        self.agent_init_pos = self.random.choice(list(allowed_positions))
+        self.all_possible_pos -= set([self.agent_init_pos])
 
     def _set_target_position(self, allowed_positions: set = None) -> None:
         if allowed_positions is None:

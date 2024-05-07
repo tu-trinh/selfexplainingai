@@ -79,6 +79,9 @@ class MindGridEnv(MiniGridEnv):
         # set objects
         for o in self.objects:
             self.put_obj(o, o.init_pos[0], o.init_pos[1])
+        # set agent
+        self.agent_dir = self.agent_init_dir
+        self.agent_pos = self.agent_init_pos
 
     def step(self, action):
         self.step_count += 1

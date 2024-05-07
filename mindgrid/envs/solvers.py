@@ -30,6 +30,8 @@ class RoomDoorKeySolver(BaseSolver):
                 # choose a door and open it
                 target_door = self.random.choice(self.doors)
                 t = OpenDoor(target_door)(self)
+                if t is None:
+                    return None
             else:
                 # no doors and can't reach goal -> no solution
                 return None
@@ -69,9 +71,8 @@ class TreasureIslandSolver(BaseSolver):
             fireproof_shoes = None
             for o in self.objects:
                 if o.type == "fireproof_shoes":
-                    fireproof_shoes = None
+                    fireproof_shoes = o
                     break
-
             # if fireproof shoes are present, grab them
             if fireproof_shoes is not None:
                 t = GetObject(fireproof_shoes)(self)
@@ -79,6 +80,8 @@ class TreasureIslandSolver(BaseSolver):
                 # choose a bridge and fix it
                 target_bridge = self.random.choice(self.bridges)
                 t = FixBridge(target_bridge)(self)
+                if t is None:
+                    return None
             else:
                 # no bridges and shoes and can't reach goal -> no solution
                 return None

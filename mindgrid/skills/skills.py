@@ -449,6 +449,8 @@ class OpenDoor(Skill):
         # unblock door
         t = Unblock(door)(env)
 
+        print(env.keys)
+
         # if door is locked, get key
         if door.is_locked:
             # if there is no key, can't open

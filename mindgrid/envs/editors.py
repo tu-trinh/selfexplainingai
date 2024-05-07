@@ -75,7 +75,7 @@ class BaseEditor:
                 self.obstacles[-1].init_pos = c
 
         # reposition agent
-        self.agent_pos = (self.agent_pos[0] * 2, self.agent_pos[1] * 2)
+        self.agent_init_pos = (self.agent_init_pos[0] * 2, self.agent_init_pos[1] * 2)
         # double agent view size
         self.agent_view_size *= 2
 
@@ -97,9 +97,9 @@ class BaseEditor:
 
         for o in self.objects + self.obstacles:
             o.init_pos = (self.width - 1 - o.init_pos[0], o.init_pos[1])
-        self.agent_pos = (self.width - 1 - self.agent_pos[0], self.agent_pos[1])
-        if self.agent_dir in [0, 2]:
-            self.agent_dir = 2 - self.agent_dir
+        self.agent_init_pos = (self.width - 1 - self.agent_init_pos[0], self.agent_init_pos[1])
+        if self.agent_init_dir in [0, 2]:
+            self.agent_init_dir = 2 - self.agent_init_dir
 
         for o in self.objects:
             if hasattr(o, "dir_vec"):
@@ -191,10 +191,12 @@ class BaseEditor:
     def put_agent_inside_section(self):
         occupied_cells = [o.init_pos for o in self.objects + self.obstacles]
         free_cells = list(set(self.inner_cells) - set(occupied_cells))
-        self.agent_pos = self.random.choice(free_cells)
-        return self.agent_pos
+        self.agent_init_pos = self.random.choice(free_cells)
+        return self.agent_init_pos
 
     def hide_tool_in_box(self):
+        if not self.tools:
+            return None
         # find a tool that is not already in a box
         target_tool = None
         while True:
@@ -218,7 +220,10 @@ class BaseEditor:
         return target_tool, box
 
     def remove_tool(self):
+        if not self.tools:
+            return None
         tool = self.random.choice(self.tools)
+        del self.tools[self.tools.index(tool)]
         # remove box that holds tool
         removed_box = None
         for i, o in enumerate(self.objects):

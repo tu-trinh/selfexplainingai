@@ -1,10 +1,10 @@
-from package.builder import make_env
-from package.infrastructure.config_utils import make_config
-from package.skills import *
+from mindgrid.builder import make_env
+from mindgrid.infrastructure.config_utils import make_config
+from mindgrid.skills import *
 
-config = make_config(file_path="package/configs/base.yaml")
+config = make_config(file_path="mindgrid/configs/base.yaml")
 
-env = make_env(config.ai.world_model)
+env = make_env(config.human.world_model)
 
 env.reset()
 
@@ -30,6 +30,10 @@ env.reset()
 #GetObject(env.target_objects[0])(env)
 
 env.solve_with_optimal_skills()
+
+env.reset()
+env.render()
+input()
 
 
 """

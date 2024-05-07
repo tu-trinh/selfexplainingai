@@ -1,7 +1,6 @@
-from package.envs. modifications import HeavyDoor, Bridge, FireproofShoes
+from minigrid.core.world_object import Ball, Box, Door, Goal, Key, Lava, Wall
 
-from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box
-
+from mindgrid.envs.objects import Bridge, FireproofShoes, HeavyDoor
 
 PLAYABLE_OBJS = [Goal, Box, Ball]
 TANGIBLE_OBJS = [Ball, Box]
@@ -17,7 +16,7 @@ OBJ_NAME_MAPPING = {
     Lava: "lava",
     HeavyDoor: "heavy_door",
     Bridge: "bridge",
-    FireproofShoes: "fireproof_shoes"
+    FireproofShoes: "fireproof_shoes",
 }
 NAME_OBJ_MAPPING = {v: k for k, v in OBJ_NAME_MAPPING.items()}
 OBJ_PLURAL_MAPPING = {
@@ -30,5 +29,5 @@ OBJ_PLURAL_MAPPING = {
     Lava: "lava",
     HeavyDoor: "heavy_doors",
     Bridge: "bridges",
-    FireproofShoes: "fireproof_shoes"
+    FireproofShoes: "fireproof_shoes",
 }

@@ -1,18 +1,11 @@
-from package.infrastructure.config_utils import ConfigDict
-from package.builder import make_env
-from package.message import Message
+from mindgrid.infrastructure.config_utils import ConfigDict
+from mindgrid.builder import make_env
 
 class Agent:
     def __init__(self, config: ConfigDict):
         self.world_model = make_env(config.world_model)
         self.skillset = config.skillset
         self.preference = config.preference
-
-    def speak(self, message: Message):
-        pass
-
-    def listen(self, message: Message):
-        pass
 
 
 class Human(Agent):

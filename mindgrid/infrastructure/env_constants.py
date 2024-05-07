@@ -1,9 +1,7 @@
-from package.enums import Level, Variant
+import numpy as np
 
 from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box
 from minigrid.core.constants import OBJECT_TO_IDX, IDX_TO_OBJECT, COLORS, COLOR_NAMES, COLOR_TO_IDX, IDX_TO_COLOR, STATE_TO_IDX, DIR_TO_VEC
-
-import numpy as np
 
 
 VEC_TO_DIR = {(1, 0): 0, (0, 1): 1, (-1, 0): 2, (0, -1): 3}
@@ -14,6 +12,7 @@ OBJECT_TO_IDX["bridge"] = 12
 OBJECT_TO_IDX["fireproof_shoes"] = 13
 OBJECT_TO_IDX["hammer"] = 14
 OBJECT_TO_IDX["passage"] = 15
+OBJECT_TO_IDX["safe_lava"] = 16
 
 IDX_TO_OBJECT = {v: k for k, v in OBJECT_TO_IDX.items()}
 
@@ -156,6 +155,8 @@ MAX_VIEW_SIZE = 9
 MIN_ROOM_SIZE = 7
 MAX_ROOM_SIZE = 12
 MAX_NUM_LOCKED_DOORS = 3
+
+"""
 UNIVERSAL_VARIANTS = [Variant.COLOR, Variant.ROOM_SIZE, Variant.ORIENTATION]
 ALLOWABLE_VARIANTS = {
     Level.EMPTY: UNIVERSAL_VARIANTS,
@@ -169,3 +170,4 @@ ALLOWABLE_VARIANTS = {
     Level.MULT_ROOMS: UNIVERSAL_VARIANTS + [Variant.NUM_ROOMS],
     Level.BOSS: UNIVERSAL_VARIANTS + [Variant.NUM_OBJECTS, Variant.OBJECTS, Variant.NUM_ROOMS]
 }
+"""

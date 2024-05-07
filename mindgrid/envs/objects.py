@@ -1,23 +1,19 @@
-import sys
+from typing import Tuple
 
-sys.path.append("/Users/tutrinh/Work/CHAI/selfexplainingai")
-
-from package.infrastructure.env_constants import (
-    OBJECT_TO_IDX,
-    COLOR_TO_IDX,
-    COLORS,
-)  # must keep import to pass object creation assertions
-
-from minigrid.core.world_object import Door, Goal, WorldObj
+from minigrid.core.world_object import Door, WorldObj
 from minigrid.utils.rendering import (
     fill_coords,
+    point_in_circle,
     point_in_line,
     point_in_rect,
-    point_in_circle,
     point_in_triangle,
 )
 
-from typing import Tuple
+from mindgrid.infrastructure.env_constants import (  # must keep import to pass object creation assertions
+    COLOR_TO_IDX,
+    COLORS,
+    OBJECT_TO_IDX,
+)
 
 
 class HeavyDoor(Door):
@@ -78,12 +74,19 @@ class Passage(WorldObj):
         fill_coords(img, point_in_triangle(*points), COLORS["grey"])
 
     def encode(self):
-        return (OBJECT_TO_IDX[self.type], COLOR_TO_IDX[self.color], self.dir_vec[0] * 2 + self.dir_vec[1])
+        return (
+            OBJECT_TO_IDX[self.type],
+            COLOR_TO_IDX[self.color],
+            self.dir_vec[0] * 2 + self.dir_vec[1],
+        )
 
 
-class SafeLava(Goal):
-    def __self__(self):
+class SafeLava(WorldObj):
+    def __init__(self):
         super().__init__("safe_lava", "grey")
+
+    def can_overlap(self):
+        return True
 
     def render(self, img):
         c = (47, 79, 79)
@@ -102,9 +105,6 @@ class SafeLava(Goal):
 
 
 class Bridge(WorldObj):
-    """
-    Wooden bridge to cross lava or other dangers
-    """
 
     def __init__(self, dir_vec: Tuple[int, int], is_intact: bool = True):
         super().__init__("bridge", "brown")
@@ -112,7 +112,7 @@ class Bridge(WorldObj):
         self.dir_vec = dir_vec
 
     def can_overlap(self):
-        return self.is_intact
+        return True
 
     def render(self, img):
         if self.is_intact:

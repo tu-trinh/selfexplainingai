@@ -1,8 +1,8 @@
-from package.infrastructure.env_constants import DIR_TO_VEC, MAX_ROOM_SIZE, COLOR_NAMES
-from package.infrastructure.obj_constants import OBJ_NAME_MAPPING
-from package.search import Search, State
-from package.infrastructure.basic_utils import manhattan_distance, debug, get_adjacent_cells
-from package.envs.modifications import Bridge
+from mindgrid.infrastructure.env_constants import DIR_TO_VEC, MAX_ROOM_SIZE, COLOR_NAMES
+from mindgrid.infrastructure.obj_constants import OBJ_NAME_MAPPING
+from mindgrid.search import Search, State
+from mindgrid.infrastructure.basic_utils import manhattan_distance, debug, get_adjacent_cells
+from mindgrid.envs.modifications import Bridge
 
 from minigrid.core.world_object import Wall, Door, Lava
 
@@ -54,7 +54,7 @@ def move_direction_n_steps_hof(direction: str, n: int):
         for _ in range(n):
             actions.append(2)
         return actions
-    
+
     return move_direction_n_steps
 
 
@@ -69,7 +69,7 @@ def go_to_color_object_hof(color: str, obj: str):
         actions = []
         actions.extend(_find_path(env, object_pos, "goto", can_overlap = obj in ["goal", "bridge"]))
         return actions
-    
+
     return go_to_color_object
 
 
@@ -84,7 +84,7 @@ def pickup_color_object_hof(color: str, obj: str):
         actions = []
         actions.extend(_find_path(env, object_pos, action_type = "pickup"))
         return actions
-    
+
     return pickup_color_object
 
 
@@ -100,7 +100,7 @@ def put_down_color_object_hof(color: str, obj: str):
         actions = []
         actions.extend(_find_path(env, object_pos, "putdown"))
         return actions
-    
+
     return put_down_color_object
 
 """
@@ -115,7 +115,7 @@ def open_color_object_hof(color: str, obj: str):
         actions.extend(_find_path(env, object_pos, "goto"))
         actions.append(5)
         return actions
-    
+
     return open_color_object
 
 """
@@ -133,7 +133,7 @@ def unlock_color_door_hof(color: str, necessary_key_pos: Tuple[int, int]):
         actions.extend(_find_path(new_env, door_pos, "goto"))
         actions.append(5)
         return actions
-    
+
     return unlock_color_door
 
 """
@@ -147,7 +147,7 @@ def close_color_door_hof(color: str):
         actions.extend(_find_path(env, door_pos, "goto"))
         actions.append(5)
         return actions
-    
+
     return close_color_door
 
 

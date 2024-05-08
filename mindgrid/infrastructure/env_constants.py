@@ -1,11 +1,21 @@
 import numpy as np
 
 from minigrid.core.world_object import Door, Key, Goal, Wall, Lava, Ball, Box
-from minigrid.core.constants import OBJECT_TO_IDX, IDX_TO_OBJECT, COLORS, COLOR_NAMES, COLOR_TO_IDX, IDX_TO_COLOR, STATE_TO_IDX, DIR_TO_VEC
+from minigrid.core.constants import (
+    OBJECT_TO_IDX,
+    IDX_TO_OBJECT,
+    COLORS,
+    COLOR_NAMES,
+    COLOR_TO_IDX,
+    IDX_TO_COLOR,
+    STATE_TO_IDX,
+    DIR_TO_VEC,
+)
 
 
 VEC_TO_DIR = {(1, 0): 0, (0, 1): 1, (-1, 0): 2, (0, -1): 3}
 DIR_TO_VEC = {0: (1, 0), 1: (0, 1), 2: (-1, 0), 3: (0, -1)}
+DIR_TO_NAME = {0: "right", 1: "down", 2: "left", 3: "up"}
 
 OBJECT_TO_IDX["heavy_door"] = 11
 OBJECT_TO_IDX["bridge"] = 12
@@ -22,36 +32,26 @@ COLOR_TO_IDX["brown"] = 6
 IDX_TO_COLOR = {v: k for k, v in COLOR_TO_IDX.items()}
 
 IDX_TO_STATE = {v: k for k, v in STATE_TO_IDX.items()}
-IDX_TO_DIR = {
-    0: "east",
-    1: "south",
-    2: "west",
-    3: "north"
-}
+IDX_TO_DIR = {0: "east", 1: "south", 2: "west", 3: "north"}
 ACTION_TO_IDX = {
     "left": 0,
     "right": 1,
     "forward": 2,
     "pickup": 3,
     "drop": 4,
-    "toggle": 5
+    "toggle": 5,
 }
 IDX_TO_ACTION = {v: k for k, v in ACTION_TO_IDX.items()}
-CUSTOM_ACTION_TO_TRUE_ACTION = {
-    1: 2,
-    2: 0,
-    3: 1,
-    4: 3,
-    5: 4,
-    6: 5,
-    7: 5,
-    8: 5
-}
+CUSTOM_ACTION_TO_TRUE_ACTION = {1: 2, 2: 0, 3: 1, 4: 3, 5: 4, 6: 5, 7: 5, 8: 5}
 SKILL_PHRASES = {
     "left": [lambda p: "left", lambda p: "turn left", lambda p: "make a left turn"],
     "right": [lambda p: "right", lambda p: "turn right", lambda p: "make a right turn"],
     "forward": [lambda p: "forward", lambda p: "step forward", lambda p: "go forward"],
-    "backward": [lambda p: "backward", lambda p: "turn backward", lambda p: "make a U-turn"],
+    "backward": [
+        lambda p: "backward",
+        lambda p: "turn backward",
+        lambda p: "make a U-turn",
+    ],
     "pickup": [lambda p: "pickup", lambda p: "grab", lambda p: "snatch up"],
     "drop": [lambda p: "drop", lambda p: "lay down", lambda p: "set down"],
     "toggle": [lambda p: "toggle", lambda p: "switch", lambda p: "activate"],
@@ -61,7 +61,7 @@ SKILL_PHRASES = {
         lambda p: f"walk_{p.split('_')[2]}_cells_forward",
         lambda p: f"step_forward_{p.split('_')[2]}_times",
         lambda p: f"progress_{p.split('_')[2]}_steps_forward",
-        lambda p: f"proceed_{p.split('_')[2]}_steps"
+        lambda p: f"proceed_{p.split('_')[2]}_steps",
     ],
     "move_right": [
         lambda p: f"move_{p.split('_')[2]}_steps_right",
@@ -69,7 +69,7 @@ SKILL_PHRASES = {
         lambda p: f"advance_{p.split('_')[2]}_steps_rightward",
         lambda p: f"walk_{p.split('_')[2]}_cells_right",
         lambda p: f"progress_{p.split('_')[2]}_steps_right",
-        lambda p: f"proceed_right_{p.split('_')[2]}_steps"
+        lambda p: f"proceed_right_{p.split('_')[2]}_steps",
     ],
     "move_left": [
         lambda p: f"move_{p.split('_')[2]}_steps_left",
@@ -77,7 +77,7 @@ SKILL_PHRASES = {
         lambda p: f"advance_{p.split('_')[2]}_steps_leftward",
         lambda p: f"walk_{p.split('_')[2]}_cells_left",
         lambda p: f"progress_{p.split('_')[2]}_steps_left",
-        lambda p: f"proceed_left_{p.split('_')[2]}_steps"
+        lambda p: f"proceed_left_{p.split('_')[2]}_steps",
     ],
     "move_backward": [
         lambda p: f"move_{p.split('_')[2]}_steps_backward",
@@ -109,7 +109,7 @@ SKILL_PHRASES = {
         lambda p: f"set_down_{p.split('_')[-2]}_{p.split('_')[-1]}",
         lambda p: f"place_{p.split('_')[-2]}_{p.split('_')[-1]}_down",
         lambda p: f"put_{p.split('_')[-2]}_{p.split('_')[-1]}_on_floor",
-        lambda p: f"lay_{p.split('_')[-2]}_{p.split('_')[-1]}_down"
+        lambda p: f"lay_{p.split('_')[-2]}_{p.split('_')[-1]}_down",
     ],
     "open_": [
         lambda p: f"open_{p.split('_')[-2]}_{p.split('_')[-1]}",
@@ -119,22 +119,16 @@ SKILL_PHRASES = {
     "close_": [
         lambda p: f"close_{p.split('_')[-2]}_{p.split('_')[-1]}",
         lambda p: f"shut_{p.split('_')[-2]}_{p.split('_')[-1]}",
-        lambda p: f"close_up_{p.split('_')[-2]}_{p.split('_')[-1]}"
+        lambda p: f"close_up_{p.split('_')[-2]}_{p.split('_')[-1]}",
     ],
     "unlock_": [
         lambda p: f"unlock_{p.split('_')[-2]}_{p.split('_')[-1]}",
         lambda p: f"unlatch_{p.split('_')[-2]}_{p.split('_')[-1]}",
-        lambda p: f"unbolt_{p.split('_')[-2]}_{p.split('_')[-1]}"
-    ]
+        lambda p: f"unbolt_{p.split('_')[-2]}_{p.split('_')[-1]}",
+    ],
 }
 
-NUM_TO_WORD = {
-    1: "one",
-    2: "two",
-    3: "three",
-    4: "four",
-    5: "five"
-}
+NUM_TO_WORD = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five"}
 NUM_TO_ORDERING = {
     1: "First",
     2: "Second",
@@ -145,7 +139,7 @@ NUM_TO_ORDERING = {
     7: "Seventh",
     8: "Eighth",
     9: "Ninth",
-    10: "Tenth"
+    10: "Tenth",
 }
 
 

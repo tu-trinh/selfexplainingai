@@ -439,6 +439,7 @@ def get_full_env_desc(full_obs: np.ndarray) -> str:
 
 def bfs(grid, init_dir, start_pos, end_pos):
 
+    print(grid)
     state = (start_pos, init_dir)
     queue = deque([state])
     trace_back = {}
@@ -449,6 +450,7 @@ def bfs(grid, init_dir, start_pos, end_pos):
         (x, y), dir = state
 
         if (x, y) in end_pos:
+            print(x, y)
             actions = []
             while trace_back[state] != -1:
                 state, action = trace_back[state]
@@ -459,7 +461,7 @@ def bfs(grid, init_dir, start_pos, end_pos):
         dir_vec = DIR_TO_VEC[dir]
         nx, ny = x + dir_vec[0], y + dir_vec[1]
         nstate = ((nx, ny), dir)
-        if grid[x, y] == 0 and nstate not in trace_back:
+        if grid[nx, ny] == 0 and nstate not in trace_back:
             queue.append(nstate)
             trace_back[nstate] = (state, Actions.forward)
 

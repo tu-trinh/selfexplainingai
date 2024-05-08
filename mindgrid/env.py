@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import random
 from typing import List
+from copy import deepcopy as dc
+from types import SimpleNamespace
 
 import numpy as np
 from minigrid.core.grid import Grid
@@ -178,11 +180,58 @@ class MindGridEnv(MiniGridEnv):
         return ret
 
     def get_state(self):
-        pass
+        return MindGridEnvState(self)
 
 
 class MindGridEnvState:
 
     def __init__(self, env: MindGridEnv):
+        self.objects = dc(env.objects)
+        self.agent_dir = dc(env.agent_dir)
+        self.agent_pos = tuple(dc(env.agent_pos))
+        self.front_pos = tuple(dc(env.front_pos))
+        self.dir_vec = tuple(dc(env.dir_vec))
+        self.carrying = dc(env.carrying)
+        self.outer_cells = dc(env.outer_cells)
+        # TODO: add more if needed
 
-        pass
+    def __eq__(self, other):
+        if self.agent_dir != other.agent_dir:
+            print("agent_dir", self.agent_dir, other.agent_dir)
+            return False
+        if self.agent_pos != other.agent_pos:
+            print("agent_pos")
+            return False
+        if self.front_pos != other.front_pos:
+            print("front_pos")
+            return False
+        if self.dir_vec != other.dir_vec:
+            print("dir_vec")
+            return False
+        if not self._are_objects_equal(self.carrying, other.carrying):
+            print("carrying")
+            return False
+        for i, o in enumerate(self.objects):
+            oo = other.objects[i]
+            if not self._are_objects_equal(o, oo):
+                print("object")
+                return False
+        # NOTE: assume that outer_cells never change
+        return True
+
+    def _are_objects_equal(self, o, oo):
+        if o is None and oo is None:
+            return True
+        if o is None or oo is None:
+            return False
+        if type(o) != type(oo):
+            return False
+        if o.color != oo.color:
+            return False
+        if not self._are_objects_equal(o.contains, oo.contains):
+            return False
+        if o.init_pos != oo.init_pos:
+            return False
+        if o.cur_pos != oo.cur_pos:
+            return False
+        return True

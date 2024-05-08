@@ -31,7 +31,7 @@ class Trajectory:
         new_t = Trajectory()
         for i in range(start, end):
             new_t.add(*self.get(i))
-        new_t.add(self.get(end))
+        new_t.add(self.states[end])
         self.check(new_t)
         return new_t
 

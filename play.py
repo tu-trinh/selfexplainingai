@@ -4,36 +4,57 @@ from mindgrid.skills import *
 
 config = make_config(file_path="mindgrid/configs/base.yaml")
 
-env = make_env(config.human.world_model)
+env = make_env(config.ai.world_model)
 
 env.reset()
 
-#PrimitiveAction(env.actions.left)(env)
-#GoTo((5, 5))(env)
-#GoToAdjacentObject(env.bridges[0])(env)
-#GoToAdjacentPosition(env.target_objects[0].init_pos)(env)
-#RotateTowardsObject(env.target_objects[0])(env)
-#RotateTowardsPosition(env.target_objects[0].cur_pos)(env)
+#t = PrimitiveAction(env.actions.left)(env)
+#print(PrimitiveAction.recognize(t))
 
-#GetObject(env.tools[0])(env)
+#t = GoTo((5, 5))(env)
+#print(GoTo.recognize(t))
+
+#t = GoToAdjacentObject(env.doors[0])(env)
+#print(GoToAdjacentObject.recognize(t))
+
+#t = GoToAdjacentObject(env.bridges[0])(env)
+#print(GoToAdjacentObject.recognize(t))
+
+#t = GoToAdjacentPosition(env.target_objects[0].init_pos)(env)
+#print(GoToAdjacentPosition.recognize(t))
+
+#t = RotateTowardsObject(env.target_objects[0])(env)
+#print(RotateTowardsObject.recognize(t))
+
+#t = RotateTowardsDirection(3)(env)
+#print(RotateTowardsDirection.recognize(t))
+
+#t = GetObject(env.tools[0])(env)
+#print(GetObject.recognize(t))
 #for o in env.objects:
 #    if o.type == "fireproof_shoes":
-#        GetObject(o)(env)
-#GetObject(env.target_objects[0])(env)
-#Unblock(env.bridges[0])(env)
-#FixBridge(env.bridges[0])(env)
-#for o in env.objects:
-#    if o.type == "box":
-#        OpenBox(o)(env)
-#        break
-#OpenDoor(env.doors[1])(env)
+#        t = GetObject(o)(env)
+#        print(GetObject.recognize(t))
 #GetObject(env.target_objects[0])(env)
 
-env.solve_with_optimal_skills()
+#t = Unblock(env.doors[0])(env)
+#print(Unblock.recognize(t))
 
-env.reset()
-env.render()
-input()
+#t = Unblock(env.bridges[0])(env)
+#print(Unblock.recognize(t))
+
+
+#t = FixBridge(env.bridges[0])(env)
+#print(FixBridge.recognize(t))
+
+for o in env.objects:
+    if o.type == "box":
+        t = OpenBox(o)(env)
+        print(OpenBox.recognize(t))
+        break
+#t = OpenDoor(env.doors[0])(env)
+#print(OpenDoor.recognize(t))
+#GetObject(env.target_objects[0])(env)
 
 
 """

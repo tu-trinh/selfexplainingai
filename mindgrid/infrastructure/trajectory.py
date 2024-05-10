@@ -66,3 +66,6 @@ class Trajectory:
     @property
     def last_state(self):
         return self.states[-1]
+
+    def __eq__(self, other: Trajectory):
+        return self.actions == other.actions and self.states == other.states

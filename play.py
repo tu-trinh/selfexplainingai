@@ -8,8 +8,8 @@ env = make_env(config.ai.world_model)
 
 env.reset()
 
-#t = PrimitiveAction(env.actions.left)(env)
-#print(PrimitiveAction.recognize(t))
+#t = Primitive(env.actions.left)(env)
+#print(Primitive.recognize(t))
 
 #t = GoTo((5, 5))(env)
 #print(GoTo.recognize(t))
@@ -47,11 +47,11 @@ env.reset()
 #t = FixBridge(env.bridges[0])(env)
 #print(FixBridge.recognize(t))
 
-for o in env.objects:
-    if o.type == "box":
-        t = OpenBox(o)(env)
-        print(OpenBox.recognize(t))
-        break
+#for o in env.objects:
+#    if o.type == "box":
+#        t = OpenBox(o)(env)
+#        print(OpenBox.recognize(t))
+#        break
 #t = OpenDoor(env.doors[0])(env)
 #print(OpenDoor.recognize(t))
 #GetObject(env.target_objects[0])(env)

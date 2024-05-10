@@ -1,4 +1,6 @@
 from mindgrid.discussion import Discussion
+from mindgrid.planner import Planner
+from mindgrid.skills import Skills
 from mindgrid.infrastructure.config_utils import make_config
 from mindgrid.infrastructure.basic_utils import debug, format_seconds
 from mindgrid.infrastructure.env_constants import (
@@ -46,11 +48,21 @@ def create_skillset_mismatch_games():
     print(config)
     game = Discussion(config)
 
-    game.ai.world_model.reset()
-    game.ai.world_model.render()
-    #print(game.ai.world_model.gen_navigation_map())
+    env = game.ai.world_model
+    env.reset()
 
+    planner = Planner(config.ai.world_model)
+    skillset = [s.value for s in Skills]
+    plan = planner(env, skillset)
+
+    env.reset()
+    print("----")
     input()
+    for k, v in plan:
+        print(k, v)
+        k(**v)(env)
+        print(env.agent_pos, env.agent_dir)
+    print(env.carrying)
     pass
 
 

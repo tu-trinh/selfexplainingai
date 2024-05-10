@@ -3,21 +3,21 @@ from __future__ import annotations
 from typing import List
 
 from mindgrid.env import MindGridEnv
-from mindgrid.envs.editors import Edit
-from mindgrid.envs.layouts import Layout
-from mindgrid.envs.tasks import Task
+from mindgrid.envs.editors import Edits
+from mindgrid.envs.layouts import Layouts
+from mindgrid.envs.tasks import Tasks
 from mindgrid.infrastructure.basic_utils import to_enum
 
 
 def make_env(config):
-    assert Task.has_value(config.task), "Task name {config.task} is invalid!"
-    assert Layout.has_value(config.layout), "Layout name {config.layout} is invalid!"
+    assert Tasks.has_value(config.task), "Task name {config.task} is invalid!"
+    assert Layouts.has_value(config.layout), "Layout name {config.layout} is invalid!"
     for edit in config.edits:
-        assert Edit.has_value(edit), f"Edit name {edit} is invalid!"
+        assert Edits.has_value(edit), f"Edit name {edit} is invalid!"
 
-    task = to_enum(Task, config.task)
-    layout = to_enum(Layout, config.layout)
-    edits = [to_enum(Edit, edit) for edit in config.edits]
+    task = to_enum(Tasks, config.task)
+    layout = to_enum(Layouts, config.layout)
+    edits = [to_enum(Edits, edit) for edit in config.edits]
     cls = create_env_class(task, layout)
     env = cls(
         config.seed,
@@ -49,9 +49,9 @@ def create_env_class(task: Task, layout: Layout):
 def _custom_init(
     self,
     env_seed: int,
-    task: Task,
-    layout: Layout,
-    edits: List[Edit],
+    task: Tasks,
+    layout: Layouts,
+    edits: List[Edits],
     allowed_object_colors: List[str],
     render_mode=None,
     **kwargs,

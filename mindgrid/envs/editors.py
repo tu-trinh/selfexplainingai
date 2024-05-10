@@ -385,7 +385,7 @@ class TreasureIslandEditor(BaseEditor):
         return shoes
 
 
-class Edit(CustomEnum):
+class Edits(CustomEnum):
 
     # applicable to all environments
     NONE = "none"

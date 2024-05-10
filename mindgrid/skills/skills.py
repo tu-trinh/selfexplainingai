@@ -7,37 +7,35 @@ from minigrid.core.actions import Actions
 from minigrid.core.world_object import Box, Goal
 
 from mindgrid.envs.objects import Bridge, DoorWithDirection
-from mindgrid.infrastructure.basic_utils import get_adjacent_cells
+from mindgrid.infrastructure.basic_utils import get_adjacent_cells, CustomEnum
 from mindgrid.infrastructure.env_constants import VEC_TO_DIR, DIR_TO_VEC
 from mindgrid.infrastructure.env_utils import bfs
 from mindgrid.infrastructure.trajectory import Trajectory
 
 
-class Skill(ABC):
-
-    @staticmethod
-    def execute(env: MindGridEnv, actions: List[ActType]) -> Trajectory:
-        if actions is None:
-            return None
-        t = Trajectory()
+def execute(env: MindGridEnv, actions: List[ActType], render=False) -> Trajectory:
+    if actions is None:
+        return None
+    t = Trajectory()
+    if render:
         env.render()
-        #input()
-        for a in actions:
-            t.add(env.get_state(), a)
-            env.step(a)
+    for a in actions:
+        t.add(env.get_state(), a)
+        env.step(a)
+        if render:
             env.render()
-            #input()
-        t.add(env.get_state())
-        return t
+    t.add(env.get_state())
+    return t
 
-    @staticmethod
-    def execute_and_merge(
-        t: Trajectory, env: MindGridEnv, actions: List[ActType]
-    ) -> Trajectory:
-        tt = Skill.execute(env, actions)
-        if tt is None:
-            return None
-        return t.merge(tt)
+
+def _get_same_object(s: MindGridEnvState, o: WorldObj):
+    for oo in s.objects:
+        if oo.init_pos == o.init_pos and oo.type == o.type:
+            return oo
+    return None
+
+
+class BaseSkill(ABC):
 
     @abstractmethod
     def __call__(self, env: MindGridEnv):
@@ -48,23 +46,23 @@ class Skill(ABC):
         raise NotImplementedError
 
 
-class PrimitiveAction(Skill):
+class Primitive(BaseSkill):
 
-    def __init__(self, action: ActType):
+    def __init__(self, action: ActType = None):
         self.action = action
 
     def __call__(self, env: MindGridEnv):
-        return Skill.execute(env, [self.action])
+        return execute(env, [self.action])
 
     def recognize(t: Trajectory):
         if t.n_actions != 1:
             return None
-        return t.last_action
+        return {"action": t.last_action}
 
 
-class GoTo(Skill):
+class GoTo(BaseSkill):
 
-    def __init__(self, pos: Tuple[int, int]):
+    def __init__(self, pos: Tuple[int, int] = None):
         self.pos = pos
 
     def __call__(self, env: MindGridEnv):
@@ -76,11 +74,11 @@ class GoTo(Skill):
         )
         if actions is None:
             return None
-        return Skill.execute(env, actions)
+        return execute(env, actions)
 
     def recognize(t):
         if t.n_actions == 0:
-            return t.last_state.agent_pos
+            return {"pos": t.last_state.agent_pos}
         # last action must be forward
         if t.last_action != Actions.forward:
             return None
@@ -88,12 +86,26 @@ class GoTo(Skill):
         for a in t.actions:
             if a not in [Actions.left, Actions.right, Actions.forward]:
                 return None
-        return t.last_state.agent_pos
+
+        pos = t.last_state.agent_pos
+
+        first_s = t.first_state
+        actions = bfs(
+            first_s.simple_2d_map,
+            first_s.agent_dir,
+            first_s.agent_pos,
+            [pos],
+        )
+
+        if actions == t.actions:
+            return {"pos": pos}
+
+        return None
 
 
-class RotateTowardsObject(Skill):
+class RotateTowardsObject(BaseSkill):
 
-    def __init__(self, obj: WorldObj):
+    def __init__(self, obj: WorldObj = None):
         self.obj = obj
 
     def __call__(self, env: MindGridEnv):
@@ -114,7 +126,7 @@ class RotateTowardsObject(Skill):
             actions = [env.actions.left] * left_rotations
         else:
             actions = [env.actions.right] * right_rotations
-        return Skill.execute(env, actions)
+        return execute(env, actions)
 
     def recognize(t):
         # actions should all be left or right
@@ -122,16 +134,16 @@ class RotateTowardsObject(Skill):
             if a not in [Actions.left, Actions.right]:
                 return None
         # agent should face towards an object at the end
-        final_s = t.last_state
-        for o in final_s.objects:
-            if o.cur_pos == final_s.front_pos:
-                return o
+        last_s = t.last_state
+        for o in last_s.objects:
+            if o.cur_pos == last_s.front_pos:
+                return {"obj": o}
         return None
 
 
-class RotateTowardsDirection(Skill):
+class RotateTowardsDirection(BaseSkill):
 
-    def __init__(self, dir: int):
+    def __init__(self, dir: int = None):
         self.dir = dir
 
     def __call__(self, env: MindGridEnv):
@@ -148,25 +160,35 @@ class RotateTowardsDirection(Skill):
         for a in t.actions:
             if a not in [Actions.left, Actions.right]:
                 return None
-        return VEC_TO_DIR[t.last_state.dir_vec]
+        return {"dir": VEC_TO_DIR[t.last_state.dir_vec]}
 
 
-class GoToAdjacentObject(Skill):
+class GoToAdjacentObject(BaseSkill):
 
-    def __init__(self, obj: WorldObj):
+    def __init__(self, obj: WorldObj = None):
         self.obj = obj
 
     def __call__(self, env: MindGridEnv):
         obj = self.obj
-        actions = bfs(
-            env.gen_simple_2d_map(),
-            env.agent_dir,
-            env.agent_pos,
-            get_adjacent_cells(obj.cur_pos, ret_as_list=True),
-        )
-        if actions is None:
+
+        # NOTE: there are at most 4 positions that are adjacent to an object
+        # we want to make the final state deterministic
+        # hence, we select the position that yield the shortest sequence of actions
+        cand = []
+        for dir_vec in VEC_TO_DIR:
+            actions = bfs(
+                env.gen_simple_2d_map(),
+                env.agent_dir,
+                env.agent_pos,
+                [(obj.cur_pos[0] + dir_vec[0], obj.cur_pos[1] + dir_vec[1])],
+            )
+            if actions is not None:
+                cand.append(actions)
+        if not cand:
             return None
-        t = Skill.execute(env, actions)
+
+        cand = sorted(cand, key=lambda x: len(x))
+        t = execute(env, cand[0])
         t = t.merge(RotateTowardsObject(obj)(env))
         return t
 
@@ -175,17 +197,43 @@ class GoToAdjacentObject(Skill):
         for a in t.actions:
             if a not in [Actions.left, Actions.right, Actions.forward]:
                 return None
+
         # agent must face towards an object
-        final_s = t.last_state
-        for o in final_s.objects:
-            if o.cur_pos == final_s.front_pos:
-                return o
+        last_s = t.last_state
+        obj = None
+        for o in last_s.objects:
+            if o.cur_pos == last_s.front_pos:
+                obj = o
+                break
+
+        if obj is None:
+            return None
+
+        # check if the agent's final position yields the shortest path from the initial position
+        # among 4 positions that are adjacent to the object
+        first_s = t.first_state
+        cand = []
+        for dir_vec in VEC_TO_DIR:
+            pos = (obj.cur_pos[0] + dir_vec[0], obj.cur_pos[1] + dir_vec[1])
+            actions = bfs(
+                first_s.simple_2d_map,
+                first_s.agent_dir,
+                first_s.agent_pos,
+                [pos],
+            )
+            if actions is not None:
+                cand.append((len(actions), pos))
+        cand = sorted(cand, key=lambda x: x[0])
+        # position that yield shortest path must be agent's last position
+        if cand[0][1] == last_s.agent_pos:
+            return {"obj": obj}
+
         return None
 
 
-class GoToAdjacentPosition(Skill):
+class GoToAdjacentPosition(BaseSkill):
 
-    def __init__(self, pos: Tuple[int, int]):
+    def __init__(self, pos: Tuple[int, int] = None):
         self.pos = pos
 
     def __call__(self, env: MindGridEnv):
@@ -198,12 +246,12 @@ class GoToAdjacentPosition(Skill):
         for a in t.actions:
             if a not in [Actions.left, Actions.right, Actions.forward]:
                 return None
-        return t.last_state.front_pos
+        return {"pos": t.last_state.front_pos}
 
 
-class DropAt(Skill):
+class DropAt(BaseSkill):
 
-    def __init__(self, pos: Tuple[int, int]):
+    def __init__(self, pos: Tuple[int, int] = None):
         self.pos = pos
 
     def __call__(self, env: MindGridEnv):
@@ -211,7 +259,7 @@ class DropAt(Skill):
         if env.carrying is None:
             return None
         t = GoToAdjacentPosition(self.pos)(env)
-        t = t.merge(Skill.execute(env, [env.actions.drop]))
+        t = t.merge(execute(env, [env.actions.drop]))
         return t
 
     def recognize(t):
@@ -221,13 +269,14 @@ class DropAt(Skill):
         # agent should initially carrying an object
         if t.first_state.carrying is None:
             return None
-        # in the end, it should not carry any object
-        if t.last_state.carrying is not None:
+        # first part must look like GoToAdjacentPosition
+        pos = GoToAdjacentPosition.recognize(t.slice(0, t.n_states - 2))
+        if pos is None:
             return None
-        return t.first_state.carrying, t.last_state.front_pos
+        return pos
 
 
-class EmptyInventory(Skill):
+class EmptyInventory(BaseSkill):
 
     def __init__(self):
         pass
@@ -236,7 +285,7 @@ class EmptyInventory(Skill):
 
         # if inventory is empty, do nothing
         if env.carrying is None:
-            return Skill.execute(env, [])
+            return execute(env, [])
 
         # find a free adjacent cell to drop
         # FIXME: should search over a larger area
@@ -256,44 +305,114 @@ class EmptyInventory(Skill):
             o = t.first_state.carrying
             # inventory is empty
             if o is None:
-                return None, None
+                return {}
             # inventory is non-empty
             return None
-        return DropAt.recognize(t)
+        if DropAt.recognize(t) is None:
+            return None
+        return {}
 
 
-class GetObject(Skill):
+class OpenBox(BaseSkill):
 
-    def __init__(self, obj: WorldObj):
+    def __init__(self, box: Box = None):
+        assert box.type == "box", "OpenBox is applicable to only boxes"
+        self.box = box
+
+    def __call__(self, env: MindGridEnv):
+        box = self.box
+        # box has been opened, skill is not applicable
+        o = env.grid.get(*box.cur_pos)
+        if o.type != "box":
+            return None
+        # go to the box and toggle it
+        t = GoToAdjacentObject(box)(env)
+        if t is None:
+            return None
+        t = t.merge(execute(env, [env.actions.toggle]))
+        return t
+
+    def recognize(t):
+        if t.n_actions == 0:
+            return None
+        if t.last_action != Actions.toggle:
+            return None
+        # first part must look like GoToAdjacentObject
+        ret = GoToAdjacentObject.recognize(t.slice(0, t.n_states - 2))
+        if ret is None:
+            return None
+
+        for o in t.first_state.objects:
+            if o.type == "box" and o.cur_pos == t.last_state.front_pos:
+                return {"box": o}
+        return None
+
+
+class GetObject(BaseSkill):
+
+    def __init__(self, obj: WorldObj = None):
         self.obj = obj
 
     def __call__(self, env: MindGridEnv):
         obj = self.obj
+
+        # already have object, do nothing
+        if env.carrying == obj:
+            return execute(env, [])
+
+        # can't get next to object
+        if (
+            bfs(
+                env.gen_simple_2d_map(),
+                env.agent_dir,
+                env.agent_pos,
+                get_adjacent_cells(obj.cur_pos),
+            )
+            is None
+        ):
+            return None
+        # if object is in a box, open it
+        o = env.grid.get(*obj.cur_pos)
+        if isinstance(o, Box):
+            t = OpenBox(o)(env)
+        else:
+            # else, go to object
+            t = GoToAdjacentObject(obj)(env)
+        if t is None:
+            return None
         # if agent is carrying an object, drop it
-        t = EmptyInventory()(env)
-        # go to object
-        t = t.merge(GoToAdjacentObject(obj)(env))
-        # if object is hidden in a box, toggle box
-        if isinstance(env.grid.get(*obj.cur_pos), Box):
-            t = t.merge(Skill.execute(env, [env.actions.toggle]))
+        t = t.merge(EmptyInventory()(env))
+        # rotate towards object
+        t = t.merge(RotateTowardsObject(obj)(env))
         # pick up object
-        t = t.merge(Skill.execute(env, [env.actions.pickup]))
+        t = t.merge(execute(env, [env.actions.pickup]))
         return t
 
     def recognize(t):
         # last action should be pickup
-        if t.n_actions == 0 or t.last_action != Actions.pickup:
+        if t.n_actions == 0 or t.actions.count(Actions.pickup) != 1:
             return None
-        # object carried at the beginning must be different than at the end
-        if t.first_state.carrying == t.last_state.carrying:
+        # must carry an object at the end
+        if t.last_state.carrying is None:
             return None
-        # NOTE: this can be None
-        return t.last_state.carrying
+        # check if = EmptyInventory + (OpenBox or GoToAdjacentObject)
+        N = t.n_states - 1
+        for i in range(N):
+            for j in range(i):
+                t1 = t.slice(0, j)
+                t2 = t.slice(j, i)
+                t3 = t.slice(i, N - 1)
+                if (
+                    OpenBox.recognize(t1) is not None
+                    or GoToAdjacentObject.recognize(t1) is not None
+                ) and EmptyInventory.recognize(t2) is not None and RotateTowardsObject(t3):
+                    return {"obj": _get_same_object(t.first_state, t.last_state.carrying)}
+        return None
 
 
-class MoveObject(Skill):
+class MoveObject(BaseSkill):
 
-    def __init__(self, obj: WorldObj, pos: Tuple[int, int]):
+    def __init__(self, obj: WorldObj = None, pos: Tuple[int, int] = None):
         self.obj = obj
         self.pos = pos
 
@@ -315,17 +434,21 @@ class MoveObject(Skill):
         for i in range(N):
             t1 = t.slice(0, i)
             t2 = t.slice(i, N - 1)
-            o1 = GetObject.recognize(t1)
-            if o1 is not None:
-                o2, pos = DropAt.recognize(t2)
-                if o1.type == o2.type and o1.init_pos == o2.init_pos and pos is not None:
-                    return o1, pos
+            ret1 = GetObject.recognize(t1)
+            if ret1 is not None:
+                ret2 = DropAt.recognize(t2)
+                if ret2 is None:
+                    continue
+                return {
+                    "obj": _get_same_object(t.first_state, ret1["obj"]),
+                    "pos": ret2["pos"],
+                }
         return None
 
 
-class GoDirNSteps(Skill):
+class GoDirNSteps(BaseSkill):
 
-    def __init__(self, dir: int, n: int):
+    def __init__(self, dir: int = None, n: int = None):
         self.dir = dir
         self.n = n
 
@@ -333,25 +456,25 @@ class GoDirNSteps(Skill):
         # rotate to dir
         t = RotateTowardsDirection(self.dir)(env)
         # move forward n steps
-        t = t.merge(Skill.execute(env, [env.actions.forward] * self.n))
+        t = t.merge(execute(env, [env.actions.forward] * self.n))
         return t
 
     def recognize(t):
         N = t.n_states
         for i in range(N):
             t1 = t.slice(0, i)
-            dir = RotateTowardsDirection.recognize(t1)
-            if dir is not None:
+            ret = RotateTowardsDirection.recognize(t1)
+            if ret is not None:
                 t2 = t.slice(i, N - 1)
                 # all actions in t2 must be forward
                 if t2.actions.count(Actions.forward) == t2.n_actions:
-                    return dir, t2.n_actions
+                    return {"dir": ret["dir"], "n": t2.n_actions}
         return None
 
 
-class Unblock(Skill):
+class Unblock(BaseSkill):
 
-    def __init__(self, obj: DoorWithDirection | Bridge):
+    def __init__(self, obj: DoorWithDirection | Bridge = None):
         assert obj.type in [
             "door",
             "bridge",
@@ -370,7 +493,7 @@ class Unblock(Skill):
 
         # if target object is not blocked, do nothing
         if block_obj is None:
-            return Skill.execute(env, [])
+            return execute(env, [])
 
         # otherwise, find a free cell and move blocking object there
         # FIXME: should search in a larger area
@@ -405,46 +528,14 @@ class Unblock(Skill):
             if o.type in ["door", "bridge"]:
                 blocking_obj = get_blocking_object(first_s, o)
                 if blocking_obj is not None and get_blocking_object(last_s, o) is None:
-                    return o, blocking_obj
+                    return {"obj": _get_same_object(t.first_state, o)}
         return None
 
 
-class OpenBox(Skill):
-
-    def __init__(self, box: Box):
-        assert box.type == "box", "OpenBox is applicable to only boxes"
-        self.box = box
-
-    def __call__(self, env: MindGridEnv):
-        box = self.box
-        # box has been opened, skill is not applicable
-        for o in env.objects:
-            if o.cur_pos == box.cur_pos:
-                return None
-        # go to the box and toggle it
-        t = GoToAdjacentObject(box)(env)
-        if t is None:
-            return None
-        t = t.merge(Skill.execute(env, [env.actions.toggle]))
-        return t
-
-    def recognize(t):
-        if t.n_actions == 0:
-            return None
-        if t.last_action != Actions.toggle:
-            return None
-        # agent must face towards a box
-        last_s = t.last_state
-        for o in last_s.objects:
-            if o.type == "box" and o.cur_pos == last_s.front_pos:
-                return o
-        return None
-
-
-class OpenDoor(Skill):
+class OpenDoor(BaseSkill):
     """Open a door"""
 
-    def __init__(self, door: DoorWithDirection):
+    def __init__(self, door: DoorWithDirection = None):
         self.door = door
 
     def __call__(self, env: MindGridEnv):
@@ -452,7 +543,7 @@ class OpenDoor(Skill):
 
         # if door is already open, do nothing
         if door.is_open:
-            return Skill.execute(env, [])
+            return execute(env, [])
 
         # unblock door
         t = Unblock(door)(env)
@@ -474,7 +565,7 @@ class OpenDoor(Skill):
         if t.n_actions == 0:
             for o in t.first_state.objects:
                 if o.type == "door" and o.is_open:
-                    return o
+                    return {"obj": o}
             return None
         # last action must be toggle
         if t.last_action != Actions.toggle:
@@ -486,14 +577,14 @@ class OpenDoor(Skill):
             if o.type == "door" and not o.is_open:
                 for oo in last_s.objects:
                     if oo.init_pos == o.init_pos and oo.is_open:
-                        return o
+                        return {"door": _get_same_object(t.first_state, o)}
         return None
 
 
-class FixBridge(Skill):
+class FixBridge(BaseSkill):
     """Fix a bridge"""
 
-    def __init__(self, bridge: Bridge):
+    def __init__(self, bridge: Bridge = None):
         self.bridge = bridge
 
     def __call__(self, env: MindGridEnv):
@@ -501,7 +592,7 @@ class FixBridge(Skill):
 
         # if bridge is intact, do nothing
         if bridge.is_intact:
-            return Skill.execute(env, [])
+            return execute(env, [])
 
         # if there is no tool, can't fix
         if not env.tools:
@@ -514,14 +605,14 @@ class FixBridge(Skill):
         # go to bridge
         t = t.merge(GoToAdjacentObject(bridge)(env))
         # toggle bridge
-        t = t.merge(Skill.execute(env, [env.actions.toggle]))
+        t = t.merge(execute(env, [env.actions.toggle]))
         return t
 
     def recognize(t):
         if t.n_actions == 0:
             for o in t.first_state.objects:
                 if o.type == "bridge" and o.is_intact:
-                    return o
+                    return {"obj": o}
             return None
         # last action must be toggle
         if t.last_action != Actions.toggle:
@@ -532,6 +623,29 @@ class FixBridge(Skill):
         for o in first_s.objects:
             if o.type == "bridge" and not o.is_intact:
                 for oo in last_s.objects:
-                    if oo.init_pos == o.init_pos and oo.is_intact:
-                        return o
+                    if (
+                        oo.type == "bridge"
+                        and oo.init_pos == o.init_pos
+                        and oo.is_intact
+                    ):
+                        return {"bridge": _get_same_object(t.first_state, o)}
         return None
+
+
+class Skills(CustomEnum):
+
+    PRIMITIVE = Primitive
+    GOTO = GoTo
+    ROTATE_TOWARDS_OBJECT = RotateTowardsObject
+    ROTATE_TOWARDS_DIRECTION = RotateTowardsDirection
+    GOTO_ADJACENT_OBJECT = GoToAdjacentObject
+    GOTO_ADJACENT_POSITION = GoToAdjacentPosition
+    DROP_AT = DropAt
+    EMPTY_INVENTORY = EmptyInventory
+    GET_OBJECT = GetObject
+    MOVE_OBJECT = MoveObject
+    GO_DIR_N_STEPS = GoDirNSteps
+    UNBLOCK = Unblock
+    OPEN_BOX = OpenBox
+    OPEN_DOOR = OpenDoor
+    FIX_BRIDGE = FixBridge

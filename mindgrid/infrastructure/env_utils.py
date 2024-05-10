@@ -437,10 +437,16 @@ def get_full_env_desc(full_obs: np.ndarray) -> str:
     return description.strip()
 
 
-def bfs(grid, init_dir, start_pos, end_pos):
+def bfs(grid, start_dir, start_pos, end_pos):
 
-    print(grid)
-    state = (start_pos, init_dir)
+    """
+    for j in range(grid.shape[1]):
+        for i in range(grid.shape[0]):
+            print(grid[i][j], end=' ')
+        print()
+    """
+
+    state = (start_pos, start_dir)
     queue = deque([state])
     trace_back = {}
     trace_back[state] = -1
@@ -450,7 +456,6 @@ def bfs(grid, init_dir, start_pos, end_pos):
         (x, y), dir = state
 
         if (x, y) in end_pos:
-            print(x, y)
             actions = []
             while trace_back[state] != -1:
                 state, action = trace_back[state]

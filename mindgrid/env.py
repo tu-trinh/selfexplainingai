@@ -9,10 +9,10 @@ import numpy as np
 from minigrid.core.grid import Grid
 from minigrid.minigrid_env import MiniGridEnv
 
-from mindgrid.envs.editors import Edit
-from mindgrid.envs.layouts import Layout
+#from mindgrid.envs.editors import Edit
+#from mindgrid.envs.layouts import Layout
 from mindgrid.envs.objects import FireproofShoes
-from mindgrid.envs.tasks import Task
+#from mindgrid.envs.tasks import Task
 from mindgrid.infrastructure.env_constants import COLOR_NAMES
 
 
@@ -70,7 +70,23 @@ class MindGridEnv(MiniGridEnv):
 
         return obs, {}
 
-    def _gen_grid(self, width, height):
+    def reset_from_state(self, state: MindGridEnvState):
+        state = state.clone()
+
+        self._reset_objects_from_state(state)
+
+        self._gen_grid(self.width, self.height, reset_from_state=True)
+
+        self.agent_dir = state.agent_dir
+        self.agent_pos = state.agent_pos
+        self.carrying = state.carrying
+        self.step_count = 0
+
+        obs = self.gen_obs()
+
+        return obs, {}
+
+    def _gen_grid(self, width, height, reset_from_state=False):
         # create grid
         self.grid = Grid(width, height)
         for i in range(self.obstacle_thickness):
@@ -80,7 +96,11 @@ class MindGridEnv(MiniGridEnv):
             self.grid.set(o.init_pos[0], o.init_pos[1], o)
         # set objects
         for o in self.objects:
-            self.put_obj(o, o.init_pos[0], o.init_pos[1])
+            if reset_from_state:
+                if o.cur_pos != (-1, -1):
+                    self.grid.set(o.cur_pos[0], o.cur_pos[1], o)
+            else:
+                self.put_obj(o, o.init_pos[0], o.init_pos[1])
         # set agent
         self.agent_dir = self.agent_init_dir
         self.agent_pos = self.agent_init_pos
@@ -148,6 +168,9 @@ class MindGridEnv(MiniGridEnv):
         elif action == self.actions.toggle:
             if fwd_cell:
                 fwd_cell.toggle(self, fwd_pos)
+                # NOTE: box disappears after being opened
+                if fwd_cell.type == "box":
+                    fwd_cell.cur_pos = (-1, -1)
 
         # Done action (not used by default)
         elif action == self.actions.done:
@@ -159,8 +182,10 @@ class MindGridEnv(MiniGridEnv):
         if self.step_count >= self.max_steps:
             truncated = True
 
+        """
         if self.render_mode == "human":
             self.render()
+        """
 
         obs = self.gen_obs()
 
@@ -191,9 +216,19 @@ class MindGridEnvState:
         self.agent_pos = tuple(dc(env.agent_pos))
         self.front_pos = tuple(dc(env.front_pos))
         self.dir_vec = tuple(dc(env.dir_vec))
-        self.carrying = dc(env.carrying)
         self.outer_cells = dc(env.outer_cells)
+        self.simple_2d_map = env.gen_simple_2d_map()
+
+        # NOTE: carrying must be an object in self.objects
+        self.carrying = None
+        for o in self.objects:
+            if self._are_objects_equal(o, env.carrying):
+                self.carrying = o
+        assert self._are_objects_equal(self.carrying, env.carrying)
         # TODO: add more if needed
+
+    def clone(self):
+        return dc(self)
 
     def __eq__(self, other):
         if self.agent_dir != other.agent_dir:
@@ -214,7 +249,7 @@ class MindGridEnvState:
         for i, o in enumerate(self.objects):
             oo = other.objects[i]
             if not self._are_objects_equal(o, oo):
-                print("object")
+                print("object", o, oo)
                 return False
         # NOTE: assume that outer_cells never change
         return True
@@ -223,15 +258,21 @@ class MindGridEnvState:
         if o is None and oo is None:
             return True
         if o is None or oo is None:
+            #print("none")
             return False
         if type(o) != type(oo):
+            #print("type")
             return False
         if o.color != oo.color:
+            #print("color")
             return False
         if not self._are_objects_equal(o.contains, oo.contains):
+            #print("contains")
             return False
         if o.init_pos != oo.init_pos:
+            #print("init_pos")
             return False
         if o.cur_pos != oo.cur_pos:
+            #print("cur_pos", o.cur_pos, oo.cur_pos)
             return False
         return True

@@ -5,9 +5,9 @@ from typing import List, Tuple, Type
 
 from minigrid.core.world_object import Ball, Key, Lava, Wall
 
-from mindgrid.envs.editors import Edit, RoomDoorKeyEditor, TreasureIslandEditor
+from mindgrid.envs.editors import *
 from mindgrid.envs.objects import Bridge, DoorWithDirection, Hammer
-from mindgrid.envs.solvers import RoomDoorKeySolver, TreasureIslandSolver
+from mindgrid.envs.solvers import *
 from mindgrid.infrastructure.basic_utils import (
     CustomEnum,
     get_adjacent_cells,
@@ -20,6 +20,13 @@ class BaseLayout(ABC):
     def _init_layout(self):
         self.agent_init_dir = self.random.randint(0, 3)
         self.obstacle_thickness = 1
+
+    def _reset_objects_from_state(self, state: MindGridEnvState):
+        for i, o in enumerate(self.objects):
+            for oo in state.objects:
+                if o.type == oo.type and o.init_pos == oo.init_pos:
+                    self.objects[i] = oo
+                    break
 
     def edit(self, edits: List[Edit]):
         for e in edits:
@@ -193,6 +200,16 @@ class RoomDoorKeyLayout(BaseLayout):
 
         self.all_possible_pos -= get_adjacent_cells(pos)
 
+    def _reset_objects_from_state(self, state: MindGridEnvState):
+        super()._reset_objects_from_state(state)
+        self.tools = self.keys = []
+        self.openings = self.doors = []
+        for o in self.objects:
+            if o.type == "key":
+                self.keys.append(o)
+            elif o.type == "door":
+                self.doors.append(o)
+
 
 class TreasureIslandLayout(BaseLayout):
 
@@ -270,8 +287,18 @@ class TreasureIslandLayout(BaseLayout):
         self.bridges[-1].init_pos = pos
         self.all_possible_pos -= get_adjacent_cells(pos)
 
+    def _reset_objects_from_state(self, state: MindGridEnvState):
+        super()._reset_objects_from_state(state)
+        self.tools = self.hammers = []
+        self.openings = self.bridges = []
+        for o in self.objects:
+            if o.type == "hammer":
+                self.hammers.append(o)
+            elif o.type == "bridge":
+                self.bridges.append(o)
 
-class Layout(CustomEnum):
+
+class Layouts(CustomEnum):
 
     ROOM_DOOR_KEY = RoomDoorKeyLayout
     TREASURE_ISLAND = TreasureIslandLayout

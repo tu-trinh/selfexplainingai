@@ -43,6 +43,7 @@ class PickUpTask(BaseTask):
         self.target_objects = [Ball(color=self.target_color)]
 
 
-class Task(CustomEnum):
+class Tasks(CustomEnum):
 
     PICKUP = PickUpTask
+    #TODO: add more tasks here

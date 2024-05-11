@@ -1,5 +1,5 @@
-task: PICKUP
-roles: 
+task: pickup
+roles:
   executor: human
   observer: ai
   solver: ai
@@ -17,9 +17,9 @@ human:
     - toggle
     - done
   world_model:
-    task: PICKUP
-    layout: ROOM_DOOR_KEY
-    edits: [DOUBLE_GRID_SIZE, HIDE_TARGETS_IN_BOXES, CHANGE_TARGET_COLOR, TOGGLE_OPENING, TOGGLE_OPENING, FLIP_VERTICAL, BLOCK_OPENING]     
+    task: pickup
+    layout: room_door_key
+    edits: [double_grid_size, flip_vertical, change_target_color, hide_target_in_box, change_agent_view_size, add_opening, toggle_opening, block_opening, hide_tool_in_box, toggle_opening]
     seed: 35
     allowed_object_colors: ["green", "blue"]
 ai:
@@ -36,8 +36,9 @@ ai:
     - toggle
     - done
   world_model:
-    task: PICKUP
-    layout: TREASURE_ISLAND
-    edits: [DOUBLE_GRID_SIZE, FLIP_VERTICAL, CHANGE_TARGET_COLOR, TOGGLE_OPENING, REMOVE_TOOL]  
+    task: pickup
+    layout: treasure_island
+    edits: [double_grid_size, flip_vertical, change_target_color, hide_target_in_box, change_agent_view_size, add_opening, toggle_opening, add_passage, block_opening, put_agent_inside_section, hide_tool_in_box]
     seed: 1233
     allowed_object_colors: ["green", "blue"]
+

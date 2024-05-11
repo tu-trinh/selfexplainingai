@@ -11,7 +11,6 @@ class BaseTask(ABC):
 
     def _init_task(self):
         self.target_color = self.random.choice(self.allowed_object_colors)
-        self._make_target_objects()
         self._set_mission()
 
     @abstractmethod
@@ -22,15 +21,11 @@ class BaseTask(ABC):
     def _gen_mission(*args, **kwargs):
         pass
 
-    @abstractmethod
-    def _make_target_objects(self) -> None:
-        pass
-
 
 class PickUpTask(BaseTask):
 
     def _set_mission(self):
-        self.mission = f"pick up all {self.target_objects[0].color} {OBJ_NAME_MAPPING[type(self.target_objects[0])]}s"
+        self.mission = f"pick up all {self.target_color} {OBJ_NAME_MAPPING[self.target_cls]}s"
 
     def _gen_mission(object: str):
         return f"pick up the {object}"
@@ -39,11 +34,12 @@ class PickUpTask(BaseTask):
         mission_func=_gen_mission, ordered_placeholders=[TANGIBLE_OBJS]
     )
 
-    def _make_target_objects(self) -> None:
-        self.target_objects = [Ball(color=self.target_color)]
+    @property
+    def target_cls(self):
+        return Ball
 
 
 class Tasks(CustomEnum):
 
-    PICKUP = PickUpTask
+    pickup = PickUpTask
     #TODO: add more tasks here

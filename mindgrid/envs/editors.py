@@ -10,6 +10,10 @@ from mindgrid.infrastructure.basic_utils import CustomEnum, get_adjacent_cells
 
 class BaseEditor:
 
+    def edit(self, edits: List[Edit]):
+        for e in edits:
+            getattr(self, e.value)()
+
     def none(self):
         pass
 
@@ -38,16 +42,16 @@ class BaseEditor:
                     )
 
         # reposition objects
-        for o in self.objects:
+        for o in self.init_objects:
             o.init_pos = (o.init_pos[0] * 2, o.init_pos[1] * 2)
 
         # expand passages and openings
-        old_objects = self.objects
-        self.objects = []
+        # old_objects = self.init_objects
+        # self.init_objects = []
         new_passages = []
-        for o in old_objects:
+        for o in self.init_objects:
+
             if not (isinstance(o, Passage) or isinstance(o, self.opening_cls)):
-                self.objects.append(o)
                 continue
 
             expand_cells = set(
@@ -62,10 +66,8 @@ class BaseEditor:
             for c in expand_cells:
                 cc = (c[0] + o.dir_vec[0], c[1] + o.dir_vec[1])
                 if cc in expand_cells:
-                    self.objects.append(o)
-                    self.objects[-1].init_pos = c
-                    self.objects.append(Passage(o.dir_vec))
-                    self.objects[-1].init_pos = cc
+                    o.init_pos = c
+                    new_passages.append((Passage(o.dir_vec), cc))
                     expand_cells.remove(c)
                     expand_cells.remove(cc)
                     break
@@ -74,8 +76,11 @@ class BaseEditor:
                 self.obstacles.append(self.obstacle_cls())
                 self.obstacles[-1].init_pos = c
 
+        for o, init_pos in new_passages:
+            self.init_objects.add("passage", o, init_pos=init_pos)
+
         # reposition agent
-        self.agent_init_pos = (self.agent_init_pos[0] * 2, self.agent_init_pos[1] * 2)
+        self.init_agent_pos = (self.init_agent_pos[0] * 2, self.init_agent_pos[1] * 2)
         # double agent view size
         self.agent_view_size *= 2
 
@@ -95,13 +100,20 @@ class BaseEditor:
                 new_cells.add((self.width - 1 - c[0], c[1]))
             setattr(self, name, new_cells)
 
-        for o in self.objects + self.obstacles:
+        for o in self.init_objects:
             o.init_pos = (self.width - 1 - o.init_pos[0], o.init_pos[1])
-        self.agent_init_pos = (self.width - 1 - self.agent_init_pos[0], self.agent_init_pos[1])
-        if self.agent_init_dir in [0, 2]:
-            self.agent_init_dir = 2 - self.agent_init_dir
 
-        for o in self.objects:
+        for o in self.obstacles:
+            o.init_pos = (self.width - 1 - o.init_pos[0], o.init_pos[1])
+
+        self.init_agent_pos = (
+            self.width - 1 - self.init_agent_pos[0],
+            self.init_agent_pos[1],
+        )
+        if self.init_agent_dir in [0, 2]:
+            self.init_agent_dir = 2 - self.init_agent_dir
+
+        for o in self.init_objects:
             if hasattr(o, "dir_vec"):
                 o.dir_vec = (-o.dir_vec[0], o.dir_vec[1])
 
@@ -113,24 +125,23 @@ class BaseEditor:
             if new_color != self.target_color:
                 self.target_color = new_color
                 break
-        for o in self.target_objects:
+        for o in self.init_targets:
             o.color = self.target_color
         self._set_mission()
         # change colors of distractors of the same type as target objects
-        for o in self.distractor_objects:
-            if isinstance(o, type(self.target_objects[0])) and hasattr(o, "color"):
+        for o in self.init_distractors:
+            if isinstance(o, type(self.init_targets[0])) and hasattr(o, "color"):
                 o.color = self.random.choice(
                     list(set(self.allowed_object_colors) - set([self.target_color]))
                 )
         return new_color
 
-    def hide_targets_in_boxes(self):
+    def hide_target_in_box(self):
         boxes = []
-        for o in self.target_objects:
+        for o in self.init_targets:
             box = Box(color=self.random.choice(self.allowed_object_colors))
             box.contains = o
-            box.init_pos = o.init_pos
-            self.objects.append(box)
+            self.init_objects.add("box", box, init_pos=o.init_pos)
             boxes.append(box)
         return boxes
 
@@ -156,16 +167,15 @@ class BaseEditor:
         removed_obstacles, dir = self._try_drill_a_hole()
         self._remove_obstacles(removed_obstacles)
         for o in removed_obstacles:
-            self.objects.append(Passage(dir))
-            self.objects[-1].init_pos = o.init_pos
+            self.init_objects.add("passage", Passage(dir), init_pos=o.init_pos)
         return removed_obstacles
 
     def block_opening(self):
         # find an opening that is not yet blocked
         free_openings = []
-        for o in self.openings:
+        for o in self.init_openings:
             is_blocked = False
-            for oo in self.objects:
+            for oo in self.init_objects:
                 if oo.cur_pos in self.outer_cells and oo.cur_pos in get_adjacent_cells(
                     o
                 ):
@@ -176,33 +186,33 @@ class BaseEditor:
         if not free_openings:
             return None
         o = self.random.choice(free_openings)
-        for n in get_adjacent_cells(o.init_pos):
-            if n in self.outer_cells:
+        for c in get_adjacent_cells(o.init_pos):
+            if c in self.outer_cells:
                 color = self.random.choice(
                     list(set(self.allowed_object_colors) - set([self.target_color]))
                 )
                 ball = Ball(color=color)
-                ball.init_pos = n
-                self.distractor_objects.append(ball)
-                self.objects.append(ball)
+                self.init_objects.add("blocking_ball", ball, init_pos=c)
                 break
         return o, ball
 
     def put_agent_inside_section(self):
-        occupied_cells = [o.init_pos for o in self.objects + self.obstacles]
+        occupied_cells = [o.init_pos for o in self.init_objects] + [
+            o.init_pos for o in self.obstacles
+        ]
         free_cells = list(set(self.inner_cells) - set(occupied_cells))
-        self.agent_init_pos = self.random.choice(free_cells)
-        return self.agent_init_pos
+        self.init_agent_pos = self.random.choice(free_cells)
+        return self.init_agent_pos
 
     def hide_tool_in_box(self):
-        if not self.tools:
+        if not self.init_tools:
             return None
         # find a tool that is not already in a box
         target_tool = None
         while True:
-            tool = self.random.choice(self.tools)
+            tool = self.random.choice(self.init_tools)
             is_inside_box = False
-            for o in self.objects:
+            for o in self.init_objects:
                 if isinstance(o, Box) and o.contains == tool:
                     is_inside_box = True
             if not is_inside_box:
@@ -214,30 +224,24 @@ class BaseEditor:
 
         box = Box(color=self.random.choice(self.allowed_object_colors))
         box.contains = target_tool
-        box.init_pos = target_tool.init_pos
-        self.objects.append(box)
+        self.init_objects.add("box", box, init_pos=target_tool.init_pos)
 
         return target_tool, box
 
     def remove_tool(self):
-        if not self.tools:
+        if not self.init_tools:
             return None
-        tool = self.random.choice(self.tools)
-        del self.tools[self.tools.index(tool)]
+
+        removed_tool = self.random.choice(self.init_tools)
+        # remove tool
+        self.init_objects.remove(self.tool_name, removed_tool)
         # remove box that holds tool
         removed_box = None
-        for i, o in enumerate(self.objects):
-            if isinstance(o, Box) and o.contains == tool:
-                del self.objects[i]
-                removed_box = o
-                break
-        # remove tool
-        removed_tool = None
-        for i, o in enumerate(self.objects):
-            if isinstance(o, self.tool_cls):
-                del self.objects[i]
-                removed_tool = o
-                break
+        if "box" in self.init_objects:
+            for i, removed_box in enumerate(self.init_objects["box"]):
+                if removed_box.contains == removed_tool:
+                    self.init_objects.remove("box", removed_box)
+                    break
         return removed_tool, removed_box
 
     def _try_drill_a_hole(self):
@@ -309,24 +313,25 @@ class RoomDoorKeyEditor(BaseEditor):
         # doors can't be open and locked (1, 1)
         door_state = self.random.choice(((0, 0), (0, 1), (1, 0)))
         door = self.opening_cls(
-            self.doors[0].color, dir, is_open=door_state[0], is_locked=door_state[1]
+            self.init_doors[0].color,
+            dir,
+            is_open=door_state[0],
+            is_locked=door_state[1],
         )
-        door.init_pos = pos
-        self.doors.append(door)
-        self.objects.append(door)
+        self.init_objects.add("door", door, init_pos=pos)
 
         # create an entryway
         self._remove_obstacles(removed_obstacles)
         for o in removed_obstacles:
             if o.init_pos == door.init_pos:
                 continue
-            self.objects.append(Passage(dir))
-            self.objects[-1].init_pos = o.init_pos
+            self.init_objects.add("passage", Passage(dir), init_pos=o.init_pos)
+
         return door
 
     def toggle_opening(self):
         door_states = [(0, 0), (0, 1), (1, 0)]
-        d = self.random.choice(self.doors)
+        d = self.random.choice(self.init_doors)
         s = (d.is_open, d.is_locked)
         i = door_states.index(s)
         ns = door_states[(i + 1) % len(door_states)]
@@ -349,21 +354,18 @@ class TreasureIslandEditor(BaseEditor):
                 break
         assert pos is not None
         bridge = Bridge(dir, is_intact=self.random.choice([0, 1]))
-        bridge.init_pos = pos
-        self.bridges.append(bridge)
-        self.objects.append(bridge)
+        self.init_objects.add("bridge", bridge, init_pos=pos)
 
         # create an entryway
         self._remove_obstacles(removed_obstacles)
         for o in removed_obstacles:
             if o.init_pos == bridge.init_pos:
                 continue
-            self.objects.append(Passage(dir))
-            self.objects[-1].init_pos = o.init_pos
+            self.init_objects.add("passage", Passage(dir), init_pos=o.init_pos)
         return bridge
 
     def toggle_opening(self):
-        b = self.random.choice(self.bridges)
+        b = self.random.choice(self.init_bridges)
         b.is_intact = not b.is_intact
         return b
 
@@ -377,31 +379,34 @@ class TreasureIslandEditor(BaseEditor):
         return None
 
     def add_fireproof_shoes(self):
-        occupied_cells = [o.init_pos for o in self.objects + self.obstacles]
+        occupied_cells = [o.init_pos for o in self.init_objects] + [
+            o.init_pos for o in self.obstacles
+        ]
         free_cells = list(set(self.outer_cells) - set(occupied_cells))
         shoes = FireproofShoes()
-        shoes.init_pos = self.random.choice(free_cells)
-        self.objects.append(shoes)
+        self.init_objects.add(
+            "fireproof_shoes", shoes, init_pos=self.random.choice(free_cells)
+        )
         return shoes
 
 
 class Edits(CustomEnum):
 
     # applicable to all environments
-    NONE = "none"
-    DOUBLE_GRID_SIZE = "double_grid_size"
-    FLIP_VERTICAL = "flip_vertical"
-    CHANGE_TARGET_COLOR = "change_target_color"
-    HIDE_TARGETS_IN_BOXES = "hide_targets_in_boxes"
-    CHANGE_AGENT_VIEW_SIZE = "change_agent_view_size"
-    ADD_OPENING = "add_opening"
-    TOGGLE_OPENING = "toggle_opening"
-    ADD_PASSAGE = "add_passage"
-    BLOCK_OPENING = "block_opening"
-    PUT_AGENT_INSIDE_SECTION = "put_agent_inside_section"
-    HIDE_TOOL_IN_BOX = "hide_tool_in_box"
-    REMOVE_TOOL = "remove_tool"
+    none = "none"
+    double_grid_size = "double_grid_size"
+    flip_vertical = "flip_vertical"
+    change_target_color = "change_target_color"
+    hide_target_in_box = "hide_target_in_box"
+    change_agent_view_size = "change_agent_view_size"
+    add_opening = "add_opening"
+    toggle_opening = "toggle_opening"
+    add_passage = "add_passage"
+    block_opening = "block_opening"
+    put_agent_inside_section = "put_agent_inside_section"
+    hide_tool_in_box = "hide_tool_in_box"
+    remove_tool = "remove_tool"
 
     # treasure_island only
-    MAKE_LAVA_SAFE = "make_lava_safe"
-    ADD_FIREPROOF_SHOES = "add_fireproof_shoes"
+    make_lava_safe = "make_lava_safe"
+    add_fireproof_shoes = "add_fireproof_shoes"

@@ -14,6 +14,7 @@ from minigrid.minigrid_env import MiniGridEnv
 from mindgrid.envs.objects import FireproofShoes
 #from mindgrid.envs.tasks import Task
 from mindgrid.infrastructure.env_constants import COLOR_NAMES
+from mindgrid.infrastructure.env_utils import are_objects_equal
 
 
 class MindGridEnv(MiniGridEnv):
@@ -57,6 +58,8 @@ class MindGridEnv(MiniGridEnv):
 
     def reset(self, seed=None, options=None):
 
+        self._reset_objects()
+
         self._gen_grid(self.width, self.height)
 
         # Item picked up, being carried, initially nothing
@@ -73,7 +76,7 @@ class MindGridEnv(MiniGridEnv):
     def reset_from_state(self, state: MindGridEnvState):
         state = state.clone()
 
-        self._reset_objects_from_state(state)
+        self._reset_objects(state=state)
 
         self._gen_grid(self.width, self.height, reset_from_state=True)
 
@@ -102,8 +105,8 @@ class MindGridEnv(MiniGridEnv):
             else:
                 self.put_obj(o, o.init_pos[0], o.init_pos[1])
         # set agent
-        self.agent_dir = self.agent_init_dir
-        self.agent_pos = self.agent_init_pos
+        self.agent_dir = self.init_agent_dir
+        self.agent_pos = self.init_agent_pos
 
     def step(self, action):
         self.step_count += 1
@@ -182,10 +185,8 @@ class MindGridEnv(MiniGridEnv):
         if self.step_count >= self.max_steps:
             truncated = True
 
-        """
         if self.render_mode == "human":
             self.render()
-        """
 
         obs = self.gen_obs()
 
@@ -211,6 +212,7 @@ class MindGridEnv(MiniGridEnv):
 class MindGridEnvState:
 
     def __init__(self, env: MindGridEnv):
+
         self.objects = dc(env.objects)
         self.agent_dir = dc(env.agent_dir)
         self.agent_pos = tuple(dc(env.agent_pos))
@@ -222,10 +224,11 @@ class MindGridEnvState:
         # NOTE: carrying must be an object in self.objects
         self.carrying = None
         for o in self.objects:
-            if self._are_objects_equal(o, env.carrying):
+            if are_objects_equal(o, env.carrying):
                 self.carrying = o
-        assert self._are_objects_equal(self.carrying, env.carrying)
-        # TODO: add more if needed
+                break
+        assert are_objects_equal(self.carrying, env.carrying)
+        # TODO: add more attributes if needed
 
     def clone(self):
         return dc(self)
@@ -243,36 +246,11 @@ class MindGridEnvState:
         if self.dir_vec != other.dir_vec:
             print("dir_vec")
             return False
-        if not self._are_objects_equal(self.carrying, other.carrying):
+        if not are_objects_equal(self.carrying, other.carrying):
             print("carrying")
             return False
-        for i, o in enumerate(self.objects):
-            oo = other.objects[i]
-            if not self._are_objects_equal(o, oo):
-                print("object", o, oo)
-                return False
-        # NOTE: assume that outer_cells never change
+        if self.objects != other.objects:
+            return False
+        # NOTE: assume that outer_cells never change so we don't check
         return True
 
-    def _are_objects_equal(self, o, oo):
-        if o is None and oo is None:
-            return True
-        if o is None or oo is None:
-            #print("none")
-            return False
-        if type(o) != type(oo):
-            #print("type")
-            return False
-        if o.color != oo.color:
-            #print("color")
-            return False
-        if not self._are_objects_equal(o.contains, oo.contains):
-            #print("contains")
-            return False
-        if o.init_pos != oo.init_pos:
-            #print("init_pos")
-            return False
-        if o.cur_pos != oo.cur_pos:
-            #print("cur_pos", o.cur_pos, oo.cur_pos)
-            return False
-        return True

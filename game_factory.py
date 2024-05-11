@@ -48,11 +48,11 @@ def create_skillset_mismatch_games():
     print(config)
     game = Discussion(config)
 
-    env = game.ai.world_model
+    env = game.human.world_model
     env.reset()
 
-    planner = Planner(config.ai.world_model)
-    skillset = [s.value for s in Skills]
+    planner = Planner(config.human.world_model)
+    skillset = list(Skills)
     plan = planner(env, skillset)
 
     env.reset()
@@ -60,7 +60,7 @@ def create_skillset_mismatch_games():
     input()
     for k, v in plan:
         print(k, v)
-        k(**v)(env)
+        k.value(**v)(env)
         print(env.agent_pos, env.agent_dir)
     print(env.carrying)
     pass

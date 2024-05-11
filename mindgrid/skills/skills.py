@@ -10,7 +10,7 @@ from mindgrid.envs.objects import Bridge, DoorWithDirection
 from mindgrid.infrastructure.basic_utils import get_adjacent_cells, CustomEnum
 from mindgrid.infrastructure.env_constants import VEC_TO_DIR, DIR_TO_VEC
 from mindgrid.infrastructure.env_utils import bfs
-from mindgrid.infrastructure.trajectory import Trajectory
+from mindgrid.infrastructure.trajectory import Trajectory, NullTrajectory
 
 
 def execute(env: MindGridEnv, actions: List[ActType], render=False) -> Trajectory:
@@ -28,10 +28,28 @@ def execute(env: MindGridEnv, actions: List[ActType], render=False) -> Trajector
     return t
 
 
-def _get_same_object(s: MindGridEnvState, o: WorldObj):
+def _get_same_object(s: MindGridEnvState, o: WorldObj) -> WorldObj:
     for oo in s.objects:
         if oo.init_pos == o.init_pos and oo.type == o.type:
             return oo
+    return None
+
+
+def _find_free_cell(env: MindGridEnv, start_pos: Tuple[int, int], r=1) -> Tuple[int, int]:
+    cand = []
+    for dx in range(-r, r):
+        for dy in range(-r, r):
+            if dx == dy == 0:
+                continue
+            pos = start_pos[0] + dx, start_pos[1] + dy
+            if (
+                0 <= pos[0] < env.width
+                and 0 <= pos[1] < env.height
+                and env.grid.get(*pos) is None
+            ):
+                cand.append((abs(dx) + abs(dy), pos))
+    if cand:
+        return sorted(cand, key=lambda x: x[0])[0][1]
     return None
 
 
@@ -73,7 +91,7 @@ class GoTo(BaseSkill):
             [self.pos],
         )
         if actions is None:
-            return None
+            return NullTrajectory()
         return execute(env, actions)
 
     def recognize(t):
@@ -113,7 +131,7 @@ class RotateTowardsObject(BaseSkill):
 
         # skill is not applicable if agent is NOT adjacent to an object
         if env.agent_pos not in get_adjacent_cells(obj.cur_pos):
-            return None
+            return NullTrajectory()
 
         from_dir = VEC_TO_DIR[tuple(env.dir_vec)]
         dir = (obj.cur_pos[0] - env.agent_pos[0], obj.cur_pos[1] - env.agent_pos[1])
@@ -185,7 +203,7 @@ class GoToAdjacentObject(BaseSkill):
             if actions is not None:
                 cand.append(actions)
         if not cand:
-            return None
+            return NullTrajectory()
 
         cand = sorted(cand, key=lambda x: len(x))
         t = execute(env, cand[0])
@@ -257,7 +275,8 @@ class DropAt(BaseSkill):
     def __call__(self, env: MindGridEnv):
         # applicable only when carrying an object
         if env.carrying is None:
-            return None
+            return NullTrajectory()
+        # go to pos and drop
         t = GoToAdjacentPosition(self.pos)(env)
         t = t.merge(execute(env, [env.actions.drop]))
         return t
@@ -288,15 +307,10 @@ class EmptyInventory(BaseSkill):
             return execute(env, [])
 
         # find a free adjacent cell to drop
-        # FIXME: should search over a larger area
-        drop_pos = None
-        for pos in get_adjacent_cells(env.agent_pos):
-            if env.grid.get(*pos) is None:
-                drop_pos = pos
-                break
+        drop_pos = _find_free_cell(env, env.agent_pos)
 
         if drop_pos is None:
-            return None
+            return NullTrajectory()
 
         return DropAt(drop_pos)(env)
 
@@ -324,11 +338,9 @@ class OpenBox(BaseSkill):
         # box has been opened, skill is not applicable
         o = env.grid.get(*box.cur_pos)
         if o.type != "box":
-            return None
+            return NullTrajectory()
         # go to the box and toggle it
         t = GoToAdjacentObject(box)(env)
-        if t is None:
-            return None
         t = t.merge(execute(env, [env.actions.toggle]))
         return t
 
@@ -341,7 +353,6 @@ class OpenBox(BaseSkill):
         ret = GoToAdjacentObject.recognize(t.slice(0, t.n_states - 2))
         if ret is None:
             return None
-
         for o in t.first_state.objects:
             if o.type == "box" and o.cur_pos == t.last_state.front_pos:
                 return {"box": o}
@@ -370,7 +381,7 @@ class GetObject(BaseSkill):
             )
             is None
         ):
-            return None
+            return NullTrajectory()
         # if object is in a box, open it
         o = env.grid.get(*obj.cur_pos)
         if isinstance(o, Box):
@@ -378,8 +389,6 @@ class GetObject(BaseSkill):
         else:
             # else, go to object
             t = GoToAdjacentObject(obj)(env)
-        if t is None:
-            return None
         # if agent is carrying an object, drop it
         t = t.merge(EmptyInventory()(env))
         # rotate towards object
@@ -395,18 +404,26 @@ class GetObject(BaseSkill):
         # must carry an object at the end
         if t.last_state.carrying is None:
             return None
-        # check if = EmptyInventory + (OpenBox or GoToAdjacentObject)
+
         N = t.n_states - 1
         for i in range(N):
-            for j in range(i):
-                t1 = t.slice(0, j)
-                t2 = t.slice(j, i)
-                t3 = t.slice(i, N - 1)
-                if (
-                    OpenBox.recognize(t1) is not None
-                    or GoToAdjacentObject.recognize(t1) is not None
-                ) and EmptyInventory.recognize(t2) is not None and RotateTowardsObject(t3):
-                    return {"obj": _get_same_object(t.first_state, t.last_state.carrying)}
+            t1 = t.slice(0, i)
+            if (
+                OpenBox.recognize(t1) is not None
+                or GoToAdjacentObject.recognize(t1) is not None
+            ):
+                for j in range(i, N):
+                    t2 = t.slice(i, j)
+                    t3 = t.slice(j, N - 1)
+                    if (
+                        EmptyInventory.recognize(t2) is not None
+                        and RotateTowardsObject.recognize(t3) is not None
+                    ):
+                        return {
+                            "obj": _get_same_object(
+                                t.first_state, t.last_state.carrying
+                            )
+                        }
         return None
 
 
@@ -433,9 +450,9 @@ class MoveObject(BaseSkill):
         N = t.n_states
         for i in range(N):
             t1 = t.slice(0, i)
-            t2 = t.slice(i, N - 1)
             ret1 = GetObject.recognize(t1)
             if ret1 is not None:
+                t2 = t.slice(i, N - 1)
                 ret2 = DropAt.recognize(t2)
                 if ret2 is None:
                     continue
@@ -496,17 +513,12 @@ class Unblock(BaseSkill):
             return execute(env, [])
 
         # otherwise, find a free cell and move blocking object there
-        # FIXME: should search in a larger area
-        pos = None
-        for c in get_adjacent_cells(block_obj.cur_pos):
-            if env.grid.get(*c) is None:
-                pos = c
-                break
+        drop_pos = _find_free_cell(env, block_obj.cur_pos)
 
-        if pos is None:
-            return None
+        if drop_pos is None:
+            return NullTrajectory()
 
-        return MoveObject(block_obj, pos)(env)
+        return MoveObject(block_obj, drop_pos)(env)
 
     def recognize(t):
 
@@ -552,13 +564,13 @@ class OpenDoor(BaseSkill):
         if door.is_locked:
             # if there is no key, can't open
             if not env.keys:
-                return None
+                return NullTrajectory()
             t = t.merge(GetObject(env.keys[0])(env))
 
         # go to door
         t = t.merge(GoToAdjacentObject(door)(env))
         # toggle door
-        t = t.merge(self.execute(env, [env.actions.toggle]))
+        t = t.merge(execute(env, [env.actions.toggle]))
         return t
 
     def recognize(t):
@@ -596,7 +608,7 @@ class FixBridge(BaseSkill):
 
         # if there is no tool, can't fix
         if not env.tools:
-            return None
+            return NullTrajectory()
 
         # unblock bridge
         t = Unblock(bridge)(env)
@@ -634,18 +646,18 @@ class FixBridge(BaseSkill):
 
 class Skills(CustomEnum):
 
-    PRIMITIVE = Primitive
-    GOTO = GoTo
-    ROTATE_TOWARDS_OBJECT = RotateTowardsObject
-    ROTATE_TOWARDS_DIRECTION = RotateTowardsDirection
-    GOTO_ADJACENT_OBJECT = GoToAdjacentObject
-    GOTO_ADJACENT_POSITION = GoToAdjacentPosition
-    DROP_AT = DropAt
-    EMPTY_INVENTORY = EmptyInventory
-    GET_OBJECT = GetObject
-    MOVE_OBJECT = MoveObject
-    GO_DIR_N_STEPS = GoDirNSteps
-    UNBLOCK = Unblock
-    OPEN_BOX = OpenBox
-    OPEN_DOOR = OpenDoor
-    FIX_BRIDGE = FixBridge
+    primitive = Primitive
+    goto = GoTo
+    rotate_towards_object = RotateTowardsObject
+    rotate_towards_direction = RotateTowardsDirection
+    goto_adjacent_object = GoToAdjacentObject
+    goto_adjacent_position = GoToAdjacentPosition
+    drop_at = DropAt
+    empty_inventory = EmptyInventory
+    get_object = GetObject
+    move_object = MoveObject
+    go_dir_n_steps = GoDirNSteps
+    unblock = Unblock
+    open_box = OpenBox
+    open_door = OpenDoor
+    fix_bridge = FixBridge

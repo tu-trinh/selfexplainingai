@@ -36,6 +36,10 @@ class Trajectory:
         return new_t
 
     def merge(self, t: Trajectory) -> Trajectory:
+
+        if t.is_null:
+            return NullTrajectory()
+
         assert (
             self.last_state == t.first_state
         ), "Can't merge incompatible trajectories!"
@@ -67,5 +71,19 @@ class Trajectory:
     def last_state(self):
         return self.states[-1]
 
+    @property
+    def is_null(self):
+        return False
+
     def __eq__(self, other: Trajectory):
         return self.actions == other.actions and self.states == other.states
+
+
+class NullTrajectory(Trajectory):
+
+    def merge(self, t: Trajectory) -> Trajectory:
+        return self
+
+    def is_null(self):
+        return True
+

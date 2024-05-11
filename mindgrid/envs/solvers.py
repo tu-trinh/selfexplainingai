@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 
 from mindgrid.infrastructure.env_utils import bfs
 from mindgrid.infrastructure.basic_utils import get_adjacent_cells
+from mindgrid.infrastructure.trajectory import NullTrajectory
 import mindgrid.skills as skill_lib
 
 
@@ -23,37 +24,31 @@ class RoomDoorKeySolver(BaseSolver):
                 self.gen_simple_2d_map(),
                 self.agent_dir,
                 self.agent_pos,
-                get_adjacent_cells(self.target_objects[0].cur_pos),
+                get_adjacent_cells(self.targets[0].cur_pos),
             )
             is None
         ):
             if self.doors:
-                # choose a door and open it
-                target_door = self.random.choice(self.doors)
-                t = skill_lib.OpenDoor(target_door)(self)
-                if t is None:
-                    return None
-                t = t.merge(skill_lib.Unblock(target_door)(self))
+                # check if there is an open door
+                open_door = None
+                for d in self.doors:
+                    if d.is_open:
+                        open_door = d
+                        break
+                if open_door is None:
+                    # choose a door and open it
+                    open_door = self.random.choice(self.doors)
+                    t = skill_lib.OpenDoor(open_door)(self)
+                else:
+                    t = skill_lib.execute(self, [])
+                t = t.merge(skill_lib.Unblock(open_door)(self))
             else:
                 # no doors and can't reach goal -> no solution
-                return None
+                return NullTrajectory()
         else:
             t = skill_lib.execute(self, [])
 
-        # check if target object is in a box
-        box_with_target_object = None
-        for o in self.objects:
-            if o.type == "box" and o.contains == self.target_objects[0]:
-                box_with_target_object = o
-                break
-
-        # open box containing target object
-        if box_with_target_object is not None:
-            t = t.merge(skill_lib.OpenBox(box_with_target_object)(self))
-
-        # get target object
-        t = t.merge(skill_lib.GoToAdjacentObject(self.target_objects[0])(self))
-        t = t.merge(skill_lib.GetObject(self.target_objects[0])(self))
+        t = t.merge(skill_lib.GetObject(self.targets[0])(self))
 
         return t
 
@@ -67,7 +62,7 @@ class TreasureIslandSolver(BaseSolver):
                 self.gen_simple_2d_map(),
                 self.agent_dir,
                 self.agent_pos,
-                get_adjacent_cells(self.target_objects[0].cur_pos),
+                get_adjacent_cells(self.targets[0].cur_pos),
             )
             is None
         ):
@@ -80,37 +75,26 @@ class TreasureIslandSolver(BaseSolver):
             if fireproof_shoes is not None:
                 t = skill_lib.GetObject(fireproof_shoes)(self)
             elif self.bridges:
-                # choose a bridge and fix it
-                target_bridge = self.random.choice(self.bridges)
-                t = skill_lib.FixBridge(target_bridge)(self)
-                if t is None:
-                    return None
-                t = t.merge(skill_lib.Unblock(target_bridge)(self))
+                # find an intact bridge
+                intact_bridge = None
+                for b in self.bridges:
+                    if b.is_intact:
+                        intact_bridge = b
+                        break
+                if intact_bridge is None:
+                    # choose a bridge and fix it
+                    intact_bridge = self.random.choice(self.bridges)
+                    t = skill_lib.FixBridge(intact_bridge)(self)
+                else:
+                    t = skill_lib.execute(self, [])
+                t = t.merge(skill_lib.Unblock(intact_bridge)(self))
             else:
                 # no bridges and shoes and can't reach goal -> no solution
-                return None
+                return NullTrajectory()
         else:
             t = skill_lib.execute(self, [])
 
-
-        """
-        # check if target object is in a box
-        box_with_target_object = None
-        for o in self.objects:
-            if o.type == "box" and o.contains == self.target_objects[0]:
-                box_with_target_object = o
-                break
-
-        # open box containing target object
-        if box_with_target_object is not None:
-            t = t.merge(skill_lib.OpenBox(box_with_target_object)(self))
-
-        # get target object
-        t = t.merge(skill_lib.GoToAdjacentObject(self.target_objects[0])(self))
-        t = t.merge(skill_lib.GetObject(self.target_objects[0])(self))
-        """
-
-        t = t.merge(skill_lib.GetObject(self.target_objects[0])(self))
+        t = t.merge(skill_lib.GetObject(self.targets[0])(self))
 
         return t
 

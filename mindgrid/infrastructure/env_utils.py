@@ -437,6 +437,30 @@ def get_full_env_desc(full_obs: np.ndarray) -> str:
     return description.strip()
 
 
+def are_objects_equal(o, oo):
+        if o is None and oo is None:
+            return True
+        if o is None or oo is None:
+            #print("none")
+            return False
+        if type(o) != type(oo):
+            #print("type")
+            return False
+        if o.color != oo.color:
+            #print("color")
+            return False
+        if not are_objects_equal(o.contains, oo.contains):
+            #print("contains")
+            return False
+        if o.init_pos != oo.init_pos:
+            #print("init_pos")
+            return False
+        if o.cur_pos != oo.cur_pos:
+            #print("cur_pos", o.cur_pos, oo.cur_pos)
+            return False
+        return True
+
+
 def bfs(grid, start_dir, start_pos, end_pos):
 
     """
@@ -479,3 +503,6 @@ def bfs(grid, start_dir, start_pos, end_pos):
                 trace_back[nstate] = (state, Actions.left if d == -1 else Actions.right)
 
     return None
+
+
+

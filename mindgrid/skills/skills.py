@@ -79,8 +79,9 @@ class Primitive(BaseSkill):
     def verbalize(self, env):
         return self.action.name
 
-    def description(self):
-        return "I can perform the following actions: (1) left: rotate counterclockwise 90 degrees; (2) right: rotate clockwise 90 degrees; (3) forward: move forward to the next cell; (4) pickup: pick up an object and place it in the inventory; (5) toggle: change the state of an object; (6) drop: place the object currently in the inventory onto the cell directly ahead; (7) done: announce that the current task is completed. The pickup and toggle actions are applicable only to objects that are directly in front of me."
+    @staticmethod
+    def description():
+        return "perform one of the following actions: (1) left: rotate counterclockwise 90 degrees; (2) right: rotate clockwise 90 degrees; (3) forward: move forward to the next cell; (4) pickup: pick up an object and place it in the inventory; (5) toggle: change the state of an object; (6) drop: place the object currently in the inventory onto the cell directly ahead; (7) done: announce that the current task is completed. The pickup and toggle actions are applicable only to objects that are directly in front of me."
 
 
 class GoTo(BaseSkill):
@@ -128,9 +129,10 @@ class GoTo(BaseSkill):
     def verbalize(self, env):
         return f"go to the cell at column {self.pos[0]} and row {self.pos[1]}"
 
-    def description(self):
+    @staticmethod
+    def description():
         return (
-            "I can traverse to a location on the grid. Example: go to column 4 row 3."
+            "traverse to a location on the grid. Example: go to column 4 row 3."
         )
 
 
@@ -174,8 +176,9 @@ class RotateTowardsObject(BaseSkill):
     def verbalize(self, env):
         return f"rotate towards the {self.obj.type}"
 
-    def description(self):
-        return "I can rotate to face a target object. The object must be located in an adjacent cell. Example: rotate towards the door at row 1 column 8."
+    @staticmethod
+    def description():
+        return "rotate to face a target object. The object must be located in an adjacent cell. Example: rotate towards the door at row 1 column 8."
 
 
 class RotateTowardsDirection(BaseSkill):
@@ -202,8 +205,9 @@ class RotateTowardsDirection(BaseSkill):
     def verbalize(self, env):
         return f"rotate towards the {IDX_TO_DIR[self.dir]}"
 
-    def description(self):
-        return "I can rotate until I am heading in a specific direction. Example: rotate towards the west."
+    @staticmethod
+    def description():
+        return "rotate until I am heading in a specific direction. Example: rotate towards the west."
 
 
 class GoAdjacentToObject(BaseSkill):
@@ -276,8 +280,9 @@ class GoAdjacentToObject(BaseSkill):
     def verbalize(self, env):
         return f"go adjacent to the {describe_object(self.obj, env.objects, relative=False, partial=True)}"
 
-    def description(self):
-        return "I can move to a cell adjacent to a target object and then rotate to face it. Example: go adjacent to the green box at column 9."
+    @staticmethod
+    def description():
+        return "move to a cell adjacent to a target object and then rotate to face it. Example: go adjacent to the green box at column 9."
 
 
 class GoAdjacentToPosition(BaseSkill):
@@ -300,8 +305,9 @@ class GoAdjacentToPosition(BaseSkill):
     def verbalize(self, env):
         return f"go adjacent to the location {describe_position(self.pos, env.grid.encode().shape, relative=False)}"
 
-    def description(self):
-        return "I can move to a cell adjacent to a target cell and then rotate to face it. Example: go adjacent to the location at column 3 row 7."
+    @staticmethod
+    def description():
+        return "move to a cell adjacent to a target cell and then rotate to face it. Example: go adjacent to the location at column 3 row 7."
 
 
 class DropAt(BaseSkill):
@@ -334,8 +340,9 @@ class DropAt(BaseSkill):
     def verbalize(self, env):
         return f"drop the carried object at {describe_position(self.pos, env.grid.encode().shape, relative=False)}"
 
-    def description(self):
-        return "I can drop the object currently in my inventory onto a target location. Example: drop the carried object at column 5 row 2."
+    @staticmethod
+    def description():
+        return "drop the object currently in my inventory onto a target location. Example: drop the carried object at column 5 row 2."
 
 
 class EmptyInventory(BaseSkill):
@@ -372,8 +379,9 @@ class EmptyInventory(BaseSkill):
     def verbalize(self, env):
         return "empty inventory"
 
-    def description(self):
-        return "I can place the object I am carrying onto an unoccupied cell. Example: empty inventory."
+    @staticmethod
+    def description():
+        return "place the object I am carrying onto an unoccupied cell. Example: empty inventory."
 
 
 class OpenBox(BaseSkill):
@@ -410,8 +418,9 @@ class OpenBox(BaseSkill):
     def verbalize(self, env):
         return f"open the {describe_object(self.box, env.objects, relative=False, partial=True)}"
 
-    def description(self):
-        return "I can open a specific box. Example: open the blue box at row 4."
+    @staticmethod
+    def description():
+        return "open a specific box. Example: open the blue box at row 4."
 
 
 class GetObject(BaseSkill):
@@ -484,8 +493,9 @@ class GetObject(BaseSkill):
     def verbalize(self, env):
         return f"get the {describe_object(self.obj, env.objects, relative=False, partial=True)}"
 
-    def description(self):
-        return "I can retrieve a specific object and store it in my inventory. This skill is applicable only when I can reach the object. Example: get the key in column 7."
+    @staticmethod
+    def description():
+        return "retrieve a specific object and store it in my inventory. This skill is applicable only when reach the object. Example: get the key in column 7."
 
 
 class MoveObject(BaseSkill):
@@ -526,8 +536,9 @@ class MoveObject(BaseSkill):
     def verbalize(self, env):
         return f"move the {describe_object(self.obj, env.objects, relative=False, partial=True)} to the cell at {describe_position(self.pos, env.grid.encode().shape, relative=False)}"
 
-    def description(self):
-        return "I can move an object to a target location. Example: move the ball in row 4 to column 6 row 8."
+    @staticmethod
+    def description():
+        return "move an object to a target location. Example: move the ball in row 4 to column 6 row 8."
 
 
 class GoDirNSteps(BaseSkill):
@@ -558,8 +569,9 @@ class GoDirNSteps(BaseSkill):
     def verbalize(self, env):
         return f"go {IDX_TO_DIR[self.dir]} {self.n} {inflect.engine().plural('step', self.n)}"
 
-    def description(self):
-        return "I can go N steps in a specific direction. Example: go north 5 steps."
+    @staticmethod
+    def description():
+        return "go N steps in a specific direction. Example: go north 5 steps."
 
 
 class Unblock(BaseSkill):
@@ -619,8 +631,9 @@ class Unblock(BaseSkill):
     def verbalize(self, env):
         return f"unblock the {describe_object(self.obj, env.objects, relative=False, partial=True)}"
 
-    def description(sef):
-        return "I can unblock a specific door. Example: unblock the blue door."
+    @staticmethod
+    def description():
+        return "unblock a specific door. Example: unblock the blue door."
 
 
 class OpenDoor(BaseSkill):
@@ -674,8 +687,9 @@ class OpenDoor(BaseSkill):
     def verbalize(self, env):
         return f"open the {describe_object(self.door, env.objects, relative=False, partial=True)}"
 
-    def description(self):
-        return "I can open a specific door. Example: open the door at row 3."
+    @staticmethod
+    def description():
+        return "open a specific door. Example: open the door at row 3."
 
 
 class FixBridge(BaseSkill):
@@ -731,9 +745,10 @@ class FixBridge(BaseSkill):
     def verbalize(self, env):
         return f"fix the {describe_object(self.bridge, env.objects, relative=False, partial=True)}"
 
-    def description(self):
+    @staticmethod
+    def description():
         return (
-            "I can fix a specific bridge. Example: fix the damaged bridge at column 7."
+            "fix a specific bridge. Example: fix the damaged bridge at column 7."
         )
 
 

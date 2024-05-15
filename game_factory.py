@@ -86,19 +86,11 @@ def fix_edit_order(edits):
             edits[i], edits[0] = edits[0], edits[i]
             return
 
-
-def create_skillset_datapoint(task, split, i, colors, skill_count):
-
-    # only create dataset for listener task
-    # speaker task dataset will be derived from listener task dataset
-    assert task in ["listen"]
-
-    item = {}
-
+def make_init_config():
     config = make_config(file_path="mindgrid/configs/base.yaml")
 
     # set roles
-    config.roles.observer = "ai"  # doesn't matter
+    config.roles.observer = "human"
     config.roles.executor = "human"
     config.roles.solver = "ai"
 
@@ -118,6 +110,20 @@ def create_skillset_datapoint(task, split, i, colors, skill_count):
         skills.remove(Skills.fix_bridge)
     elif wm_config.layout == "treasure_island":
         skills.remove(Skills.open_door)
+    return config, skills
+
+
+
+def create_skillset_datapoint(task, split, i, colors, skill_count):
+
+    # only create dataset for listener task
+    # speaker task dataset will be derived from listener task dataset
+    assert task in ["listen"]
+
+    item = {}
+
+    config, skills = make_init_config()
+    wm_config = config.ai.world_model
 
     must_have_skill = sample_inversely(skill_count, skills)
     print(must_have_skill.name)
@@ -139,11 +145,6 @@ def create_skillset_datapoint(task, split, i, colors, skill_count):
         fix_edit_order(wm_config.edits)
 
         env = make_env(wm_config)
-
-        # env.render_mode = "human"
-        # env.reset()
-        # env.render()
-
         planner = Planner(wm_config)
 
         p1 = try_generate_plan(planner, env, skills, must_have_skill=must_have_skill)
@@ -190,6 +191,71 @@ def create_skillset_datapoint(task, split, i, colors, skill_count):
     item["ref_plan"]["non_executor"] = [(x[0].name, x[1]) for x in p2]
 
     return item
+
+
+def create_worldmodel_datapoint(task, split, i, colors, skill_count):
+
+    # only create dataset for listener task
+    # speaker task dataset will be derived from listener task dataset
+    assert task in ["listen"]
+
+    item = {}
+
+    config, skills = make_init_config()
+
+    observer = config.roles.observer
+    nonobserver = "human" if observer == "ai" else "ai"
+
+    if split == "train":
+        observer_edits = random.sample(edits, 2)
+        nonobserver_edits = []
+    else:
+        nonobserver_edits = random.sample(edits, 2)
+        left_edits = [x for x in edits if x not in nonobserver_edits]
+
+        n_observer_edits = random.randint(0, len(left_edits) - 1)
+        observer_edits = random.sample(left_edits, n_observer_edits)
+
+    fix_edit_order(observer_edits)
+    fix_edit_order(nonobserver_edits)
+
+    observer_wm_config = getattr(config, observer).world_model
+    nonobserver_wm_config = getattr(config, nonobserver).world_model
+
+    observer_env = make_env(observer_wm_config)
+    nonobserver_env = make_env(observer_wm_config)
+    nonobserver_env.edit(nonobserver_edits)
+
+    while True:
+        n_skills = random.randint(1, len(skills) - 1)
+        skillset = random.sample(skills, n_skills)
+
+        observer_planner = Planner(
+
+        p_observer =
+        p_nonobserver =
+
+
+    t1 = execute_plan(env, p1)
+    t2 = execute_plan(env, p2)
+
+    config.human.world_model = config.ai.world_model = wm_config
+    executor = config.roles.executor
+    non_executor = "ai" if executor == "human" else "human"
+
+    getattr(config, executor).skillset = [s.name for s in p1_skillset]
+    getattr(config, non_executor).skillset = [s.name for s in p2_skillset]
+
+    config_dict = config.to_dict()
+    config_str = yaml.safe_dump(config_dict, default_flow_style=False, sort_keys=False)
+
+    item["config"] = config_str
+    item["ref_plan"] = {}
+    item["ref_plan"]["executor"] = [(x[0].name, x[1]) for x in p1]
+    item["ref_plan"]["non_executor"] = [(x[0].name, x[1]) for x in p2]
+
+    return item
+
 
 
 def create_split(task, split, dataset, datapoint_creation_fn):

@@ -30,9 +30,9 @@ def create_intention_datapoint(game_item):
         item["skill_name"] = s
         item["arguments"] = a
 
-        skill = to_enum(Skills, s).value(**a)
+        skill_cls = to_enum(Skills, s).value
+        skill = skill_cls(**a)
         item["instruction"] = tokenize(skill.verbalize(env))
-        item["skill_description"] = tokenize(skill.description())
 
         t = skill(env)
         full_obs = []

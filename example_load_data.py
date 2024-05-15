@@ -1,4 +1,6 @@
 import pickle
+from mindgrid.skills import Skills
+from mindgrid.infrastructure.basic_utils import to_enum
 
 game_path = "datasets/skillset_listen_games_1000.pickle"
 data_path = "datasets/skillset_listen_data_1000.pickle"
@@ -41,7 +43,8 @@ for o, a in zip(x["partial_text_obs"], x["actions"]):
 d += x["partial_text_obs"][-1]
 # this format can be helpful for prompting
 print("----------Example listener task prompt-----------")
-print("Instruction:", x["instruction"])
+print("Skill description :", to_enum(Skills, x["skill_name"]).value.description())
+print("Instruction :", x["instruction"])
 print(d)
 print("Your action:")
 print("----------End-----------")
@@ -59,9 +62,13 @@ print()
 # for example
 print("----------Example speaker task prompt-----------")
 print(d)
+print()
 print("What skill does the above the trajectory describe? Below are the skill names and their descriptions")
-print("[LIST OF SKILL DEFINTIONS]")
-print("e.g. (1)", x["skill_name"], ":", x["skill_description"].replace("I can", ""))
-print("Your answer:")
+print()
+print("List of skills and their definitions")
+for i, s in enumerate(Skills):
+    print(str(i + 1) + ". ", s.name, ":", s.value.description())
+print("\nYour answer:")
 print("----------End prompt-----------")
+
 

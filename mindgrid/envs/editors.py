@@ -14,9 +14,6 @@ class BaseEditor:
         for e in edits:
             getattr(self, e.value)()
 
-    def none(self):
-        pass
-
     def double_grid_size(self):
         # expand set of inner, outer, divider cells
         for name in ["inner_cells", "outer_cells", "divider_cells"]:
@@ -393,7 +390,6 @@ class TreasureIslandEditor(BaseEditor):
 class Edits(CustomEnum):
 
     # applicable to all environments
-    none = "none"
     double_grid_size = "double_grid_size"
     flip_vertical = "flip_vertical"
     change_target_color = "change_target_color"

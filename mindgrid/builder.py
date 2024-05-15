@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import List
 
+from minigrid.wrappers import FullyObsWrapper
+
 from mindgrid.env import MindGridEnv
 from mindgrid.envs.editors import Edits
 from mindgrid.envs.layouts import Layouts
@@ -25,8 +27,9 @@ def make_env(config):
         layout,
         edits,
         allowed_object_colors=config.allowed_object_colors,
-        render_mode="human",
+        render_mode=config.render_mode if hasattr(config, "render_mode") else None,
     )
+    #env = FullyObsWrapper(env)
     return env
 
 

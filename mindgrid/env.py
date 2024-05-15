@@ -49,7 +49,7 @@ class MindGridEnv(MiniGridEnv):
             max_steps=max_steps,
             see_through_walls=False,
             render_mode=render_mode,
-            agent_view_size=agent_view_size,
+            agent_view_size=self.room_size,
             **kwargs,
         )
 
@@ -212,13 +212,15 @@ class MindGridEnv(MiniGridEnv):
 class MindGridEnvState:
 
     def __init__(self, env: MindGridEnv):
-
+        self.full_obs = dc(env.grid.encode())
+        self.partial_obs = dc(env.gen_obs()["image"])
         self.objects = dc(env.objects)
         self.agent_dir = dc(env.agent_dir)
         self.agent_pos = tuple(dc(env.agent_pos))
         self.front_pos = tuple(dc(env.front_pos))
         self.dir_vec = tuple(dc(env.dir_vec))
         self.outer_cells = dc(env.outer_cells)
+        self.inner_cells = dc(env.inner_cells)
         self.simple_2d_map = env.gen_simple_2d_map()
 
         # NOTE: carrying must be an object in self.objects

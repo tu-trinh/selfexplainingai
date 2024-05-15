@@ -19,6 +19,8 @@ class RoomDoorKeySolver(BaseSolver):
 
     def solve_with_optimal_skills(self) -> Trajectory:
 
+        self.reset()
+
         if (
             bfs(
                 self.gen_simple_2d_map(),
@@ -41,14 +43,14 @@ class RoomDoorKeySolver(BaseSolver):
                     t = skill_lib.OpenDoor(open_door)(self)
                 else:
                     t = skill_lib.execute(self, [])
-                t = t.merge(skill_lib.Unblock(open_door)(self))
+                t += skill_lib.Unblock(open_door)(self)
             else:
                 # no doors and can't reach goal -> no solution
                 return NullTrajectory()
         else:
             t = skill_lib.execute(self, [])
 
-        t = t.merge(skill_lib.GetObject(self.targets[0])(self))
+        t += skill_lib.GetObject(self.targets[0])(self)
 
         return t
 
@@ -56,6 +58,8 @@ class RoomDoorKeySolver(BaseSolver):
 class TreasureIslandSolver(BaseSolver):
 
     def solve_with_optimal_skills(self) -> Trajectory:
+
+        self.reset()
 
         if (
             bfs(
@@ -87,14 +91,14 @@ class TreasureIslandSolver(BaseSolver):
                     t = skill_lib.FixBridge(intact_bridge)(self)
                 else:
                     t = skill_lib.execute(self, [])
-                t = t.merge(skill_lib.Unblock(intact_bridge)(self))
+                t += skill_lib.Unblock(intact_bridge)(self)
             else:
                 # no bridges and shoes and can't reach goal -> no solution
                 return NullTrajectory()
         else:
             t = skill_lib.execute(self, [])
 
-        t = t.merge(skill_lib.GetObject(self.targets[0])(self))
+        t += skill_lib.GetObject(self.targets[0])(self)
 
         return t
 

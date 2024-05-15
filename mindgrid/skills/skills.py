@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inflect
 from abc import ABC, abstractmethod
 from typing import List, Tuple
 
@@ -8,22 +9,18 @@ from minigrid.core.world_object import Box, Goal
 
 from mindgrid.envs.objects import Bridge, DoorWithDirection
 from mindgrid.infrastructure.basic_utils import get_adjacent_cells, CustomEnum
-from mindgrid.infrastructure.env_constants import VEC_TO_DIR, DIR_TO_VEC
-from mindgrid.infrastructure.env_utils import bfs
+from mindgrid.infrastructure.env_constants import VEC_TO_DIR, DIR_TO_VEC, IDX_TO_DIR
+from mindgrid.infrastructure.env_utils import bfs, describe_object, describe_position
 from mindgrid.infrastructure.trajectory import Trajectory, NullTrajectory
 
 
-def execute(env: MindGridEnv, actions: List[ActType], render=False) -> Trajectory:
+def execute(env: MindGridEnv, actions: List[Actions]) -> Trajectory:
     if actions is None:
         return None
     t = Trajectory()
-    if render:
-        env.render()
     for a in actions:
         t.add(env.get_state(), a)
         env.step(a)
-        if render:
-            env.render()
     t.add(env.get_state())
     return t
 
@@ -35,7 +32,9 @@ def _get_same_object(s: MindGridEnvState, o: WorldObj) -> WorldObj:
     return None
 
 
-def _find_free_cell(env: MindGridEnv, start_pos: Tuple[int, int], r=1) -> Tuple[int, int]:
+def _find_free_cell(
+    env: MindGridEnv, start_pos: Tuple[int, int], r=1
+) -> Tuple[int, int]:
     cand = []
     for dx in range(-r, r):
         for dy in range(-r, r):
@@ -66,7 +65,7 @@ class BaseSkill(ABC):
 
 class Primitive(BaseSkill):
 
-    def __init__(self, action: ActType = None):
+    def __init__(self, action: Actions = None):
         self.action = action
 
     def __call__(self, env: MindGridEnv):
@@ -76,6 +75,12 @@ class Primitive(BaseSkill):
         if t.n_actions != 1:
             return None
         return {"action": t.last_action}
+
+    def verbalize(self, env):
+        return self.action.name
+
+    def description(self):
+        return "I can perform the following actions: (1) left: rotate counterclockwise 90 degrees; (2) right: rotate clockwise 90 degrees; (3) forward: move forward to the next cell; (4) pickup: pick up an object and place it in the inventory; (5) toggle: change the state of an object; (6) drop: place the object currently in the inventory onto the cell directly ahead; (7) done: announce that the current task is completed. The pickup and toggle actions are applicable only to objects that are directly in front of me."
 
 
 class GoTo(BaseSkill):
@@ -120,6 +125,14 @@ class GoTo(BaseSkill):
 
         return None
 
+    def verbalize(self, env):
+        return f"go to the cell at column {self.pos[0]} and row {self.pos[1]}"
+
+    def description(self):
+        return (
+            "I can traverse to a location on the grid. Example: go to column 4 row 3."
+        )
+
 
 class RotateTowardsObject(BaseSkill):
 
@@ -158,6 +171,12 @@ class RotateTowardsObject(BaseSkill):
                 return {"obj": o}
         return None
 
+    def verbalize(self, env):
+        return f"rotate towards the {self.obj.type}"
+
+    def description(self):
+        return "I can rotate to face a target object. The object must be located in an adjacent cell. Example: rotate towards the door at row 1 column 8."
+
 
 class RotateTowardsDirection(BaseSkill):
 
@@ -180,8 +199,14 @@ class RotateTowardsDirection(BaseSkill):
                 return None
         return {"dir": VEC_TO_DIR[t.last_state.dir_vec]}
 
+    def verbalize(self, env):
+        return f"rotate towards the {IDX_TO_DIR[self.dir]}"
 
-class GoToAdjacentObject(BaseSkill):
+    def description(self):
+        return "I can rotate until I am heading in a specific direction. Example: rotate towards the west."
+
+
+class GoAdjacentToObject(BaseSkill):
 
     def __init__(self, obj: WorldObj = None):
         self.obj = obj
@@ -207,7 +232,7 @@ class GoToAdjacentObject(BaseSkill):
 
         cand = sorted(cand, key=lambda x: len(x))
         t = execute(env, cand[0])
-        t = t.merge(RotateTowardsObject(obj)(env))
+        t += RotateTowardsObject(obj)(env)
         return t
 
     def recognize(t):
@@ -248,8 +273,14 @@ class GoToAdjacentObject(BaseSkill):
 
         return None
 
+    def verbalize(self, env):
+        return f"go adjacent to the {describe_object(self.obj, env.objects, relative=False, partial=True)}"
 
-class GoToAdjacentPosition(BaseSkill):
+    def description(self):
+        return "I can move to a cell adjacent to a target object and then rotate to face it. Example: go adjacent to the green box at column 9."
+
+
+class GoAdjacentToPosition(BaseSkill):
 
     def __init__(self, pos: Tuple[int, int] = None):
         self.pos = pos
@@ -257,7 +288,7 @@ class GoToAdjacentPosition(BaseSkill):
     def __call__(self, env: MindGridEnv):
         goal = Goal()
         goal.init_pos = goal.cur_pos = self.pos
-        return GoToAdjacentObject(goal)(env)
+        return GoAdjacentToObject(goal)(env)
 
     def recognize(t):
         # actions should all be navigational
@@ -265,6 +296,12 @@ class GoToAdjacentPosition(BaseSkill):
             if a not in [Actions.left, Actions.right, Actions.forward]:
                 return None
         return {"pos": t.last_state.front_pos}
+
+    def verbalize(self, env):
+        return f"go adjacent to the location {describe_position(self.pos, env.grid.encode().shape, relative=False)}"
+
+    def description(self):
+        return "I can move to a cell adjacent to a target cell and then rotate to face it. Example: go adjacent to the location at column 3 row 7."
 
 
 class DropAt(BaseSkill):
@@ -277,8 +314,8 @@ class DropAt(BaseSkill):
         if env.carrying is None:
             return NullTrajectory()
         # go to pos and drop
-        t = GoToAdjacentPosition(self.pos)(env)
-        t = t.merge(execute(env, [env.actions.drop]))
+        t = GoAdjacentToPosition(self.pos)(env)
+        t += execute(env, [env.actions.drop])
         return t
 
     def recognize(t):
@@ -288,11 +325,17 @@ class DropAt(BaseSkill):
         # agent should initially carrying an object
         if t.first_state.carrying is None:
             return None
-        # first part must look like GoToAdjacentPosition
-        pos = GoToAdjacentPosition.recognize(t.slice(0, t.n_states - 2))
+        # first part must look like GoAdjacentToPosition
+        pos = GoAdjacentToPosition.recognize(t.slice(0, t.n_states - 2))
         if pos is None:
             return None
         return pos
+
+    def verbalize(self, env):
+        return f"drop the carried object at {describe_position(self.pos, env.grid.encode().shape, relative=False)}"
+
+    def description(self):
+        return "I can drop the object currently in my inventory onto a target location. Example: drop the carried object at column 5 row 2."
 
 
 class EmptyInventory(BaseSkill):
@@ -326,6 +369,12 @@ class EmptyInventory(BaseSkill):
             return None
         return {}
 
+    def verbalize(self, env):
+        return "empty inventory"
+
+    def description(self):
+        return "I can place the object I am carrying onto an unoccupied cell. Example: empty inventory."
+
 
 class OpenBox(BaseSkill):
 
@@ -340,8 +389,8 @@ class OpenBox(BaseSkill):
         if o.type != "box":
             return NullTrajectory()
         # go to the box and toggle it
-        t = GoToAdjacentObject(box)(env)
-        t = t.merge(execute(env, [env.actions.toggle]))
+        t = GoAdjacentToObject(box)(env)
+        t += execute(env, [env.actions.toggle])
         return t
 
     def recognize(t):
@@ -349,14 +398,20 @@ class OpenBox(BaseSkill):
             return None
         if t.last_action != Actions.toggle:
             return None
-        # first part must look like GoToAdjacentObject
-        ret = GoToAdjacentObject.recognize(t.slice(0, t.n_states - 2))
+        # first part must look like GoAdjacentToObject
+        ret = GoAdjacentToObject.recognize(t.slice(0, t.n_states - 2))
         if ret is None:
             return None
         for o in t.first_state.objects:
             if o.type == "box" and o.cur_pos == t.last_state.front_pos:
                 return {"box": o}
         return None
+
+    def verbalize(self, env):
+        return f"open the {describe_object(self.box, env.objects, relative=False, partial=True)}"
+
+    def description(self):
+        return "I can open a specific box. Example: open the blue box at row 4."
 
 
 class GetObject(BaseSkill):
@@ -388,13 +443,13 @@ class GetObject(BaseSkill):
             t = OpenBox(o)(env)
         else:
             # else, go to object
-            t = GoToAdjacentObject(obj)(env)
+            t = GoAdjacentToObject(obj)(env)
         # if agent is carrying an object, drop it
-        t = t.merge(EmptyInventory()(env))
+        t += EmptyInventory()(env)
         # rotate towards object
-        t = t.merge(RotateTowardsObject(obj)(env))
+        t += RotateTowardsObject(obj)(env)
         # pick up object
-        t = t.merge(execute(env, [env.actions.pickup]))
+        t += execute(env, [env.actions.pickup])
         return t
 
     def recognize(t):
@@ -410,7 +465,7 @@ class GetObject(BaseSkill):
             t1 = t.slice(0, i)
             if (
                 OpenBox.recognize(t1) is not None
-                or GoToAdjacentObject.recognize(t1) is not None
+                or GoAdjacentToObject.recognize(t1) is not None
             ):
                 for j in range(i, N):
                     t2 = t.slice(i, j)
@@ -426,6 +481,12 @@ class GetObject(BaseSkill):
                         }
         return None
 
+    def verbalize(self, env):
+        return f"get the {describe_object(self.obj, env.objects, relative=False, partial=True)}"
+
+    def description(self):
+        return "I can retrieve a specific object and store it in my inventory. This skill is applicable only when I can reach the object. Example: get the key in column 7."
+
 
 class MoveObject(BaseSkill):
 
@@ -439,7 +500,7 @@ class MoveObject(BaseSkill):
         # pick up object
         t = GetObject(obj)(env)
         # drop
-        t = t.merge(DropAt(pos)(env))
+        t += DropAt(pos)(env)
         return t
 
     def recognize(t):
@@ -462,6 +523,12 @@ class MoveObject(BaseSkill):
                 }
         return None
 
+    def verbalize(self, env):
+        return f"move the {describe_object(self.obj, env.objects, relative=False, partial=True)} to the cell at {describe_position(self.pos, env.grid.encode().shape, relative=False)}"
+
+    def description(self):
+        return "I can move an object to a target location. Example: move the ball in row 4 to column 6 row 8."
+
 
 class GoDirNSteps(BaseSkill):
 
@@ -473,7 +540,7 @@ class GoDirNSteps(BaseSkill):
         # rotate to dir
         t = RotateTowardsDirection(self.dir)(env)
         # move forward n steps
-        t = t.merge(execute(env, [env.actions.forward] * self.n))
+        t += execute(env, [env.actions.forward] * self.n)
         return t
 
     def recognize(t):
@@ -487,6 +554,12 @@ class GoDirNSteps(BaseSkill):
                 if t2.actions.count(Actions.forward) == t2.n_actions:
                     return {"dir": ret["dir"], "n": t2.n_actions}
         return None
+
+    def verbalize(self, env):
+        return f"go {IDX_TO_DIR[self.dir]} {self.n} {inflect.engine().plural('step', self.n)}"
+
+    def description(self):
+        return "I can go N steps in a specific direction. Example: go north 5 steps."
 
 
 class Unblock(BaseSkill):
@@ -543,6 +616,12 @@ class Unblock(BaseSkill):
                     return {"obj": _get_same_object(t.first_state, o)}
         return None
 
+    def verbalize(self, env):
+        return f"unblock the {describe_object(self.obj, env.objects, relative=False, partial=True)}"
+
+    def description(sef):
+        return "I can unblock a specific door. Example: unblock the blue door."
+
 
 class OpenDoor(BaseSkill):
     """Open a door"""
@@ -565,12 +644,12 @@ class OpenDoor(BaseSkill):
             # if there is no key, can't open
             if not env.keys:
                 return NullTrajectory()
-            t = t.merge(GetObject(env.keys[0])(env))
+            t += GetObject(env.keys[0])(env)
 
         # go to door
-        t = t.merge(GoToAdjacentObject(door)(env))
+        t += GoAdjacentToObject(door)(env)
         # toggle door
-        t = t.merge(execute(env, [env.actions.toggle]))
+        t += execute(env, [env.actions.toggle])
         return t
 
     def recognize(t):
@@ -591,6 +670,12 @@ class OpenDoor(BaseSkill):
                     if oo.init_pos == o.init_pos and oo.is_open:
                         return {"door": _get_same_object(t.first_state, o)}
         return None
+
+    def verbalize(self, env):
+        return f"open the {describe_object(self.door, env.objects, relative=False, partial=True)}"
+
+    def description(self):
+        return "I can open a specific door. Example: open the door at row 3."
 
 
 class FixBridge(BaseSkill):
@@ -613,11 +698,11 @@ class FixBridge(BaseSkill):
         # unblock bridge
         t = Unblock(bridge)(env)
         # get tool
-        t = t.merge(GetObject(env.tools[0])(env))
+        t += GetObject(env.tools[0])(env)
         # go to bridge
-        t = t.merge(GoToAdjacentObject(bridge)(env))
+        t += GoAdjacentToObject(bridge)(env)
         # toggle bridge
-        t = t.merge(execute(env, [env.actions.toggle]))
+        t += execute(env, [env.actions.toggle])
         return t
 
     def recognize(t):
@@ -643,15 +728,23 @@ class FixBridge(BaseSkill):
                         return {"bridge": _get_same_object(t.first_state, o)}
         return None
 
+    def verbalize(self, env):
+        return f"fix the {describe_object(self.bridge, env.objects, relative=False, partial=True)}"
+
+    def description(self):
+        return (
+            "I can fix a specific bridge. Example: fix the damaged bridge at column 7."
+        )
+
 
 class Skills(CustomEnum):
 
     primitive = Primitive
-    goto = GoTo
+    go_to = GoTo
     rotate_towards_object = RotateTowardsObject
     rotate_towards_direction = RotateTowardsDirection
-    goto_adjacent_object = GoToAdjacentObject
-    goto_adjacent_position = GoToAdjacentPosition
+    go_adjacent_to_object = GoAdjacentToObject
+    go_adjacent_to_position = GoAdjacentToPosition
     drop_at = DropAt
     empty_inventory = EmptyInventory
     get_object = GetObject

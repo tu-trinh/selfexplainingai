@@ -17,6 +17,7 @@ VEC_TO_DIR = {(1, 0): 0, (0, 1): 1, (-1, 0): 2, (0, -1): 3}
 DIR_TO_VEC = {0: (1, 0), 1: (0, 1), 2: (-1, 0), 3: (0, -1)}
 DIR_TO_NAME = {0: "right", 1: "down", 2: "left", 3: "up"}
 
+# NEW OBJECTS
 OBJECT_TO_IDX["heavy_door"] = 11
 OBJECT_TO_IDX["bridge"] = 12
 OBJECT_TO_IDX["fireproof_shoes"] = 13
@@ -26,10 +27,48 @@ OBJECT_TO_IDX["safe_lava"] = 16
 
 IDX_TO_OBJECT = {v: k for k, v in OBJECT_TO_IDX.items()}
 
+
+# NEW COLORS
 COLORS["brown"] = np.array([119, 70, 20])
-COLOR_NAMES = sorted(list(COLORS.keys()))
 COLOR_TO_IDX["brown"] = 6
+
+COLORS["orange"] = np.array([255, 165, 0])
+COLOR_TO_IDX["orange"] = 7
+
+COLORS["pink"] = np.array([255, 192, 203])
+COLOR_TO_IDX["pink"] = 8
+
+COLORS["teal"] = np.array([0, 128, 128])
+COLOR_TO_IDX["teal"] = 9
+
+COLORS["beige"] = np.array([245, 245, 220])
+COLOR_TO_IDX["beige"] = 10
+
+COLORS["navy"] = np.array([0, 0, 128])
+COLOR_TO_IDX["navy"] = 11
+
+COLORS["magenta"] = np.array([255, 0, 255])
+COLOR_TO_IDX["magenta"] = 12
+
+COLORS["lime"] = np.array([191, 255, 0])
+COLOR_TO_IDX["lime"] = 13
+
+COLORS["olive"] = np.array([128, 128, 0])
+COLOR_TO_IDX["olive"] = 14
+
+COLORS["coral"] = np.array([255, 127, 80])
+COLOR_TO_IDX["coral"] = 15
+
+COLORS["aqua"] = np.array([0, 255, 255])
+COLOR_TO_IDX["aqua"] = 16
+
+COLORS["gold"] = np.array([255, 215, 0])
+COLOR_TO_IDX["gold"] = 17
+
 IDX_TO_COLOR = {v: k for k, v in COLOR_TO_IDX.items()}
+COLOR_NAMES = sorted(list(COLORS.keys()))
+
+#####
 
 IDX_TO_STATE = {v: k for k, v in STATE_TO_IDX.items()}
 IDX_TO_DIR = {0: "east", 1: "south", 2: "west", 3: "north"}

@@ -35,7 +35,10 @@ class Trajectory:
         self.check(new_t)
         return new_t
 
-    def merge(self, t: Trajectory) -> Trajectory:
+    def __iadd__(self, t: Trajectory) -> Trajectory:
+
+        if self.n_states == 0:
+            return t
 
         if t.is_null:
             return NullTrajectory()
@@ -81,9 +84,9 @@ class Trajectory:
 
 class NullTrajectory(Trajectory):
 
-    def merge(self, t: Trajectory) -> Trajectory:
+    def __iadd__(self, t: Trajectory) -> Trajectory:
         return self
 
+    @property
     def is_null(self):
         return True
-

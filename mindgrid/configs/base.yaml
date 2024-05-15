@@ -4,8 +4,6 @@ roles:
   observer: ai
   solver: ai
 human:
-  model_source: gpt
-  query_source: openai
   preference:
     - reward_carry_object_hof: 1
   skillset:
@@ -23,8 +21,6 @@ human:
     seed: 35
     allowed_object_colors: ["green", "blue"]
 ai:
-  model_source: gpt
-  query_source: openai
   preference:
     - reward_carry_object_hof: 1
   skillset:

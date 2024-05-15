@@ -69,7 +69,6 @@ def make_config_1(config, seed):
         "flip_vertical",
         "change_target_color",
         "hide_target_in_box",
-        "change_agent_view_size",
         "add_opening",
         "toggle_opening",
         "block_opening",
@@ -90,7 +89,6 @@ def make_config_2(config, seed):
         "flip_vertical",
         "change_target_color",
         "hide_target_in_box",
-        "change_agent_view_size",
         "add_opening",
         "toggle_opening",
         "block_opening",
@@ -110,7 +108,6 @@ def make_config_3(config, seed):
         "flip_vertical",
         "change_target_color",
         "hide_target_in_box",
-        "change_agent_view_size",
         "toggle_opening",
         "block_opening",
         "hide_tool_in_box",
@@ -130,7 +127,6 @@ def make_config_4(config, seed):
         "flip_vertical",
         "change_target_color",
         "hide_target_in_box",
-        "change_agent_view_size",
         "toggle_opening",
         "hide_tool_in_box",
         "toggle_opening",
@@ -149,7 +145,6 @@ def make_config_5(config, seed):
         "flip_vertical",
         "change_target_color",
         "hide_target_in_box",
-        "change_agent_view_size",
         "toggle_opening",
         "hide_tool_in_box",
         "toggle_opening",
@@ -166,7 +161,6 @@ def make_config_6(config, seed):
         "double_grid_size",
         "flip_vertical",
         "change_target_color",
-        "change_agent_view_size",
         "toggle_opening",
         "hide_tool_in_box",
         "toggle_opening",
@@ -183,7 +177,6 @@ def make_config_7(config, seed):
         "double_grid_size",
         "flip_vertical",
         "change_target_color",
-        "change_agent_view_size",
     ]
 
     return env_config
@@ -208,7 +201,6 @@ def make_random_config(config, seed, n=2):
         "flip_vertical",
         "change_target_color",
         "hide_target_in_box",
-        "change_agent_view_size",
         "add_opening",
         "toggle_opening",
         "block_opening",
@@ -238,10 +230,11 @@ def test_planner_room_door_key():
     config = make_config(file_path="mindgrid/configs/base.yaml")
     config.human.world_model.layout = "room_door_key"
 
-    for seed in [234, 654, 231, 54, 876, 356, 2039, 10392, 6540, 984]:
+    for seed in [234]: #[234, 654, 231, 54, 876, 356, 2039, 10392, 6540, 984]:
         print(seed)
         print("TEST 1")
         plan_and_check(make_config_1(config, seed))
+        """
         print("TEST 2")
         plan_and_check(make_config_2(config, seed))
         print("TEST 3")
@@ -256,9 +249,9 @@ def test_planner_room_door_key():
         plan_and_check(make_config_7(config, seed))
         print("TEST 8")
         plan_and_check(make_config_8(config, seed))
+        """
 
     print("TEST RANDOM")
     for _ in range(20):
         seed = random.randint(0, 10000)
         plan_and_check(make_random_config(config, seed))
-

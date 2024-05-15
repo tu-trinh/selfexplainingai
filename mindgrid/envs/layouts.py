@@ -61,6 +61,9 @@ class ObjectManager:
     def __contains__(self, name):
         return name in self.store
 
+    def __len__(self):
+        return len(self.store["all"])
+
 
 class BaseLayout(ABC):
 
@@ -153,7 +156,7 @@ class BaseLayout(ABC):
         self.all_possible_pos -= set([init_pos]) | get_adjacent_cells(init_pos)
 
     def _add_distractors(self, distractor_types: List[Type]) -> None:
-        num_distractors = self.random.randint(2, min(self.width, self.height) - 3)
+        num_distractors = self.random.randint(2, min(self.width, self.height) // 2)
         for i in range(num_distractors):
             distractor_type = self.random.choice(distractor_types)
             # only one key with same color as door
@@ -300,7 +303,7 @@ class RoomDoorKeyLayout(BaseLayout):
 
     def _add_key(self):
         # key must be outside room
-        init_pos = self.random.choice(list(self.outer_cells))
+        init_pos = self.random.choice(list(self.outer_cells & self.all_possible_pos))
         self.all_possible_pos -= set([init_pos]) | get_adjacent_cells(init_pos)
         self.init_objects.add(
             "key", Key(color=self.init_doors[-1].color), init_pos=init_pos
@@ -397,11 +400,18 @@ class TreasureIslandLayout(BaseLayout):
             self.opening_cls(dir_vec, is_intact=self.random.choice([0, 1])),
             init_pos=init_pos,
         )
+
+        # delete obstacles at the bridge's location
+        for i, o in enumerate(self.obstacles):
+            if o.init_pos == init_pos:
+                del self.obstacles[i]
+                break
+
         self.all_possible_pos -= get_adjacent_cells(pos)
 
     def _add_hammer(self):
         # hammer must be outside section
-        init_pos = self.random.choice(list(self.outer_cells))
+        init_pos = self.random.choice(list(self.outer_cells & self.all_possible_pos))
         self.all_possible_pos -= set([init_pos]) | get_adjacent_cells(init_pos)
         self.init_objects.add("hammer", Hammer(), init_pos=init_pos)
 

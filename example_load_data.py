@@ -108,7 +108,7 @@ def world_model_tasks():
     x = data["val_in"][0]
     print(x.keys())
 
-    # LISTENER task: x["init_description"] + x["edit_deyyscriptions"] -> x["partial_text_obs"] + x["actions"]
+    # LISTENER task: x["init_description"] + x["edit_descriptions"] -> x["partial_text_obs"] + x["actions"]
     # x["init_description"] is the description of the initial state in the ORIGINAL environment
     # x["edit_descriptions"] is the list of edits applied to the original environment
     print(x["partial_text_obs"][0])

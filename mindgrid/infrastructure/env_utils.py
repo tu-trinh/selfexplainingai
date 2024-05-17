@@ -613,7 +613,7 @@ def plural_step(n):
     return inflect.engine().plural("step", n)
 
 
-def describe_object(o, objects, relative=True, partial=False, article=None):
+def describe_object(o, objects, relative=True, partial=False, article=None, specified_attrs=None):
 
     attrs = ["x", "y", "state", "color"]
     if partial:
@@ -624,6 +624,9 @@ def describe_object(o, objects, relative=True, partial=False, article=None):
                 break
     else:
         chosen_attrs = attrs
+
+    if specified_attrs is not None:
+        chosen_attrs = specified_attrs
 
     d = o.type
     if "color" in chosen_attrs:

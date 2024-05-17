@@ -102,7 +102,7 @@ class DynamicEdit(BaseEdit):
         inner_class = getattr(
             self.__class__, _snake_to_pascal(env.layout_name) + "Edit"
         )
-        self.instance = inner_class(env)
+        self.instance = self.inner_class(env)
 
     def apply(self):
         return self.instance.apply()
@@ -110,13 +110,20 @@ class DynamicEdit(BaseEdit):
     def verbalize(self):
         return self.instance.verbalize()
 
+    @classmethod
+    def describe(cls, env: MindGridEnv):
+        inner_class = getattr(
+            cls, _snake_to_pascal(env.layout_name) + "Edit"
+        )
+        return inner_class.describe(env)
+
 
 class DoubleGridSizeEdit(BaseEdit):
 
     def verbalize(self):
         return "The grid size has been doubled."
 
-    def describe():
+    def describe(env: MindGridEnv):
         return "Double the dimensions of the grid. Every cell in the original grid is stretched into four cells. An object or entity at position (x, y) in the original grid is now roughly at position (2x, 2y). The width of the wall or lava stream is doubled."
 
     def apply(self):
@@ -200,7 +207,7 @@ class FlipVerticalEdit(BaseEdit):
     def verbalize(self):
         return "The grid has been flipped vertically."
 
-    def describe():
+    def describe(env: MindGridEnv):
         return "Flip the grid vertically to create a mirror reflection of the original."
 
     def apply(self):
@@ -250,7 +257,7 @@ class ChangeTargetColorEdit(BaseEdit):
         return d
 
 
-    def describe():
+    def describe(env: MindGridEnv):
         return "Change the color of the target object. Set other objects that is of the same type and have the new target color to a different color."
 
     def apply(self):
@@ -289,7 +296,7 @@ class HideTargetInBoxEdit(BaseEdit):
         box = self._describe_object_full(self.box, article="a")
         return f"The {obj} is hidden inside {box}."
 
-    def describe(self):
+    def describe(env: MindGridEnv):
         return "Hide a target object inside a box. If there are multiple target objects, one is randomly selected."
 
     def apply(self):
@@ -307,7 +314,7 @@ class ChangeAgentViewSizeEdit(BaseEdit):
     def verbalize(self):
         return f"The view size of the agent is changed to {self.new_view_size}."
 
-    def describe():
+    def describe(env: MindGridEnv):
         return "Change the view size of the agent. Let x be the old view size. The new view size is randomly chosen from x - 2 to x + 2."
 
     def apply(self):
@@ -333,7 +340,7 @@ class AddOpeningEdit(DynamicEdit):
             door = self._describe_object_full(self.door, article="a")
             return f"There is {door}."
 
-        def describe():
+        def describe(env: MindGridEnv):
             return "Add a door to the wall connecting the inner and outer room. The door can be open, closed, or locked."
 
         def apply(self):
@@ -375,7 +382,7 @@ class AddOpeningEdit(DynamicEdit):
             bridge = self._describe_object_full(self.bridge, article="a")
             return f"There is {bridge}."
 
-        def describe():
+        def describe(env: MindGridEnv):
             return "Add a bridge that connects the island to the mainland. The bridge can be either damaged or intact."
 
         def apply(self):
@@ -413,7 +420,7 @@ class ToggleOpeningEdit(DynamicEdit):
             new_door_state = describe_object_state(self.new_door)
             return f"The {old_door} is now {new_door_state}."
 
-        def describe():
+        def describe(env: MindGridEnv):
             return "Set an existing door to a new state (open, closed, or locked). If multiple doors are present, one will be selected randomly."
 
         def apply(self):
@@ -437,7 +444,7 @@ class ToggleOpeningEdit(DynamicEdit):
             new_bridge_state = describe_object_state(self.new_bridge)
             return f"The {old_bridge} is now {new_bridge_state}."
 
-        def describe():
+        def describe(env: MindGridEnv):
             return "Set an existing bridge to a new state (intact or damaged). If multiple bridges exist, one is selected randomly."
 
         def apply(self):
@@ -463,7 +470,7 @@ class AddPassageEdit(BaseEdit):
             from_to = ("column", pos_x[0], pos_x[-1])
         return f"There is a walkable passage at {at[0]} {at[1]} from {from_to[0]} {from_to[1]} to {from_to[0]} {from_to[2]}"
 
-    def describe():
+    def describe(env: MindGridEnv):
         return "Add a walkable passage connecting the inner room or the island with the outer section. The location of the passage is randomly chosen."
 
     def apply(self):
@@ -482,7 +489,7 @@ class BlockOpeningEdit(BaseEdit):
         blocking_o = self._describe_object_full(self.blocking_o, article="a")
         return f"The {blocked_o} is blocked by {blocking_o}."
 
-    def describe():
+    def describe(env: MindGridEnv):
         return "Block a door or a bridge with a ball, making it impossible to access it from the outer section of the grid. If multiple doors or bridges are present, one will be randomly selected."
 
     def apply(self):
@@ -523,7 +530,7 @@ class PutAgentInsideSectionEdit(BaseEdit):
         else:
             return f"The agent starts from within the inner room at {pos}."
 
-    def describe():
+    def describe(env: MindGridEnv):
         return "Put the agent within the island or the inner room."
 
     def apply(self):
@@ -544,7 +551,7 @@ class HideToolInBoxEdit(BaseEdit):
         box = self._describe_object_full(self.box, article="a")
         return f"The {self.env.tool_name} is hidden inside {box}."
 
-    def describe():
+    def describe(env: MindGridEnv):
         return "Hide a key or a hammer inside a box. If there are multiple keys or hammers, randomly choose one from those that are not already hidden inside boxes."
 
     def apply(self):
@@ -580,7 +587,7 @@ class RemoveToolEdit(BaseEdit):
         removed_tool = self._describe_object_full(self.removed_tool)
         return f"The {removed_tool} is removed from the grid."
 
-    def describe():
+    def describe(env: MindGridEnv):
         return "Remove a key or hammer from the grid. If there are multiple keys or hammers, one is selected at random. If the removed object was hidden inside a box, the box is also removed."
 
     def apply(self):
@@ -607,7 +614,7 @@ class MakeLavaSafeEdit(BaseEdit):
     def verbalize(self):
         return f"The lava is safe to walk on."
 
-    def describe():
+    def describe(env: MindGridEnv):
         return "Make the lava safe to walk on. The agent will not die from walking on this type of lava."
 
     def apply(self):
@@ -627,7 +634,7 @@ class AddFireproofShoesEdit(BaseEdit):
         shoes = self._describe_object_full(self.shoes, article="a")
         return f"There is {shoes}."
 
-    def describe():
+    def describe(env: MindGridEnv):
         return "Add fire-proof shoes to the grid. When the agent is carrying the shoes, it will not die from walking on regular lava. The location of the shoes is chosen randomly."
 
     def apply(self):

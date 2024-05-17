@@ -198,6 +198,8 @@ class BaseLayout(ABC):
 class RoomDoorKeyLayout(BaseLayout):
 
     layout_name = "room_door_key"
+    opening_name = "door"
+    tool_name = "key"
     editor = RoomDoorKeyEditor
     solver = RoomDoorKeySolver
 
@@ -313,6 +315,11 @@ class RoomDoorKeyLayout(BaseLayout):
 class TreasureIslandLayout(BaseLayout):
 
     layout_name = "treasure_island"
+    opening_name = "bridge"
+    tool_name = "hammer"
+    editor = RoomDoorKeyEditor
+    solver = RoomDoorKeySolver
+
     editor = TreasureIslandEditor
     solver = TreasureIslandSolver
 

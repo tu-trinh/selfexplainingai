@@ -613,7 +613,7 @@ def plural_step(n):
     return inflect.engine().plural("step", n)
 
 
-def describe_object(o, objects, relative=True, partial=False):
+def describe_object(o, objects, relative=True, partial=False, article=None):
 
     attrs = ["x", "y", "state", "color"]
     if partial:
@@ -649,6 +649,12 @@ def describe_object(o, objects, relative=True, partial=False):
             d += f" {abs(o.rel_turn)} {plural_step(abs(o.rel_turn))} {'right' if o.rel_turn > 0 else 'left'}"
         else:
             d += f" row {o.cur_pos[1]}"
+
+    if article is not None:
+        if article == "the":
+            d = "the " + d
+        else:
+            d = inflect.engine().a(d)
 
     return d
 

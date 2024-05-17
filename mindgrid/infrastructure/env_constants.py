@@ -32,38 +32,21 @@ IDX_TO_OBJECT = {v: k for k, v in OBJECT_TO_IDX.items()}
 COLORS["brown"] = np.array([119, 70, 20])
 COLOR_TO_IDX["brown"] = 6
 
-COLORS["orange"] = np.array([255, 165, 0])
-COLOR_TO_IDX["orange"] = 7
 
-COLORS["pink"] = np.array([255, 192, 203])
-COLOR_TO_IDX["pink"] = 8
+COLORS["turquoise"] = np.array([64, 224, 208])
+COLOR_TO_IDX["turquoise"] = 7
 
-COLORS["teal"] = np.array([0, 128, 128])
-COLOR_TO_IDX["teal"] = 9
+COLORS["saffron"] = np.array([244, 196, 48])
+COLOR_TO_IDX["saffron"] = 8
 
-COLORS["beige"] = np.array([245, 245, 220])
-COLOR_TO_IDX["beige"] = 10
+COLORS["indigo"] = np.array([75, 0, 130])
+COLOR_TO_IDX["indigo"] = 9
 
-COLORS["navy"] = np.array([0, 0, 128])
-COLOR_TO_IDX["navy"] = 11
-
-COLORS["magenta"] = np.array([255, 0, 255])
-COLOR_TO_IDX["magenta"] = 12
+COLORS["salmon"] = np.array([250, 128, 114])
+COLOR_TO_IDX["salmon"] = 10
 
 COLORS["lime"] = np.array([191, 255, 0])
-COLOR_TO_IDX["lime"] = 13
-
-COLORS["olive"] = np.array([128, 128, 0])
-COLOR_TO_IDX["olive"] = 14
-
-COLORS["coral"] = np.array([255, 127, 80])
-COLOR_TO_IDX["coral"] = 15
-
-COLORS["aqua"] = np.array([0, 255, 255])
-COLOR_TO_IDX["aqua"] = 16
-
-COLORS["gold"] = np.array([255, 215, 0])
-COLOR_TO_IDX["gold"] = 17
+COLOR_TO_IDX["lime"] = 11
 
 IDX_TO_COLOR = {v: k for k, v in COLOR_TO_IDX.items()}
 COLOR_NAMES = sorted(list(COLORS.keys()))

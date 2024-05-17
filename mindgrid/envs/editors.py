@@ -5,16 +5,26 @@ from typing import List
 from minigrid.core.world_object import Ball, Box, WorldObj
 
 from mindgrid.envs.objects import Bridge, FireproofShoes, Passage, SafeLava
-from mindgrid.infrastructure.basic_utils import CustomEnum, get_adjacent_cells
+from mindgrid.infrastructure.basic_utils import CustomEnum, get_adjacent_cells, to_enum
 
 
 class BaseEditor:
 
     def edit(self, edits: List[Edit]):
         for e in edits:
+            if isinstance(e, str):
+                e = to_enum(Edits, e)
+            assert isinstance(e, Edits)
             getattr(self, e.value)()
 
     def double_grid_size(self):
+
+        def verbalize():
+            return "The grid size is doubled."
+
+        def describe():
+            return "Double the dimensions of the grid. Every cell in the original grid is stretched into four cells. An object or entity at position (x, y) in the original grid is now roughly at position (2x, 2y). The width of the wall or lava stream is doubled."
+
         # expand set of inner, outer, divider cells
         for name in ["inner_cells", "outer_cells", "divider_cells"]:
             new_cells = set()
@@ -91,6 +101,13 @@ class BaseEditor:
         return None
 
     def flip_vertical(self):
+
+        def verbalize():
+            return "The grid is flipped vertically."
+
+        def describe():
+            return "Flip the grid vertically to create a mirror reflection of the original."
+
         for name in ["inner_cells", "outer_cells"]:
             new_cells = set()
             for c in getattr(self, name):
@@ -117,6 +134,14 @@ class BaseEditor:
         return None
 
     def change_target_color(self):
+
+        def verbalize(new_color):
+            return f"The target color is changed from {old_color} to {new_color}"
+
+        def describe():
+            return "Change the color of the target object. Set other objects that is of the same type and have the new target color to a different color."
+
+        old_color = self.target_color
         while True:
             new_color = self.random.choice(self.allowed_object_colors)
             if new_color != self.target_color:
@@ -134,6 +159,13 @@ class BaseEditor:
         return new_color
 
     def hide_target_in_box(self):
+
+        def verbalize(boxes):
+            d = ""
+            for b in boxes:
+                d += f"Put {describe_object(b.contains, self, relative=False, partial=True)} in a {b.color} box"
+            return d
+
         boxes = []
         for o in self.init_targets:
             box = Box(color=self.random.choice(self.allowed_object_colors))

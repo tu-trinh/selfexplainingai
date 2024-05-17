@@ -49,12 +49,20 @@ class MindGridEnv(MiniGridEnv):
             max_steps=max_steps,
             see_through_walls=False,
             render_mode=render_mode,
-            agent_view_size=self.room_size,
+            agent_view_size=self.room_size // 2,
             **kwargs,
         )
 
         # Unique environment configs
         self.env_id = f"{self.task}-{self.layout}-{self.seed}"
+
+    def edit(self, edits):
+        self.applied_edits = []
+        for e in edits:
+            self.reset()
+            e = e.value(self)
+            e.apply()
+            self.applied_edits.append(e)
 
     def reset(self, seed=None, options=None):
 

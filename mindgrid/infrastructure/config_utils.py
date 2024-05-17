@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import yaml
 from typing import Dict
 from collections import OrderedDict
@@ -52,6 +54,9 @@ class ConfigDict:
                 rv = v
             ret[k] = rv
         return ret
+
+    def clone(self) -> ConfigDict:
+        return ConfigDict(**self.to_dict())
 
 
 def make_config(file_path: str = None, config_str = None):

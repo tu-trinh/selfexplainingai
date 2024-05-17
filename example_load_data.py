@@ -43,7 +43,7 @@ for o, a in zip(x["partial_text_obs"], x["actions"]):
 d += x["partial_text_obs"][-1]
 # this format can be helpful for prompting
 print("----------Example listener task prompt-----------")
-print("Skill description :", to_enum(Skills, x["skill_name"]).value.description())
+print("Skill description :", to_enum(Skills, x["skill_name"]).value.describe())
 print("Instruction :", x["instruction"])
 print(d)
 print("Your action:")
@@ -67,7 +67,7 @@ print("What skill does the above the trajectory describe? Below are the skill na
 print()
 print("List of skills and their definitions")
 for i, s in enumerate(Skills):
-    print(str(i + 1) + ". ", s.name, ":", s.value.description())
+    print(str(i + 1) + ". ", s.name, ":", s.value.describe())
 print("\nYour answer:")
 print("----------End prompt-----------")
 

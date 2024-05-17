@@ -59,6 +59,10 @@ class BaseSkill(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def verbalize(self, env: MindGridEnv):
+        raise NotImplementedError
+
+    @abstractmethod
     def recognize(self, t: Trajectory):
         raise NotImplementedError
 
@@ -80,7 +84,7 @@ class Primitive(BaseSkill):
         return self.action.name
 
     @staticmethod
-    def description():
+    def describe():
         return "perform one of the following actions: (1) left: rotate counterclockwise 90 degrees; (2) right: rotate clockwise 90 degrees; (3) forward: move forward to the next cell; (4) pickup: pick up an object and place it in the inventory; (5) toggle: change the state of an object; (6) drop: place the object currently in the inventory onto the cell directly ahead; (7) done: announce that the current task is completed. The pickup and toggle actions are applicable only to objects that are directly in front of me."
 
 
@@ -130,7 +134,7 @@ class GoTo(BaseSkill):
         return f"go to the cell at column {self.pos[0]} and row {self.pos[1]}"
 
     @staticmethod
-    def description():
+    def describe():
         return (
             "traverse to a location on the grid. Example: go to column 4 row 3."
         )
@@ -177,7 +181,7 @@ class RotateTowardsObject(BaseSkill):
         return f"rotate towards the {self.obj.type}"
 
     @staticmethod
-    def description():
+    def describe():
         return "rotate to face a target object. The object must be located in an adjacent cell. Example: rotate towards the door at row 1 column 8."
 
 
@@ -206,7 +210,7 @@ class RotateTowardsDirection(BaseSkill):
         return f"rotate towards the {IDX_TO_DIR[self.dir]}"
 
     @staticmethod
-    def description():
+    def describe():
         return "rotate until I am heading in a specific direction. Example: rotate towards the west."
 
 
@@ -281,7 +285,7 @@ class GoAdjacentToObject(BaseSkill):
         return f"go adjacent to the {describe_object(self.obj, env.objects, relative=False, partial=True)}"
 
     @staticmethod
-    def description():
+    def describe():
         return "move to a cell adjacent to a target object and then rotate to face it. Example: go adjacent to the green box at column 9."
 
 
@@ -306,7 +310,7 @@ class GoAdjacentToPosition(BaseSkill):
         return f"go adjacent to the location {describe_position(self.pos, env.grid.encode().shape, relative=False)}"
 
     @staticmethod
-    def description():
+    def describe():
         return "move to a cell adjacent to a target cell and then rotate to face it. Example: go adjacent to the location at column 3 row 7."
 
 
@@ -341,7 +345,7 @@ class DropAt(BaseSkill):
         return f"drop the carried object at {describe_position(self.pos, env.grid.encode().shape, relative=False)}"
 
     @staticmethod
-    def description():
+    def describe():
         return "drop the object currently in my inventory onto a target location. Example: drop the carried object at column 5 row 2."
 
 
@@ -380,7 +384,7 @@ class EmptyInventory(BaseSkill):
         return "empty inventory"
 
     @staticmethod
-    def description():
+    def describe():
         return "place the object I am carrying onto an unoccupied cell. Example: empty inventory."
 
 
@@ -419,7 +423,7 @@ class OpenBox(BaseSkill):
         return f"open the {describe_object(self.box, env.objects, relative=False, partial=True)}"
 
     @staticmethod
-    def description():
+    def describe():
         return "open a specific box. Example: open the blue box at row 4."
 
 
@@ -494,7 +498,7 @@ class GetObject(BaseSkill):
         return f"get the {describe_object(self.obj, env.objects, relative=False, partial=True)}"
 
     @staticmethod
-    def description():
+    def describe():
         return "retrieve a specific object and store it in my inventory. This skill is applicable only when reach the object. Example: get the key in column 7."
 
 
@@ -537,7 +541,7 @@ class MoveObject(BaseSkill):
         return f"move the {describe_object(self.obj, env.objects, relative=False, partial=True)} to the cell at {describe_position(self.pos, env.grid.encode().shape, relative=False)}"
 
     @staticmethod
-    def description():
+    def describe():
         return "move an object to a target location. Example: move the ball in row 4 to column 6 row 8."
 
 
@@ -570,7 +574,7 @@ class GoDirNSteps(BaseSkill):
         return f"go {IDX_TO_DIR[self.dir]} {self.n} {inflect.engine().plural('step', self.n)}"
 
     @staticmethod
-    def description():
+    def describe():
         return "go N steps in a specific direction. Example: go north 5 steps."
 
 
@@ -632,7 +636,7 @@ class Unblock(BaseSkill):
         return f"unblock the {describe_object(self.obj, env.objects, relative=False, partial=True)}"
 
     @staticmethod
-    def description():
+    def describe():
         return "unblock a specific door. Example: unblock the blue door."
 
 
@@ -688,7 +692,7 @@ class OpenDoor(BaseSkill):
         return f"open the {describe_object(self.door, env.objects, relative=False, partial=True)}"
 
     @staticmethod
-    def description():
+    def describe():
         return "open a specific door. Example: open the door at row 3."
 
 
@@ -746,7 +750,7 @@ class FixBridge(BaseSkill):
         return f"fix the {describe_object(self.bridge, env.objects, relative=False, partial=True)}"
 
     @staticmethod
-    def description():
+    def describe():
         return (
             "fix a specific bridge. Example: fix the damaged bridge at column 7."
         )

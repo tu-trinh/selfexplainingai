@@ -5,7 +5,7 @@ from typing import List
 from minigrid.wrappers import FullyObsWrapper
 
 from mindgrid.env import MindGridEnv
-from mindgrid.envs.editors import Edits
+from mindgrid.envs.edits import Edits
 from mindgrid.envs.layouts import Layouts
 from mindgrid.envs.tasks import Tasks
 from mindgrid.infrastructure.basic_utils import to_enum

@@ -104,6 +104,29 @@ class SafeLava(WorldObj):
             fill_coords(img, point_in_line(0.7, yhi, 0.9, ylo, r=0.03), (0, 0, 0))
 
 
+class SafeLava(WorldObj):
+    def __init__(self):
+        super().__init__("safe_lava", "grey")
+
+    def can_overlap(self):
+        return True
+
+    def render(self, img):
+        c = (47, 79, 79)
+
+        # Background color
+        fill_coords(img, point_in_rect(0, 1, 0, 1), c)
+
+        # Little waves
+        for i in range(3):
+            ylo = 0.3 + 0.2 * i
+            yhi = 0.4 + 0.2 * i
+            fill_coords(img, point_in_line(0.1, ylo, 0.3, yhi, r=0.03), (0, 0, 0))
+            fill_coords(img, point_in_line(0.3, yhi, 0.5, ylo, r=0.03), (0, 0, 0))
+            fill_coords(img, point_in_line(0.5, ylo, 0.7, yhi, r=0.03), (0, 0, 0))
+            fill_coords(img, point_in_line(0.7, yhi, 0.9, ylo, r=0.03), (0, 0, 0))
+
+
 class Bridge(WorldObj):
 
     def __init__(self, dir_vec: Tuple[int, int], is_intact: bool = True):

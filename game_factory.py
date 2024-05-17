@@ -368,8 +368,8 @@ if __name__ == "__main__":
     primes = [2, 3, 5, 7, 11]
 
     version = 2
-    prefix = "skillset"
-    #prefix = "worldmodel"
+    #prefix = "skillset"
+    prefix = "worldmodel"
     task = "listen"
 
     if prefix == "skillset":

@@ -1,12 +1,15 @@
 import os
 import sys
 import pickle
+import random
+import inflect
 from nltk.tokenize import word_tokenize
 
 from mindgrid.builder import make_env
 from mindgrid.infrastructure.config_utils import make_config
 from mindgrid.infrastructure.basic_utils import to_enum
-from mindgrid.infrastructure.env_utils import describe_state
+from mindgrid.infrastructure.env_utils import describe_state, describe_object_state, describe_object, get_attribute
+from mindgrid.infrastructure.env_constants import IDX_TO_DIR
 from mindgrid.infrastructure.trajectory import Trajectory
 from mindgrid.skills import Skills
 
@@ -89,25 +92,27 @@ def create_worldmodel_datapoint(game_item):
     nonobserver_env.reset()
     observer_env.reset()
 
-    """
     print(getattr(config, observer).world_model.edits)
+    """
     observer_env.render_mode = "human"
     observer_env.render()
-    input()
     """
+    #input()
 
     item["init_description"] = describe_state(nonobserver_env.get_state(), relative=False)
     item["edit_descriptions"] = []
     for e in observer_env.applied_edits:
         item["edit_descriptions"].append(tokenize(e.verbalize()))
-        print(item["edit_descriptions"][-1])
-
-    input()
 
     plan = game_item["ref_plan"][config.roles.observer]
     t = Trajectory()
+    print(plan)
     for s, a in plan:
         t += to_enum(Skills, s).value(**a)(observer_env)
+
+
+    print(t.n_states)
+    #input()
 
     item["actions"] = [x.name for x in t.actions]
     item["states"] = t.states
@@ -129,6 +134,57 @@ def create_worldmodel_datapoint(game_item):
     item["full_text_obs"] = full_text_obs
     item["partial_obs"] = partial_obs
     item["partial_text_obs"] = partial_text_obs
+
+    print(t.n_actions)
+
+    item["queries"] = []
+    for j in range(t.n_actions + 1):
+        item["queries"].append([])
+        for i in range(5):
+            a = -1
+            while a == -1:
+                state = t.states[j]
+
+                types = set([o.type for o in state.objects])
+                o_type = random.choice(list(types))
+                objects_type = [o for o in state.objects if o.type == o_type] + ["agent"]
+
+                o = random.choice(objects_type)
+
+                if o == "agent":
+                    cand_attrs = ["dir", "x", "y"]
+                    attr = random.choice(cand_attrs)
+                    if attr == "x":
+                        attr_name = "column"
+                        a = state.agent_pos[0]
+                    elif attr == "y":
+                        attr_name = "row"
+                        a = state.agent_pos[1]
+                    elif attr == "dir":
+                        attr_name = "facing direction"
+                        a = IDX_TO_DIR[state.agent_dir]
+
+                    q = f"what is the {attr_name} of the agent?"
+
+                else:
+                    cand_attrs = ["x", "y", "color", "state"]
+                    if describe_object_state(o) == "":
+                        cand_attrs.remove("state")
+                    attr = random.choice(cand_attrs)
+
+                    attr_name = attr
+                    if attr == "x":
+                        attr_name = "column"
+                    elif attr_name == "y":
+                        attr_name = "row"
+
+                    cand_attrs.remove(attr)
+                    q = f"what is the {attr_name} of the {describe_object(o, state.objects, relative=False, specified_attrs=cand_attrs)}?"
+
+                    a = get_attribute(o, attr)
+
+            print(q, a)
+            item["queries"][-1].append({ "time_step": j, "object": o, "attribute": attr, "question": q, "answer": a})
 
     return [item]
 
@@ -155,6 +211,8 @@ def create_dataset(prefix, task, game_dataset, datapoint_creation_fn):
         dataset = pickle.load(f)
     print(f"Reload dataset successful!")
 
+
+random.seed(340)
 
 version = 1
 #prefix = "skillset"

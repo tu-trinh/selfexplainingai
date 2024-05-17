@@ -830,8 +830,8 @@ def describe_state(state, relative=True):
         carrying = state.carrying
 
 
-    d = f"You are at column {state.agent_pos[0]} and row {state.agent_pos[1]} . "
-    d += f"You are facing {IDX_TO_DIR[state.agent_dir]} "
+    d = [f"You are at column {state.agent_pos[0]} and row {state.agent_pos[1]}."]
+    d += [f"You are facing {IDX_TO_DIR[state.agent_dir]}."]
     # describe carried object
     if carrying:
         color = describe_object_color(carrying)
@@ -839,9 +839,9 @@ def describe_state(state, relative=True):
         if color != "":
             dd += " " + color
         dd += " " + carrying.type
-        d += f"and are carrying {inflect.engine().a(dd)} . "
+        d += [f"You are carrying {inflect.engine().a(dd)}."]
     else:
-        d += "and your inventory is empty . "
+        d += ["Your inventory is empty."]
     # describe objects within view
     object_descriptions = []
     if objects:
@@ -849,9 +849,9 @@ def describe_state(state, relative=True):
             [inflect.engine().a(describe_object(o, objects, relative=relative)) for o in objects]
         )
         no = len(objects)
-        d += f"You see {no} {inflect.engine().plural('object', no)} : {od} . "
+        d += [f"You see {no} {inflect.engine().plural('object', no)}: {od}."]
     else:
-        d += "You do not see any objects . "
+        d += ["You do not see any objects."]
     # describe obstacles
     obstacle_to_description = defaultdict(list)
     for o_type in ["wall", "lava", "safe_lava"]:
@@ -865,153 +865,13 @@ def describe_state(state, relative=True):
                 obstacle_to_description[o_name].append(dd)
 
     for o_name, v in obstacle_to_description.items():
-        d += f"There are {inflect.engine().plural(o_name)} : "
-        d += ", ".join(v) + " . "
+        dd = f"There are {inflect.engine().plural(o_name)}: "
+        dd += ", ".join(v) + "."
+        d += [dd]
 
+    d = " ".join(d)
     d = re.sub(r"\s+", " ", d).strip()
-
-
-    #print(obs[:, :, 0])
-    #print(d)
 
     return d
 
 
-"""
-def describe_obstacles(state, env, relative=False):
-
-    def find_ranges(dim):
-        line_to_object = defaultdict(list)
-        for o in obstacles:
-            line_to_object[o.init_pos[dim]].append(o)
-
-        for k in line_to_object:
-            v = line_to_object[k]
-            update_ranges(v, dim)
-
-    def update_ranges(v, dim):
-        v = sorted(v, key=lambda x: x.init_pos[1 - dim])
-        last_i = None
-        prev_o = None
-        for i, o in enumerate(v):
-            if prev_o is None or o.init_pos[1 - dim] - 1 != prev_o.init_pos[1 - dim]:
-                if last_i is not None:
-                    r = {"dim": dim, "length": l, "obstacles": []}
-                    for j in range(last_i, i):
-                        r["obstacles"].append(v[j])
-                    for j in range(last_i, i):
-                        object_to_range[v[j]].append(r)
-                last_i = i
-                l = 1
-            else:
-                l += 1
-            prev_o = o
-
-        r = {"dim": dim, "length": l, "obstacles": []}
-        for j in range(last_i, len(v)):
-            r["obstacles"].append(v[j])
-        for j in range(last_i, len(v)):
-            object_to_range[v[j]].append(r)
-
-    obstacles = dc(env.obstacles)
-    for o in state.objects:
-        if isinstance(o, env.obstacle_cls):
-            obstacles.append(dc(o))
-
-    for o in obstacles:
-        o.cur_pos = o.init_pos
-
-    object_to_range = defaultdict(list)
-    find_ranges(0)
-    find_ranges(1)
-
-    descriptions = []
-
-    while True:
-        can_break = True
-        deleted_obstacles = []
-        for k, v in object_to_range.items():
-            max_l = max([x["length"] for x in v])
-            for x in random.sample(v, len(v)):
-                if x["length"] > 1 or (x["length"] == 1 and max_l == 1):
-                    can_break = False
-                    descriptions.append(
-                        describe_obstacle_range(
-                            x["dim"],
-                            x["obstacles"],
-                            x["length"],
-                            state,
-                            env,
-                            relative=relative,
-                        )
-                    )
-                    deleted_obstacles = x["obstacles"]
-                    break
-            if deleted_obstacles:
-                break
-        for o in deleted_obstacles:
-            if o in object_to_range:
-                del object_to_range[o]
-        if can_break:
-            break
-
-    for d in descriptions:
-        print(d)
-
-
-def find_min_max_coords(points):
-    if not points:
-        return None  # Return None or raise an exception if the list is empty
-
-    # Initialize min and max values with the coordinates of the first point
-    min_x = max_x = points[0][0]
-    min_y = max_y = points[0][1]
-
-    # Iterate through the list of points and update min and max values
-    for x, y in points:
-        if x < min_x:
-            min_x = x
-        if x > max_x:
-            max_x = x
-        if y < min_y:
-            min_y = y
-        if y > max_y:
-            max_y = y
-
-    return min_x, max_x, min_y, max_y
-
-
-def describe_observation(state, env):
-
-    d = "You are facing {IDX_TO_DIR[state.agent_dir]}."
-
-    # describe section
-    obstacle_d = []
-    section_name = "a room" if env.layout_name == "room_door_key" else "an island"
-    row_obstacles = {}
-    col_obstacles = {}
-    for o in range(env.obstacles):
-        dx, dy = o.cur_pos[0] - state.agent_pos[0], o.cur_pos[1] - state.agent_pos[1]
-        xd, yd = relative_position(DIR_TO_VEC[state.agent_dir], (dx, dy))
-        col_obstacles[dx].append((dx, dy, xd, yd))
-        row_obstacles[dy].append((dx, dy, xd, yd))
-
-    for k, v in col_obstacles.items():
-        v = sorted(v, key=lambda x: x[1])
-        length = 1
-        for i, e in enumerate(v):
-            dx, dy, xd, yd = e
-            if i > 0 and dy - 1 != e[i - 1][1]:
-                obstacle_d.append(
-                    f"There is a {env.obstacles[0].type} of length {width} {dx} cells {xd}"
-                )
-                length = 1
-            length += 1
-        obstacle_d.append(
-            f"There is a {env.obstacles[0].type} of length {width} {dx} cells {xd}"
-        )
-
-    for o in state.objects:
-        if o.type == "bridge":
-            return
-"""

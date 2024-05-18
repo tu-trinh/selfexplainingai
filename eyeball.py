@@ -98,5 +98,5 @@ def eyeball_worldmodel():
 
 
 # NOTE: uncomment one of the followings
-#eyeball_skillset()
-eyeball_worldmodel()
+eyeball_skillset()
+# eyeball_worldmodel()

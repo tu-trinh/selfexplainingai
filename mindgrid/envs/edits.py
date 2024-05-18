@@ -102,7 +102,7 @@ class DynamicEdit(BaseEdit):
         inner_class = getattr(
             self.__class__, _snake_to_pascal(env.layout_name) + "Edit"
         )
-        self.instance = self.inner_class(env)
+        self.instance = inner_class(env)
 
     def apply(self):
         return self.instance.apply()

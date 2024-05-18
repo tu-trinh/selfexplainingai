@@ -13,10 +13,6 @@ from mindgrid.infrastructure.env_constants import IDX_TO_DIR
 from mindgrid.infrastructure.trajectory import Trajectory
 from mindgrid.skills import Skills
 
-
-def tokenize(s):
-    return " ".join(word_tokenize(s))
-
 def create_skillset_datapoint(game_item):
 
     config = make_config(config_str=game_item["config"])
@@ -37,7 +33,7 @@ def create_skillset_datapoint(game_item):
 
         skill_cls = to_enum(Skills, s).value
         skill = skill_cls(**a)
-        item["instruction"] = tokenize(tokenize(skill.verbalize(env)))
+        item["instruction"] = skill.verbalize(env)
 
         t = skill(env)
         full_obs = []
@@ -48,10 +44,10 @@ def create_skillset_datapoint(game_item):
             state = t.states[i]
 
             full_obs.append(state.full_obs)
-            full_text_obs.append(tokenize(describe_state(state, relative=False)))
+            full_text_obs.append(describe_state(state, relative=False))
 
             partial_obs.append(state.partial_obs)
-            partial_text_obs.append(tokenize(describe_state(state, relative=True)))
+            partial_text_obs.append(describe_state(state, relative=True))
 
         item["states"] = t.states
         item["full_obs"] = full_obs
@@ -102,7 +98,7 @@ def create_worldmodel_datapoint(game_item):
     item["init_description"] = describe_state(nonobserver_env.get_state(), relative=False)
     item["edit_descriptions"] = []
     for e in observer_env.applied_edits:
-        item["edit_descriptions"].append(tokenize(e.verbalize()))
+        item["edit_descriptions"].append(e.verbalize())
 
     plan = game_item["ref_plan"][config.roles.observer]
     t = Trajectory()
@@ -125,10 +121,10 @@ def create_worldmodel_datapoint(game_item):
         state = t.states[i]
 
         full_obs.append(state.full_obs)
-        full_text_obs.append(tokenize(describe_state(state, relative=False)))
+        full_text_obs.append(describe_state(state, relative=False))
 
         partial_obs.append(state.partial_obs)
-        partial_text_obs.append(tokenize(describe_state(state, relative=True)))
+        partial_text_obs.append(describe_state(state, relative=True))
 
     item["full_obs"] = full_obs
     item["full_text_obs"] = full_text_obs
@@ -214,13 +210,18 @@ def create_dataset(prefix, task, game_dataset, datapoint_creation_fn):
 
 random.seed(340)
 
-version = 1
+version = 2
 #prefix = "skillset"
 prefix = "worldmodel"
 task = "listen"
 
-#open_path = f"datasets/{prefix}_{task}_games_1000_v{version}.pickle"
-open_path = f"datasets/temp_games.pickle"
+if prefix == "skillset":
+    train_size = 1000
+elif prefix == "worldmodel":
+    train_size = 5000
+
+open_path = f"datasets/{prefix}_{task}_games_{train_size}_v{version}.pickle"
+#open_path = f"datasets/temp_games.pickle"
 
 save_path = open_path.replace("games", "data")
 

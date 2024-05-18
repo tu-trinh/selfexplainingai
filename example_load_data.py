@@ -6,8 +6,8 @@ from mindgrid.infrastructure.basic_utils import to_enum
 from mindgrid.builder import make_env
 
 def skillset_tasks():
-    game_path = "datasets/skillset_listen_games_1000.pickle"
-    data_path = "datasets/skillset_listen_data_1000.pickle"
+    game_path = "datasets/skillset_listen_games_1000_v2.pickle"
+    data_path = "datasets/skillset_listen_data_1000_v2.pickle"
 
     with open(game_path, "rb") as f:
         games = pickle.load(f)
@@ -78,11 +78,8 @@ def skillset_tasks():
 
 def world_model_tasks():
 
-    #game_path = "datasets/skillset_listen_games_1000.pickle"
-    #data_path = "datasets/skillset_listen_data_1000.pickle"
-
-    game_path = "datasets/temp_games.pickle"
-    data_path = "datasets/temp_data.pickle"
+    game_path = "datasets/worldmodel_listen_games_5000.pickle"
+    data_path = "datasets/worldmodel_listen_data_5000.pickle"
 
     with open(game_path, "rb") as f:
         games = pickle.load(f)
@@ -154,4 +151,5 @@ def world_model_tasks():
 
 
 
-world_model_tasks()
+# world_model_tasks()
+skillset_tasks()

@@ -85,7 +85,7 @@ class Primitive(BaseSkill):
 
     @staticmethod
     def describe():
-        return "perform one of the following actions: (1) left: rotate counterclockwise 90 degrees; (2) right: rotate clockwise 90 degrees; (3) forward: move forward to the next cell; (4) pickup: pick up an object and place it in the inventory; (5) toggle: change the state of an object; (6) drop: place the object currently in the inventory onto the cell directly ahead; (7) done: announce that the current task is completed. The pickup and toggle actions are applicable only to objects that are directly in front of me."
+        return "perform one of the following actions: (1) left: rotate counterclockwise 90 degrees; (2) right: rotate clockwise 90 degrees; (3) forward: move forward to the cell directly in front; (4) pickup: pick up an object and place it in your inventory; (5) toggle: change the state of an object, such as unlocking/opening/closing a door, opening a box, or fixing a bridge; (6) drop: put the object currently in inventory down onto the cell directly in front; (7) done: announce that the current task is completed. Note that the pickup and toggle actions are only applicable to objects directly in front of you."
 
 
 class GoTo(BaseSkill):
@@ -211,7 +211,7 @@ class RotateTowardsDirection(BaseSkill):
 
     @staticmethod
     def describe():
-        return "rotate until I am heading in a specific direction. Example: rotate towards the west."
+        return "rotate until you are heading in a specific direction. Example: rotate towards the west."
 
 
 class GoAdjacentToObject(BaseSkill):
@@ -346,7 +346,7 @@ class DropAt(BaseSkill):
 
     @staticmethod
     def describe():
-        return "drop the object currently in my inventory onto a target location. Example: drop the carried object at column 5 row 2."
+        return "drop the object currently in your inventory onto a target location. Example: drop the carried object at column 5 row 2."
 
 
 class EmptyInventory(BaseSkill):
@@ -385,7 +385,7 @@ class EmptyInventory(BaseSkill):
 
     @staticmethod
     def describe():
-        return "place the object I am carrying onto an unoccupied cell. Example: empty inventory."
+        return "place the object you are carrying onto an unoccupied cell. Example: empty inventory."
 
 
 class OpenBox(BaseSkill):
@@ -499,7 +499,7 @@ class GetObject(BaseSkill):
 
     @staticmethod
     def describe():
-        return "retrieve a specific object and store it in my inventory. This skill is applicable only when reach the object. Example: get the key in column 7."
+        return "retrieve a specific object and store it in your inventory. This skill is applicable only when you've reached the object. Example: get the key in column 7."
 
 
 class MoveObject(BaseSkill):

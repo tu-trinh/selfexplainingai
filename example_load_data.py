@@ -78,8 +78,8 @@ def skillset_tasks():
 
 def world_model_tasks():
 
-    game_path = "datasets/worldmodel_listen_games_5000.pickle"
-    data_path = "datasets/worldmodel_listen_data_5000.pickle"
+    game_path = "datasets/worldmodel_listen_games_5000_v2.pickle"
+    data_path = "datasets/worldmodel_listen_data_5000_v2.pickle"
 
     with open(game_path, "rb") as f:
         games = pickle.load(f)
@@ -133,7 +133,7 @@ def world_model_tasks():
 
     env = make_env(config.ai.world_model)
 
-    # LISTENER task:  x["partial_text_obs"] + x["actions"] -> x["edit_descriptions"]
+    # SPEAKER task:  x["partial_text_obs"] + x["actions"] -> x["edit_descriptions"]
     print(x["partial_text_obs"][0])
     # NOTE: if there are N states, there are N - 1 actions
     # this format can be helpful for prompting
@@ -151,5 +151,5 @@ def world_model_tasks():
 
 
 
-# world_model_tasks()
-skillset_tasks()
+world_model_tasks()
+# skillset_tasks()

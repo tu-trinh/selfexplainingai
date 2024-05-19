@@ -32,7 +32,6 @@ IDX_TO_OBJECT = {v: k for k, v in OBJECT_TO_IDX.items()}
 COLORS["brown"] = np.array([119, 70, 20])
 COLOR_TO_IDX["brown"] = 6
 
-
 COLORS["turquoise"] = np.array([64, 224, 208])
 COLOR_TO_IDX["turquoise"] = 7
 
@@ -62,6 +61,7 @@ ACTION_TO_IDX = {
     "pickup": 3,
     "drop": 4,
     "toggle": 5,
+    "done": 6
 }
 IDX_TO_ACTION = {v: k for k, v in ACTION_TO_IDX.items()}
 CUSTOM_ACTION_TO_TRUE_ACTION = {1: 2, 2: 0, 3: 1, 4: 3, 5: 4, 6: 5, 7: 5, 8: 5}

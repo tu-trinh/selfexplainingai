@@ -47,7 +47,7 @@ Transformer Modules
 class EncoderLayer(nn.Module):
     def __init__(self, d_model: int, num_heads: int):
         super().__init__()
-        self.self_attention = nn.MultiheadAttention(d_model, num_heads, need_weights = False)
+        self.self_attention = nn.MultiheadAttention(d_model, num_heads)
         self.feed_forward = nn.Sequential(
             nn.Linear(d_model, d_model * 4),
             nn.ReLU(),
@@ -57,7 +57,7 @@ class EncoderLayer(nn.Module):
         self.norm2 = nn.LayerNorm(d_model)
 
     def forward(self, x: torch.tensor):
-        attn_output = self.self_attention(x, x, x)
+        attn_output = self.self_attention(x, x, x, need_weights = False)
         x = self.norm1(x + attn_output)
         ff_output = self.feed_forward(x)
         x = self.norm2(x + ff_output)
@@ -67,8 +67,8 @@ class EncoderLayer(nn.Module):
 class DecoderLayer(nn.Module):
     def __init__(self, d_model: int, num_heads: int):
         super().__init__()
-        self.self_attention = nn.MultiheadAttention(d_model, num_heads, need_weights = False)
-        self.cross_attention = nn.MultiheadAttention(d_model, num_heads, need_weights = False)
+        self.self_attention = nn.MultiheadAttention(d_model, num_heads)
+        self.cross_attention = nn.MultiheadAttention(d_model, num_heads)
         self.feed_forward = nn.Sequential(
             nn.Linear(d_model, d_model * 4),
             nn.ReLU(),
@@ -79,9 +79,9 @@ class DecoderLayer(nn.Module):
         self.norm3 = nn.LayerNorm(d_model)
 
     def forward(self, target: torch.tensor, memory: torch.tensor):
-        self_attn_output = self.self_attention(target, target, target)
+        self_attn_output = self.self_attention(target, target, target, need_weights = False)
         target = self.norm1(target + self_attn_output)
-        cross_attn_output = self.cross_attention(target, memory, memory)
+        cross_attn_output = self.cross_attention(target, memory, memory, need_weights = False)
         target = self.norm2(target + cross_attn_output)
         ff_output = self.feed_forward(target)
         target = self.norm3(target + ff_output)
@@ -239,6 +239,15 @@ class BLDatapoint:
         self.actions = actions
         self.queries = queries
         self.answers = answers
+    
+    def assert_tensors(self):
+        assert isinstance(self.init_state, torch.Tensor), "Init state is not a tensor"
+        assert isinstance(self.init_dir, torch.Tensor), "Init dir is not a tensor"
+        assert isinstance(self.edits, torch.Tensor), "Edits are not tensor"
+        assert isinstance(self.observations, torch.Tensor), "Observations are not tensor"
+        assert isinstance(self.actions, torch.Tensor), "Actions are not tensor"
+        assert isinstance(self.queries, torch.Tensor), "Queries are not tensor"
+        assert isinstance(self.answers, torch.Tensor), "Answers are not tensor"
 
 
 class BLDataset(Dataset):
@@ -300,6 +309,7 @@ def expand_datapoint(datapoint: Dict, gamepoint: Dict, edit_spp: SentencePiecePr
     observer = game_config.roles.observer
     nonobserver = "human" if observer == "ai" else "ai"
     init_env = make_env(getattr(game_config, nonobserver).world_model)
+    init_env.reset()
     init_env_state = init_env.get_state()
     init_state = (torch.tensor(init_env_state.full_obs), init_env_state.agent_dir)
     edits = [torch.tensor(edit_spp.encode_as_ids(edit)) for edit in datapoint["edit_descriptions"]]
@@ -309,12 +319,10 @@ def expand_datapoint(datapoint: Dict, gamepoint: Dict, edit_spp: SentencePiecePr
     for query in datapoint["queries"]:
         this_queries, this_answers = [], []
         for question in query:
-            this_queries.append(torch.tensor(query_spp.encode_as_ids(question["question"])))
-            this_answers.append(torch.tensor(answer_spp.encode_as_ids(question["answer"])))
-        queries.append(torch.stack(this_queries))
-        answers.append(torch.stack(this_answers))
-    queries = torch.stack(queries)
-    answers = torch.stack(answers)
+            this_queries.append(query_spp.encode_as_ids(question["question"]))
+            this_answers.append(answer_spp.encode_as_ids(str(question["answer"])))
+        queries.append(this_queries)
+        answers.append(this_answers)
     # Then make sliding window training datapoints
     ret_dicts = []
     for i in range(len(queries)):
@@ -339,8 +347,11 @@ def expand_datapoint(datapoint: Dict, gamepoint: Dict, edit_spp: SentencePiecePr
 def pad_truncate_tensor(tensors: torch.tensor, max_shape: Tuple):
     reshaped_tensors = []
     for t in tensors:
-        pad_dims = [(0, max(0, max_shape[i] - t.shape[i])) for i in range(len(t.shape) - 1, -1, -1)]
-        padded_t = F.pad(t, pad_dims)
+        pad_dims = []
+        for i in range(len(t.shape) - 1, -1, -1):
+            pad_size = max(0, max_shape[i] - t.shape[i])
+            pad_dims.extend((0, pad_size))
+        padded_t = F.pad(t, tuple(pad_dims))
         truncated_t = padded_t[tuple(slice(0, max_shape[i]) for i in range(len(padded_t.shape)))]
         reshaped_tensors.append(truncated_t)
     return torch.stack(reshaped_tensors)
@@ -360,7 +371,7 @@ def preprocess_data(dataset: BLDataset, split: str,
     if split == "train":
         max_num_edits = 0
         max_num_queries = 0
-    data_logs, edit_logs, obs_logs, query_logs = [], [], [], []
+    data_logs, edit_logs, obs_logs, query_logs = [], {}, {}, {}
 
     data, games = load_data(split)
     edit_spp = spm.SentencePieceProcessor()
@@ -390,18 +401,18 @@ def preprocess_data(dataset: BLDataset, split: str,
                     obs_logs[i][j] = [observations_length]
                 else:
                     obs_logs[i][j] = [observations_length - 1, observations_length]
-                queries_length = len(queries)
-                queries.extend(training_dict["queries"])
-                answers.extend(training_dict["answers"])
-                query_logs[i][j] = list(range(queries_length, queries_length + len(training_dict["queries"])))
-                if split == "train":
-                    max_num_queries = max(max_num_queries, len(training_dict["queries"]))
+            queries_length = len(queries)
+            queries.extend(training_dict["queries"])
+            answers.extend(training_dict["answers"])
+            query_logs[i][j] = list(range(queries_length, queries_length + len(training_dict["queries"])))
+            if split == "train":
+                max_num_queries = max(max_num_queries, len(training_dict["queries"]))
     
     # Pad/truncate necessary data objects
     if split == "train":
         max_initial_state_shape = tuple(max([state[0].shape[i] for state in initial_states]) for i in range(3))
     initial_state_grids = pad_truncate_tensor([state[0] for state in initial_states], max_initial_state_shape)
-    initial_state_directions = torch.stack([state[1] for state in initial_states])
+    initial_state_directions = torch.stack([torch.tensor(state[1]) for state in initial_states])
     assert len(initial_state_grids) == len(data), f"`initial_state_grids` has length {len(initial_state_grids)}, data has length {len(data)}"
     assert len(initial_state_directions) == len(data), f"`initial_state_directions` has length {len(initial_state_directions)}, data has length {len(data)}"
 
@@ -415,10 +426,10 @@ def preprocess_data(dataset: BLDataset, split: str,
     edits = pad_sequence(edits, batch_first = True, padding_value = 0)
     assert len(edits) == prev_edits_length, f"messed up padding edits: {prev_edits_length} vs. {edits.shape}"
     prev_queries_length = len(queries)
-    queries = pad_sequence(queries, batch_first = True, padding_value = 0)
+    queries = pad_sequence([torch.tensor(q) for q in queries], batch_first = True, padding_value = 0)
     assert len(queries) == prev_queries_length, f"messed up padding queries: {prev_queries_length} vs. {queries.shape}"
     prev_answers_length = len(answers)
-    answers = pad_sequence(answers, batch_first = True, padding_value = 0)
+    answers = pad_sequence([torch.tensor(a) for a in answers], batch_first = True, padding_value = 0)
     assert len(answers) == prev_answers_length, f"messed up padding answers: {prev_answers_length} vs. {answers.shape}"
 
     # Regroup data back into their original Datapoints and put into the Dataset
@@ -426,11 +437,11 @@ def preprocess_data(dataset: BLDataset, split: str,
     assert null_observations[0].shape == max_observation_shape, f"messed up padding null observations: {null_observations[0].shape} vs. {max_observation_shape}"
     cat_obs_shape = None
     for i in range(len(data)):
-        for j in range(len(data_logs[i])):
+        for j in range(data_logs[i]):
             bl_datapoint = BLDatapoint()
             bl_datapoint.init_state = initial_state_grids[i]
             bl_datapoint.init_dir = initial_state_directions[i]
-            bl_datapoint.edits = torch.stack(edits[k] for k in edit_logs[i])
+            bl_datapoint.edits = torch.stack([edits[k] for k in edit_logs[i]])
             bl_datapoint.edits = F.pad(bl_datapoint.edits, (0, 0, 0, max_num_edits - bl_datapoint.edits.size(0)))
             if j == 0:
                 bl_datapoint.observations = torch.cat([null_observations[0], null_observations[1]])
@@ -445,10 +456,11 @@ def preprocess_data(dataset: BLDataset, split: str,
                 bl_datapoint.actions = torch.tensor([actions[obs_logs[i][j][0]], actions[obs_logs[i][j][0]]])
             assert bl_datapoint.observations.shape == (cat_obs_shape[0], *max_observation_shape[1:]), f"oops! datapoint obs is shaped {bl_datapoint.observations.shape} and we want {(cat_obs_shape[0], *max_observation_shape[1:])}"
             assert bl_datapoint.actions.shape == (2,), f"oops! datapoint act is shaped {bl_datapoint.actions.shape}"
-            bl_datapoint.queries = torch.stack(queries[k] for k in query_logs[i][j])
+            bl_datapoint.queries = torch.stack([queries[k] for k in query_logs[i][j]])
             bl_datapoint.queries = F.pad(bl_datapoint.queries, (0, 0, 0, max_num_queries - bl_datapoint.queries.size(0)))
-            bl_datapoint.answers = torch.stack(answers[k] for k in query_logs[i][j])
+            bl_datapoint.answers = torch.stack([answers[k] for k in query_logs[i][j]])
             bl_datapoint.answers = F.pad(bl_datapoint.answers, (0, 0, 0, max_num_queries - bl_datapoint.answers.size(0)))
+            bl_datapoint.assert_tensors()
             dataset.add(bl_datapoint)
     
     if split == "train":
@@ -470,16 +482,24 @@ Training
 """
 class Wrapper:
     def __init__(self, d_model: int, num_layers: int, num_heads: int, num_epochs: int = None, save_every: int = None, train_mode: bool = True):
+        self.log_file = os.path.join(THIS_DIR, "log.txt")
+        self.model_file = os.path.join(THIS_DIR, "model.pt")
+
         self.train_dataset = BLDataset()
+        start = time.time()
         (
             self.state_shape, self.obs_shape,
             self.max_edits, self.max_queries,
             self.edit_length, self.query_length, self.ans_length,
             self.edit_vocab_size, self.query_vocab_size, self.answer_vocab_size
         ) = preprocess_data(self.train_dataset, "train")
+        end = time.time()
+        with open(self.log_file, "a") as f:
+            f.write(f"Loading training data took {format_seconds(end - start)}\n")
         assert len(self.train_dataset) != 0, "Dataset is empty!!!"
         self.train_dataloader = DataLoader(self.train_dataset, batch_size = 4, shuffle = True)
         
+        start = time.time()
         if train_mode:
             self.val_in_dataset = BLDataset()
             preprocess_data(self.val_in_dataset, "test_in", self.state_shape, self.obs_shape, self.max_edits, self.max_queries, self.edit_length, self.query_length, self.ans_length)
@@ -498,14 +518,27 @@ class Wrapper:
                 "in": DataLoader(self.test_in_dataset, batch_size = 1, shuffle = True),
                 "out": DataLoader(self.test_out_dataset, batch_size = 1, shuffle = True)
             }
+        end = time.time()
+        with open(self.log_file, "a") as f:
+            f.write(f"Loading val/test data took {format_seconds(end - start)}\n")
+        
+        if train_mode:
+            with open(self.log_file, "a") as f:
+                f.write(f"Init state shape: {self.state_shape}\n")
+                f.write(f"Concatenated observation shape: {self.obs_shape}\n")
+                f.write(f"Max num edits: {self.max_edits}\n")
+                f.write(f"Max num queries: {self.max_queries}\n")
+                f.write(f"Edit length: {self.edit_length}\n")
+                f.write(f"Query length: {self.query_length}\n")
+                f.write(f"Answer length: {self.ans_length}\n")
 
         self.d_model = d_model
         self.num_layers = num_layers
         self.num_heads = num_heads
         self.model = BLModel(
-            StateEncoder(self.state_shape, 4, self.d_model),
+            StateEncoder(self.state_shape[0], 4, self.d_model),
             EditEncoder(self.edit_vocab_size, self.d_model, self.num_layers, self.num_heads),
-            ObservationEncoder(self.obs_shape, self.d_model),
+            ObservationEncoder(self.obs_shape[0], self.d_model),
             ActionEncoder(7, self.d_model),
             QueryEncoder(self.query_vocab_size, self.d_model, self.num_layers, self.num_heads),
             InputTransformer(self.d_model, self.num_layers, self.num_heads),
@@ -518,18 +551,6 @@ class Wrapper:
             self.num_epochs = num_epochs
             self.save_interval = save_every
             self.val_losses = {"in": float("inf"), "out": float("inf")}
-        self.log_file = os.path.join(THIS_DIR, "log.txt")
-        self.model_file = os.path.join(THIS_DIR, "model.pt")
-
-        if train_mode:
-            with open(self.log_file, "a") as f:
-                f.write(f"Init state shape: {self.state_shape}\n")
-                f.write(f"Concatenated observation shape: {self.obs_shape}\n")
-                f.write(f"Max num edits: {self.max_edits}\n")
-                f.write(f"Max num queries: {self.max_queries}\n")
-                f.write(f"Edit length: {self.edit_length}\n")
-                f.write(f"Query length: {self.query_length}\n")
-                f.write(f"Answer length: {self.ans_length}\n")
     
 
     def train(self):
@@ -622,12 +643,21 @@ if __name__ == "__main__":
         create_vocabularies()
     elif args.info:
         wrapper = Wrapper(d_model = 256, num_layers = 4, num_heads = 4, train_mode = False)
-        N = 1
-        C = 1
-        EN = 1
-        M = 1
-        Q = 1
-        QN = 1
+        """
+        Init state shape: (11, 11, 3)
+        Concatenated observation shape: torch.Size([24, 12, 3])
+        Max num edits: 2
+        Max num queries: 5
+        Edit length: 42
+        Query length: 38
+        Answer length: 13
+        """
+        N = 11
+        C = 2
+        EN = 42
+        M = 12
+        Q = 5
+        QN = 38
         print(summary(
             wrapper.model,
             [(4, N, N, 3), (4,), (4, C, EN), (4, 2*M, M, 3), (4, 2), (4, Q, QN)]

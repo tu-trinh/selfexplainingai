@@ -20,6 +20,7 @@ import torch.nn.functional as F
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader, Dataset
 import torch.optim as optim
+from torchinfo import summary
 import pickle
 import time
 
@@ -519,6 +520,16 @@ class Wrapper:
             self.val_losses = {"in": float("inf"), "out": float("inf")}
         self.log_file = os.path.join(THIS_DIR, "log.txt")
         self.model_file = os.path.join(THIS_DIR, "model.pt")
+
+        if train_mode:
+            with open(self.log_file, "a") as f:
+                f.write(f"Init state shape: {self.state_shape}\n")
+                f.write(f"Concatenated observation shape: {self.obs_shape}\n")
+                f.write(f"Max num edits: {self.max_edits}\n")
+                f.write(f"Max num queries: {self.max_queries}\n")
+                f.write(f"Edit length: {self.edit_length}\n")
+                f.write(f"Query length: {self.query_length}\n")
+                f.write(f"Answer length: {self.ans_length}\n")
     
 
     def train(self):
@@ -604,13 +615,26 @@ if __name__ == "__main__":
     parser.add_argument("--setup", "-s", action = "store_true", default = False)
     parser.add_argument("--train", "-t", action = "store_true", default = False)
     parser.add_argument("--eval", "-e", action = "store_true", default = False)
+    parser.add_argument("--info", "-i", action = "store_true", default = False)
     args = parser.parse_args()
 
     if args.setup:
         create_vocabularies()
+    elif args.info:
+        wrapper = Wrapper(d_model = 256, num_layers = 4, num_heads = 4, train_mode = False)
+        N = 1
+        C = 1
+        EN = 1
+        M = 1
+        Q = 1
+        QN = 1
+        print(summary(
+            wrapper.model,
+            [(4, N, N, 3), (4,), (4, C, EN), (4, 2*M, M, 3), (4, 2), (4, Q, QN)]
+        ))
     elif args.train:
         wrapper = Wrapper(d_model = 256, num_layers = 4, num_heads = 4, num_epochs = 10, save_every = 1)
-        wrapper.train()
+        # wrapper.train()
     elif args.eval:
         wrapper = Wrapper(d_model = 256, num_layers = 4, num_heads = 4, train_mode = False)
         wrapper.evaluate()

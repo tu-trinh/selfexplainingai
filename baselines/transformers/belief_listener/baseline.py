@@ -283,14 +283,14 @@ def create_vocabularies():
             for query_set in datapoint["queries"]:
                 for query in query_set:
                     query_file.write(query["question"].strip() + "\n")
-                    answer_file.write(query["answer"].strip() + "\n")
+                    answer_file.write(str(query["answer"]).strip() + "\n")
     edit_file.close()
     query_file.close()
     answer_file.close()
     
-    train_spm(edit_filename, "edits", len(COLOR_NAMES) + len(OBJ_NAME_MAPPING) + len(Edits) * 50)
-    train_spm(query_filename, "queries", len(COLOR_NAMES) + len(OBJ_NAME_MAPPING) + 200)
-    train_spm(answer_filename, "answers", len(COLOR_NAMES) + len(OBJ_NAME_MAPPING) + MAX_ROOM_SIZE + 20)
+    train_spm(edit_filename, os.path.join(THIS_DIR, "edits"), min(181, len(COLOR_NAMES) + len(OBJ_NAME_MAPPING) + len(Edits) * 50))
+    train_spm(query_filename, os.path.join(THIS_DIR, "queries"), min(115, len(COLOR_NAMES) + len(OBJ_NAME_MAPPING) + 200))
+    train_spm(answer_filename, os.path.join(THIS_DIR, "answers"), len(COLOR_NAMES) + len(OBJ_NAME_MAPPING) + MAX_ROOM_SIZE + 20)
 
 
 def expand_datapoint(datapoint: Dict, gamepoint: Dict, edit_spp: SentencePieceProcessor, query_spp: SentencePieceProcessor, answer_spp: SentencePieceProcessor):
@@ -363,11 +363,11 @@ def preprocess_data(dataset: BLDataset, split: str,
 
     data, games = load_data(split)
     edit_spp = spm.SentencePieceProcessor()
-    edit_spp.load("edits.model")
+    edit_spp.load(os.path.join(THIS_DIR, "edits.model"))
     query_spp = spm.SentencePieceProcessor()
-    query_spp.load("queries.model")
+    query_spp.load(os.path.join(THIS_DIR, "queries.model"))
     answer_spp = spm.SentencePieceProcessor()
-    answer_spp.load("answers.model")
+    answer_spp.load(os.path.join(THIS_DIR, "answers.model"))
     for i, (datapoint, gamepoint) in enumerate(zip(data, games)):
         expanded_datapoint = expand_datapoint(datapoint, gamepoint, edit_spp, query_spp, answer_spp)
         data_logs.append(len(expanded_datapoint))
@@ -468,7 +468,7 @@ def preprocess_data(dataset: BLDataset, split: str,
 Training
 """
 class Wrapper:
-    def __init__(self, d_model: int, num_layers: int, num_heads: int, num_epochs: int, save_every: int):
+    def __init__(self, d_model: int, num_layers: int, num_heads: int, num_epochs: int = None, save_every: int = None, train_mode: bool = True):
         self.train_dataset = BLDataset()
         (
             self.state_shape, self.obs_shape,
@@ -479,23 +479,24 @@ class Wrapper:
         assert len(self.train_dataset) != 0, "Dataset is empty!!!"
         self.train_dataloader = DataLoader(self.train_dataset, batch_size = 4, shuffle = True)
         
-        self.val_in_dataset = BLDataset()
-        preprocess_data(self.val_in_dataset, "test_in", self.state_shape, self.obs_shape, self.max_edits, self.max_queries, self.edit_length, self.query_length, self.ans_length)
-        self.val_out_dataset = BLDataset()
-        preprocess_data(self.val_out_dataset, "test_out", self.state_shape, self.obs_shape, self.max_edits, self.max_queries, self.edit_length, self.query_length, self.ans_length)
-        self.val_dataloaders = {
-            "in": DataLoader(self.val_in_dataset, batch_size = 1, shuffle = True),
-            "out": DataLoader(self.val_out_dataset, batch_size = 1, shuffle = True)
-        }
-        
-        self.test_in_dataset = BLDataset()
-        preprocess_data(self.test_in_dataset, "test_in", self.state_shape, self.obs_shape, self.max_edits, self.max_queries, self.edit_length, self.query_length, self.ans_length)
-        self.test_out_dataset = BLDataset()
-        preprocess_data(self.test_out_dataset, "test_out", self.state_shape, self.obs_shape, self.max_edits, self.max_queries, self.edit_length, self.query_length, self.ans_length)
-        self.test_dataloaders = {
-            "in": DataLoader(self.test_in_dataset, batch_size = 1, shuffle = True),
-            "out": DataLoader(self.test_out_dataset, batch_size = 1, shuffle = True)
-        }
+        if train_mode:
+            self.val_in_dataset = BLDataset()
+            preprocess_data(self.val_in_dataset, "test_in", self.state_shape, self.obs_shape, self.max_edits, self.max_queries, self.edit_length, self.query_length, self.ans_length)
+            self.val_out_dataset = BLDataset()
+            preprocess_data(self.val_out_dataset, "test_out", self.state_shape, self.obs_shape, self.max_edits, self.max_queries, self.edit_length, self.query_length, self.ans_length)
+            self.val_dataloaders = {
+                "in": DataLoader(self.val_in_dataset, batch_size = 1, shuffle = True),
+                "out": DataLoader(self.val_out_dataset, batch_size = 1, shuffle = True)
+            }
+        else:
+            self.test_in_dataset = BLDataset()
+            preprocess_data(self.test_in_dataset, "test_in", self.state_shape, self.obs_shape, self.max_edits, self.max_queries, self.edit_length, self.query_length, self.ans_length)
+            self.test_out_dataset = BLDataset()
+            preprocess_data(self.test_out_dataset, "test_out", self.state_shape, self.obs_shape, self.max_edits, self.max_queries, self.edit_length, self.query_length, self.ans_length)
+            self.test_dataloaders = {
+                "in": DataLoader(self.test_in_dataset, batch_size = 1, shuffle = True),
+                "out": DataLoader(self.test_out_dataset, batch_size = 1, shuffle = True)
+            }
 
         self.d_model = d_model
         self.num_layers = num_layers
@@ -510,14 +511,14 @@ class Wrapper:
             AnswerDecoder(self.answer_vocab_size, self.d_model, self.num_layers, self.num_heads)
         ).to(DEVICE)
         
-        self.lr = 1e-4
-        self.optimizer = optim.Adam(self.model.parameters(), lr = self.lr)
-        self.num_epochs = num_epochs
-        self.save_interval = save_every
+        if train_mode:
+            self.lr = 1e-4
+            self.optimizer = optim.Adam(self.model.parameters(), lr = self.lr)
+            self.num_epochs = num_epochs
+            self.save_interval = save_every
+            self.val_losses = {"in": float("inf"), "out": float("inf")}
         self.log_file = os.path.join(THIS_DIR, "log.txt")
         self.model_file = os.path.join(THIS_DIR, "model.pt")
-        self.eval_file = os.path.join(THIS_DIR, "eval.txt")
-        self.val_losses = {"in": float("inf"), "out": float("inf")}
     
 
     def train(self):
@@ -608,6 +609,8 @@ if __name__ == "__main__":
     if args.setup:
         create_vocabularies()
     elif args.train:
-        train()
+        wrapper = Wrapper(d_model = 256, num_layers = 4, num_heads = 4, num_epochs = 10, save_every = 1)
+        wrapper.train()
     elif args.eval:
-        eval()
+        wrapper = Wrapper(d_model = 256, num_layers = 4, num_heads = 4, train_mode = False)
+        wrapper.evaluate()

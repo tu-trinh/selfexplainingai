@@ -241,7 +241,7 @@ def listener_task(out_file: str, suffix: str, model_idx: int):
 
     counter = 0
     with get_open_file(out_file) as f:
-        for i, datapoint in enumerate(tqdm(data[:1])):
+        for i, datapoint in enumerate(tqdm(data)):
             if i >= start_idx:
                 obs_window = [datapoint["partial_text_obs"][0]]
                 act_window = []

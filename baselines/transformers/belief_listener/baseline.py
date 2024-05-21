@@ -23,6 +23,7 @@ import torch.optim as optim
 from torchinfo import summary
 import pickle
 import time
+from tqdm import tqdm
 
 
 
@@ -57,7 +58,7 @@ class EncoderLayer(nn.Module):
         self.norm2 = nn.LayerNorm(d_model)
 
     def forward(self, x: torch.tensor):
-        attn_output = self.self_attention(x, x, x, need_weights = False)
+        attn_output, _ = self.self_attention(x, x, x, need_weights = False)
         x = self.norm1(x + attn_output)
         ff_output = self.feed_forward(x)
         x = self.norm2(x + ff_output)
@@ -79,9 +80,9 @@ class DecoderLayer(nn.Module):
         self.norm3 = nn.LayerNorm(d_model)
 
     def forward(self, target: torch.tensor, memory: torch.tensor):
-        self_attn_output = self.self_attention(target, target, target, need_weights = False)
+        self_attn_output, _ = self.self_attention(target, target, target, need_weights = False)
         target = self.norm1(target + self_attn_output)
-        cross_attn_output = self.cross_attention(target, memory, memory, need_weights = False)
+        cross_attn_output, _ = self.cross_attention(target, memory, memory, need_weights = False)
         target = self.norm2(target + cross_attn_output)
         ff_output = self.feed_forward(target)
         target = self.norm3(target + ff_output)
@@ -89,17 +90,18 @@ class DecoderLayer(nn.Module):
 
 
 class StateEncoder(nn.Module):
-    def __init__(self, tensor_channels: int, dir_vocab_size: int, d_model: int):
+    def __init__(self, state_dim: int, dir_vocab_size: int, d_model: int):
         super().__init__()
         self.cnn = nn.Conv2d(in_channels = 3, out_channels = d_model, kernel_size = 3, stride = 1, padding = 1)
         self.dir_embedder = nn.Embedding(num_embeddings = dir_vocab_size, embedding_dim = d_model)
-        self.fc = nn.Linear(d_model * tensor_channels**2 + d_model, d_model)
+        self.fc = nn.Linear(d_model * state_dim**2 + d_model, d_model)
 
     def forward(self, state_tensor: torch.tensor, directions: torch.tensor):
         assert state_tensor.dim() == 4, f"Expected 4D tensor (B, N, N, 3); got {state_tensor.shape}"
         assert directions.dim() == 1, f"Expected 1D tensor (B); got {directions.shape}"
+        state_tensor = state_tensor.float().permute(0, 3, 1, 2)
         batch_size = state_tensor.size(0)
-        state_features = self.cnn(state_tensor).view(batch_size, -1)
+        state_features = self.cnn(state_tensor).reshape(batch_size, -1)
         dir_embedding = self.dir_embedder(directions)
         combined_state = torch.cat((state_features, dir_embedding), dim = -1)
         state_embedding = self.fc(combined_state)
@@ -113,7 +115,7 @@ class EditEncoder(nn.Module):
         self.encoder_layers = nn.ModuleList([EncoderLayer(d_model, num_heads) for _ in range(num_layers)])
 
     def forward(self, edits: torch.tensor):
-        assert edits.dim() == 3, f"Expected 3D tensor (B, C, edit_length); got {edits.shape}"
+        assert edits.dim() == 2, f"Expected 2D tensor (B, C * edit_length); got {edits.shape}"
         edit_embeddings = self.embedder(edits)
         for layer in self.encoder_layers:
             edit_embeddings = layer(edit_embeddings)
@@ -121,15 +123,16 @@ class EditEncoder(nn.Module):
 
 
 class ObservationEncoder(nn.Module):
-    def __init__(self, tensor_channels: int, d_model: int):
+    def __init__(self, obs_dim: int, d_model: int):
         super().__init__()
         self.cnn = nn.Conv2d(in_channels = 3, out_channels = d_model, kernel_size = 3, stride = 1, padding = 1)
-        self.fc = nn.Linear(d_model * tensor_channels**2 * 2, d_model)
+        self.fc = nn.Linear(d_model * obs_dim * obs_dim // 2 , d_model)
 
     def forward(self, observations: torch.tensor):
         assert observations.dim() == 4, f"Expected 4D tensor (B, 2M, 2M, 3); got {observations.shape}"
+        observations = observations.float().permute(0, 3, 1, 2)
         batch_size = observations.size(0)
-        obs_features = self.cnn(observations).view(batch_size, -1)
+        obs_features = self.cnn(observations).reshape(batch_size, -1)
         obs_embeddings = self.fc(obs_features)
         return obs_embeddings
 
@@ -152,8 +155,12 @@ class QueryEncoder(nn.Module):
         self.encoder_layers = nn.ModuleList([EncoderLayer(d_model, num_heads) for _ in range(num_layers)])
 
     def forward(self, queries: torch.tensor):
-        assert queries.dim() == 3; f"Expected 3D tensor (B, Q, query_length); got {queries.shape}"
+        assert queries.dim() == 3, f"Expected 3D tensor (B, Q, query_length); got {queries.shape}"
+        batch_size, num_queries, query_length = queries.size()
+        queries = queries.reshape(batch_size, -1)
         query_embeddings = self.embedder(queries)
+        query_embeddings = query_embeddings.reshape(batch_size, num_queries, query_length, -1)
+        query_embeddings = query_embeddings.reshape(batch_size, -1, self.embedder.embedding_dim)
         for layer in self.encoder_layers:
             query_embeddings = layer(query_embeddings)
         return query_embeddings
@@ -181,7 +188,11 @@ class AnswerDecoder(nn.Module):
     def forward(self, memory: torch.tensor, queries: torch.tensor):
         assert memory.dim() == 3, f"Expected 3D tensor (B, something, d_model); got {memory.shape}"
         assert queries.dim() == 3, f"Expected 3D tensor (B, Q, query_length); got {queries.shape}"
+        batch_size, num_queries, query_length = queries.size()
+        queries = queries.reshape(batch_size, -1)
         query_embeddings = self.embedder(queries)
+        query_embeddings = query_embeddings.view(batch_size, num_queries, query_length, -1)
+        query_embeddings = query_embeddings.view(batch_size, -1, self.embedder.embedding_dim)
         for layer in self.decoder_layers:
             query_embeddings = layer(query_embeddings, memory)
         answers = self.fc(query_embeddings)
@@ -208,8 +219,8 @@ class BLModel(nn.Module):
         combined_embeddings = torch.cat((
             state_embedding.unsqueeze(1),  # (B, 1, d_model)
             edit_embedding,  # (B, C, d_model)
-            obs_embedding.view(obs_embedding.size(0), -1, obs_embedding.size(-1)),  # (B, 2, d_model)
-            act_embedding.view(act_embedding.size(0), -1, act_embedding.size(-1)),  # (B, 2, d_model)
+            obs_embedding.reshape(obs_embedding.size(0), -1, obs_embedding.size(-1)),  # (B, 2, d_model)
+            act_embedding.reshape(act_embedding.size(0), -1, act_embedding.size(-1)),  # (B, 2, d_model)
             query_embedding  # (B, Q, d_model)
         ), dim = 1)
         combined_output = self.input_trans(combined_embeddings)
@@ -441,8 +452,8 @@ def preprocess_data(dataset: BLDataset, split: str,
             bl_datapoint = BLDatapoint()
             bl_datapoint.init_state = initial_state_grids[i]
             bl_datapoint.init_dir = initial_state_directions[i]
-            bl_datapoint.edits = torch.stack([edits[k] for k in edit_logs[i]])
-            bl_datapoint.edits = F.pad(bl_datapoint.edits, (0, 0, 0, max_num_edits - bl_datapoint.edits.size(0)))
+            bl_datapoint.edits = torch.cat([edits[k] for k in edit_logs[i]])
+            bl_datapoint.edits = F.pad(bl_datapoint.edits, (0, max_num_edits * edits.size(1) - bl_datapoint.edits.size(0)))
             if j == 0:
                 bl_datapoint.observations = torch.cat([null_observations[0], null_observations[1]])
                 if not cat_obs_shape:
@@ -470,7 +481,7 @@ def preprocess_data(dataset: BLDataset, split: str,
     
     return (
         max_initial_state_shape, cat_obs_shape,
-        max_num_edits, max_num_queries,
+        max_num_edits * edits.size(1), max_num_queries,
         edit_length, query_length, answer_length,
         edit_spp.get_piece_size(), query_spp.get_piece_size(), answer_spp.get_piece_size()
     )
@@ -555,14 +566,14 @@ class Wrapper:
 
     def train(self):
         self.model.train()
-        for i in range(self.num_epochs):
+        for i in tqdm(range(self.num_epochs)):
             losses = []
             start = time.time()
-            for batch in self.train_dataloader:
+            for batch in tqdm(self.train_dataloader):
                 init_states, init_dirs, edits, observations, actions, queries, answers = [item.to(DEVICE) for item in batch]
                 output = self.model(init_states, init_dirs, edits, observations, actions, queries)
                 self.optimizer.zero_grad()
-                loss = F.cross_entropy(output.view(-1, self.answer_vocab_size), answers.view(-1))
+                loss = F.cross_entropy(output.reshape(-1, self.answer_vocab_size), answers.reshape(-1))
                 loss.backward()
                 self.optimizer.step()
                 losses.append(loss.item())
@@ -586,10 +597,10 @@ class Wrapper:
             for split in ["in", "out"]:
                 losses = []
                 start = time.time()
-                for batch in self.val_dataloaders[split]:
+                for batch in tqdm(self.val_dataloaders[split]):
                     init_states, init_dirs, edits, observations, actions, queries, answers = [item.to(DEVICE) for item in batch]
                     output = self.model(init_states, init_dirs, edits, observations, actions, queries)
-                    loss = F.cross_entropy(output.view(-1, self.answer_vocab_size), answers.view(-1))
+                    loss = F.cross_entropy(output.reshape(-1, self.answer_vocab_size), answers.reshape(-1))
                     losses.append(loss.item())
                 end = time.time()
                 split_loss = np.mean(losses)
@@ -617,7 +628,7 @@ class Wrapper:
             for split in ["in", "out"]:
                 score = []  # +x where x is proportion of questions in a query correct
                 start = time.time()
-                for batch in self.test_dataloaders[split]:
+                for batch in tqdm(self.test_dataloaders[split]):
                     init_states, init_dirs, edits, observations, actions, queries, answers = [item.to(DEVICE) for item in batch]
                     output = self.model(init_states, init_dirs, edits, observations, actions, queries)
                     preds = output.argmax(dim = -1)
@@ -664,7 +675,7 @@ if __name__ == "__main__":
         ))
     elif args.train:
         wrapper = Wrapper(d_model = 256, num_layers = 4, num_heads = 4, num_epochs = 10, save_every = 1)
-        # wrapper.train()
+        wrapper.train()
     elif args.eval:
         wrapper = Wrapper(d_model = 256, num_layers = 4, num_heads = 4, train_mode = False)
         wrapper.evaluate()

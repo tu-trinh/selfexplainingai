@@ -4,6 +4,5 @@ sandbox/
 data/
 access_tokens.py
 .vscode/
-logs/
 datasets/
-baselines/*/*.txt
+baselines/*/*/*.txt

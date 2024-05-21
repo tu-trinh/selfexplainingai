@@ -65,7 +65,7 @@ def eyeball_worldmodel():
     id_to_game = {x["id"] : x for x in games[split]}
 
     # NOTE: change the id of the example
-    x = data[split][2]
+    x = data[split][0]
 
     game = id_to_game[x["game_id"]]
 
@@ -98,5 +98,5 @@ def eyeball_worldmodel():
 
 
 # NOTE: uncomment one of the followings
-eyeball_skillset()
-# eyeball_worldmodel()
+# eyeball_skillset()
+eyeball_worldmodel()

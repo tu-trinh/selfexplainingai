@@ -21,7 +21,7 @@ import re
 from typing import Dict, List, Tuple, Union
 from tqdm import tqdm
 import time
-import random
+import numpy as np
 
 
 MODELS = ["llama-3-70b-instruct", "mixtral-8x7b-instruct", "gemma-7b-instruct"]
@@ -41,16 +41,19 @@ You are an agent who is trying to complete a task in a grid-like environment, wh
 4. You can only put an object down in a cell that has no other object
 5. When you open a box, it disappears and is replaced by the object inside it, IF there is one
 """
+TRAINING_DATA = None
+NUM_TRAINING_EXAMPLES = 0
+USING_FEW_SHOT = False
 
 
 def load_data(suffix: str, need_configs: bool = False) -> Tuple[List[Dict], List]:
     with open("datasets/skillset_listen_data_1000_v2.pickle", "rb") as f:
         data = pickle.load(f)
-    data = data[f"test_{suffix}"]
+    data = data[f"test_{suffix}"] if suffix != "train" else data["train"]
 
     with open("datasets/skillset_listen_games_1000_v2.pickle", "rb") as f:
         games = pickle.load(f)
-    games = games[f"test_{suffix}"]
+    games = games[f"test_{suffix}"] if suffix != "train" else games["train"]
     game_layouts = ["room_door_key" in game["config"] for game in games]
     if need_configs:
         game_configs = [game["config"] for game in games]
@@ -108,7 +111,64 @@ def find_start_idx(out_file: str, data_length: int):
     return start_idx
 
 
-def build_prompt(datapoint: Dict, task: str, is_rdk: bool, obs_window: List[str] = [], acts_window: List[str] = []) -> Union[str, List[str]]:
+def build_few_shot_prompt(datapoint: Dict, task: str, is_rdk: bool, obs_window: List[str] = [], acts_window: List[str] = []) -> Union[str, List[str]]:
+    prompt = (RDK_INTRO.strip() if is_rdk else TI_INTRO.strip()) + "\n\n"
+    if task == "speaker":
+        prompt += "You will be given a trajectory consisting of observations (obs) that you've previously seen and the corresponding actions you took in response. Your job is to identify which task the trajectory exemplifies." + "\n\n"
+        prompt += "Below are three examples of trajectories you might see and the correct tasks associated with them." + "\n\n"
+        training_examples = [TRAINING_DATA[i] for i in np.random.choice(NUM_TRAINING_EXAMPLES, size = 3)]
+        for i, te in enumerate(training_examples):
+            prompt += f"EXAMPLE {i + 1}\n"
+            prompt += "TRAJECTORY:\n"
+            for j, (obs, act) in enumerate(zip(te["partial_text_obs"], te["actions"])):
+                prompt += f"Obs {j + 1}: {obs}\nYour action: {act}\n"
+            prompt += f"Final obs: {te['partial_text_obs'][-1]}" + "\n"
+            prompt += f"TASK: {te['skill_name']}\n"
+            prompt += f"END EXAMPLE {i + 1}\n\n"
+        prompt += f"NOW IT IS YOUR TURN. Here is your trajectory:\n"
+        for i, (obs, act) in enumerate(zip(datapoint["partial_text_obs"], datapoint["actions"])):
+            prompt += f"Obs {i + 1}: {obs}\nYour action: {act}\n"
+        prompt += f"Final obs: {datapoint['partial_text_obs'][-1]}" + "\n\n"
+        prompt += "Which of the following tasks does your above trajectory exemplify? Below are the available task names, descriptions, and examples. Your answer should be the exact task name (including underscores) taken ONLY from the below options, such as 'primitive', 'drop_at', etc. No more, no less." + "\n"
+        for i, skill in enumerate(Skills):
+            prompt += f"{i + 1}. {skill.name}: {skill.value.describe()}\n"
+        prompt += "\nYour answer: "
+    elif task == "listener":
+        prompt += "You will be given a task to execute"
+        if len(obs_window) == 1:
+            prompt += ", as well as an initial observation (obs) of what you currently see in the environment. Given these, your job is to choose the best action to take in order to make progress towards or complete your task." + "\n\n"
+            prompt += "Below are three examples of tasks you might receive, initial observations you might see, and the expected actions you should take." + "\n\n"
+        else:
+            if len(obs_window) == 2:
+                prompt += ". You will also be given a previous observation (obs) that you've seen in the environment and the corresponding action you took in response. "
+            elif len(obs_window) == 3:
+                prompt += ". You will also be given previous observations (obs) that you've seen in the environment and the corresponding actions you took in response. "
+            prompt += "Given these, and the current observation, your job is to choose the best action to take in order to make progress towards or complete your task." + "\n\n"
+            prompt += "Below are three examples of tasks you might receive, observations and actions you might have, and the expected actions you should take." + "\n\n"
+        training_examples = [TRAINING_DATA[i] for i in np.random.choice(NUM_TRAINING_EXAMPLES, size = 3)]
+        for i, te in enumerate(training_examples):
+            prompt += f"EXAMPLE {i + 1}\n"
+            prompt += f"TASK: {te['instruction']}. This means to {to_enum(Skills, datapoint['skill_name']).value.describe()}\n"
+            if len(obs_window) == 2:
+                prompt += f"PREVIOUS OBS: {te['partial_text_obs'][0]}\nYOUR ACTION: {te['actions'][0]}\n"
+            elif len(obs_window) == 3:
+                prompt += f"OBS TWO TIMESTEPS AGO: {te['partial_text_obs'][0]}\nYOUR ACTION: {te['actions'][0]}\nOBS ONE TIMESTEP AGO: {te['partial_text_obs'][1]}\nYOUR ACTION: {te['actions'][1]}\n"
+            prompt += f"CURRENT OBS: {te['partial_text_obs'][2]}\n"
+            prompt += f"CORRECT ACTION: {te['actions'][2]}\n"
+            prompt += f"END EXAMPLE {i + 1}\n\n"
+        prompt += f"NOW IT IS YOUR TURN. Your task is: {datapoint['instruction']}. This means to {to_enum(Skills, datapoint['skill_name']).value.describe()}\n"
+        if len(obs_window) == 2:
+            prompt += f"PREVIOUS OBS: {obs_window[0]}\nYOUR ACTION: {acts_window[0]}\n"
+        elif len(obs_window) == 3:
+            prompt += f"OBS TWO TIMESTEPS AGO: {obs_window[0]}\nYOUR ACTION: {acts_window[0]}\nOBS ONE TIMESTEP AGO: {obs_window[1]}\nYOUR ACTION: {acts_window[1]}\n"
+        prompt += f"CURRENT OBS: {obs_window[-1]}\n\n"
+        prompt += "Which of the following actions should you take to make progress towards or complete your given task? Below are the action names and their descriptions. Your answer should be the exact action name (NOT number) chosen ONLY from the list below, such as 'left', 'forward', etc. No more, no less." + "\n"
+        prompt += break_up_primitive_skills(is_rdk)
+        prompt += "\nYour answer: "
+    return prompt
+
+
+def build_prompt(datapoint: Dict, task: str, is_rdk: bool, obs_window: List[str] = [], acts_window: List[str] = []) -> str:
     prompt = (RDK_INTRO.strip() if is_rdk else TI_INTRO.strip()) + "\n\n"
     if task == "speaker":
         prompt += """
@@ -150,14 +210,17 @@ def speaker_task(out_file: str, suffix: str, model_idx: int):
     """
     data, game_layouts = load_data(suffix)
     start_idx = find_start_idx(out_file, len(data))
-    if not start_idx:
+    if start_idx is None:
         return
     
     with get_open_file(out_file) as f:
         for i, datapoint in enumerate(tqdm(data)):
             if i >= start_idx:
                 game_id = int(re.search(r"(\d+)", datapoint["game_id"]).group(1))
-                prompt = build_prompt(datapoint, "speaker", game_layouts[game_id])
+                if USING_FEW_SHOT:
+                    prompt = build_few_shot_prompt(datapoint, "speaker", game_layouts[game_id])
+                else:
+                    prompt = build_prompt(datapoint, "speaker", game_layouts[game_id])
                 resp = Completion.create(model = MODELS[model_idx], prompt = prompt, temperature = TEMPERATURE, max_new_tokens = 20)
                 model_answer = json.loads(resp.json())["output"]["text"]
                 correct_answer = datapoint["skill_name"]
@@ -173,12 +236,12 @@ def listener_task(out_file: str, suffix: str, model_idx: int):
     """
     data, game_configs, game_layouts = load_data(suffix, need_configs = True)
     start_idx = find_start_idx(out_file, len(data))
-    if not start_idx:
+    if start_idx is None:
         return
 
     counter = 0
     with get_open_file(out_file) as f:
-        for i, datapoint in enumerate(tqdm(data)):
+        for i, datapoint in enumerate(tqdm(data[:1])):
             if i >= start_idx:
                 obs_window = [datapoint["partial_text_obs"][0]]
                 act_window = []
@@ -190,7 +253,10 @@ def listener_task(out_file: str, suffix: str, model_idx: int):
                 env.reset()
                 pbar = tqdm(total = max_steps)
                 while curr_steps < max_steps:
-                    prompt = build_prompt(datapoint, "listener", game_layouts[game_id], obs_window, act_window)
+                    if USING_FEW_SHOT:
+                        prompt = build_few_shot_prompt(datapoint, "listener", game_layouts[game_id], obs_window, act_window)
+                    else:
+                        prompt = build_prompt(datapoint, "listener", game_layouts[game_id], obs_window, act_window)
                     resp = Completion.create(model = MODELS[model_idx], prompt = prompt, temperature = TEMPERATURE, max_new_tokens = 10)
                     model_answer = json.loads(resp.json())["output"]["text"]
                     match = re.search(r"(left|right|forward|pickup|drop|toggle|done)", model_answer.lower())
@@ -227,10 +293,18 @@ if __name__ == "__main__":
     parser.add_argument("--ood", "-ood", action = "store_true", default = False)
     parser.add_argument("--id", "-id", action = "store_true", default = False)
     parser.add_argument("--model", "-m", type = int, required = True)
+    parser.add_argument("--few_shot", "-f", action = "store_true", default = False)
     args = parser.parse_args()
     
     assert args.speaker or args.listener, "Choose either speaker or listener"
     assert args.ood or args.id, "Choose either _in or _out"
+    USING_FEW_SHOT = args.few_shot
+    print("Using few shot?", USING_FEW_SHOT)
+    time.sleep(2)
+    if USING_FEW_SHOT:
+        TRAINING_DATA, _ = load_data("train")
+        TRAINING_DATA = [dp for dp in TRAINING_DATA if 3 <= len(dp["actions"]) <= 10]  # need ≥ three for listener task, not too many for speaker task
+        NUM_TRAINING_EXAMPLES = len(TRAINING_DATA)
 
     output_file = f"intention_{'speaker' if args.speaker else 'listener'}_{'id' if args.id else 'ood'}.txt"
     output_file = output_file.replace(".txt", f"_{MODELS[args.model].split('-')[0]}.txt")
@@ -247,7 +321,7 @@ if __name__ == "__main__":
     elif "ood_gemma" in output_file:
         llmengine.api_engine.api_key = BBBBB_SCALE_KEY
 
-    output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), output_file)
+    output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "few_shot" if USING_FEW_SHOT else "zero_shot", output_file)
     if args.speaker:
         speaker_task(output_path, "out" if args.ood else "in", args.model)
     elif args.listener:

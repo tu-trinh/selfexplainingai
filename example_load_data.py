@@ -151,5 +151,5 @@ def world_model_tasks():
 
 
 
-world_model_tasks()
-# skillset_tasks()
+# world_model_tasks()
+skillset_tasks()

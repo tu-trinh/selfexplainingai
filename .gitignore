@@ -6,3 +6,7 @@ access_tokens.py
 .vscode/
 datasets/
 baselines/*/*/*.txt
+baselines/wandb/
+baselines/logs/
+*.tar
+slurm/

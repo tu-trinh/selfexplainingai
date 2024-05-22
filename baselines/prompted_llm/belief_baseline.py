@@ -264,7 +264,12 @@ def speaker_task(out_file: str, suffix: str, model_idx: int):
                 game_config = make_config(config_str = game_configs[game_id])
                 env = make_env(getattr(game_config, game_config.roles.executor).world_model)
                 env.reset()
-                prompt = build_few_shot_prompt(datapoint, "speaker", game_layouts[game_id], env = env)
+                if USING_FEW_SHOT:
+                    prompt = build_few_shot_prompt(datapoint, "speaker", game_layouts[game_id], env = env)
+                else:
+                    prompt = build_prompt(datapoint, "speaker", game_layouts[game_id], env = env)
+                f.write(prompt)
+                return
                 resp = Completion.create(model = MODELS[model_idx], prompt = prompt, temperature = TEMPERATURE, max_new_tokens = 50)
                 model_answer = json.loads(resp.json())["output"]["text"]
                 f.write(f"Datapoint {i}: model: {model_answer}\n")
@@ -294,9 +299,12 @@ def listener_task(out_file: str, suffix: str, model_idx: int):
                             prompt = build_few_shot_prompt(datapoint, "listener", game_layouts[game_id], obs_window = obs_window, acts_window = acts_window, query_idx = j)
                         else:
                             prompt = build_prompt(datapoint, "listener", game_layouts[game_id], obs_window = obs_window, acts_window = acts_window, query_idx = j)
-                        resp = Completion.create(model = MODELS[model_idx], prompt = prompt, temperature = TEMPERATURE, max_new_tokens = 30)
-                        model_answer = json.loads(resp.json())["output"]["text"]
-                        f.write(f"Datapoint {i} query {j}: model: {model_answer}\n\n")
+                        # resp = Completion.create(model = MODELS[model_idx], prompt = prompt, temperature = TEMPERATURE, max_new_tokens = 30)
+                        # model_answer = json.loads(resp.json())["output"]["text"]
+                        # f.write(f"Datapoint {i} query {j}: model: {model_answer}\n\n")
+                        if j == 2:
+                            f.write(prompt)
+                            return
                         try:
                             obs_window.append(datapoint["partial_text_obs"][j])
                             acts_window.append(datapoint["actions"][j])
@@ -331,8 +339,9 @@ if __name__ == "__main__":
         TRAINING_DATA = [dp for dp in TRAINING_DATA if 2 <= len(dp["actions"]) <= 5]  # need ≥ two for listener task, not too many for speaker task
         NUM_TRAINING_EXAMPLES = len(TRAINING_DATA)
 
-    output_file = f"belief_{'speaker' if args.speaker else 'listener'}_{'id' if args.id else 'ood'}.txt"
-    output_file = output_file.replace(".txt", f"_{MODELS[args.model].split('-')[0]}.txt")
+    # output_file = f"belief_{'speaker' if args.speaker else 'listener'}_{'id' if args.id else 'ood'}.txt"
+    # output_file = output_file.replace(".txt", f"_{MODELS[args.model].split('-')[0]}.txt")
+    output_file = "belief_prompts.txt"
     if "id_llama" in output_file:
         llmengine.api_engine.api_key = SCALE_KEY
     elif "ood_llama" in output_file:

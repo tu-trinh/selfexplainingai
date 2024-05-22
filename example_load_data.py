@@ -27,6 +27,7 @@ def skillset_tasks():
     for split in data:
         print(f"- {split} has {len(data[split])} datapoints")
     print()
+    return
 
 
     # keys of a datapoint
@@ -99,6 +100,7 @@ def world_model_tasks():
     for split in data:
         print(f"- {split} has {len(data[split])} datapoints")
     print()
+    return
 
 
     # keys of a datapoint
@@ -151,5 +153,5 @@ def world_model_tasks():
 
 
 
-# world_model_tasks()
+world_model_tasks()
 skillset_tasks()

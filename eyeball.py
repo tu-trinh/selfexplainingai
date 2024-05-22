@@ -21,9 +21,11 @@ def eyeball_skillset():
     id_to_game = {x["id"] : x for x in games[split]}
 
     # NOTE: change the id of the example
+
     x = data[split][234]
 
     game = id_to_game[x["game_id"]]
+    print(game["config"])
 
     config = make_config(config_str=game["config"])
 
@@ -65,7 +67,12 @@ def eyeball_worldmodel():
     id_to_game = {x["id"] : x for x in games[split]}
 
     # NOTE: change the id of the example
-    x = data[split][0]
+    for i in range(len(games[split])):
+        if "treasure_island" in games[split][i]["config"] and "double_grid_size" not in games[split][i]["config"] and i not in [3]:
+            print("Using index", i)
+            print(games[split][i]["config"])
+            x = data[split][i]
+            break
 
     game = id_to_game[x["game_id"]]
 
@@ -98,5 +105,5 @@ def eyeball_worldmodel():
 
 
 # NOTE: uncomment one of the followings
-# eyeball_skillset()
-eyeball_worldmodel()
+eyeball_skillset()
+# eyeball_worldmodel()

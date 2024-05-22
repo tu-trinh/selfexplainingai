@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".
 
 from mindgrid.skills import Skills
 from mindgrid.skills.skills import Primitive
-from package.infrastructure.access_tokens import *
+from mindgrid.access_tokens import *
 from mindgrid.infrastructure.basic_utils import to_enum
 from mindgrid.builder import make_env
 from mindgrid.infrastructure.config_utils import make_config
@@ -221,8 +221,6 @@ def speaker_task(out_file: str, suffix: str, model_idx: int):
                     prompt = build_few_shot_prompt(datapoint, "speaker", game_layouts[game_id])
                 else:
                     prompt = build_prompt(datapoint, "speaker", game_layouts[game_id])
-                f.write(prompt)
-                return
                 resp = Completion.create(model = MODELS[model_idx], prompt = prompt, temperature = TEMPERATURE, max_new_tokens = 20)
                 model_answer = json.loads(resp.json())["output"]["text"]
                 correct_answer = datapoint["skill_name"]
@@ -259,16 +257,12 @@ def listener_task(out_file: str, suffix: str, model_idx: int):
                         prompt = build_few_shot_prompt(datapoint, "listener", game_layouts[game_id], obs_window, act_window)
                     else:
                         prompt = build_prompt(datapoint, "listener", game_layouts[game_id], obs_window, act_window)
-                    if curr_steps == 3:
-                        f.write(prompt)
-                        return
-                    # resp = Completion.create(model = MODELS[model_idx], prompt = prompt, temperature = TEMPERATURE, max_new_tokens = 10)
-                    # model_answer = json.loads(resp.json())["output"]["text"]
-                    model_answer = "left"
+                    resp = Completion.create(model = MODELS[model_idx], prompt = prompt, temperature = TEMPERATURE, max_new_tokens = 10)
+                    model_answer = json.loads(resp.json())["output"]["text"]
                     match = re.search(r"(left|right|forward|pickup|drop|toggle|done)", model_answer.lower())
                     if match:
                         if match.group(1) == "done":
-                            # f.write(f"Datapoint {i} prompt {curr_steps}: model: done\n")
+                            f.write(f"Datapoint {i} prompt {curr_steps}: model: done\n")
                             break
                         action = ACTION_TO_IDX[match.group(1)]
                         env.step(action)
@@ -277,7 +271,7 @@ def listener_task(out_file: str, suffix: str, model_idx: int):
                         if len(obs_window) == 4:
                             obs_window = obs_window[1:]
                             act_window = act_window[1:]
-                        # f.write(f"Datapoint {i} prompt {curr_steps}: model: {IDX_TO_ACTION[action]}\n")
+                        f.write(f"Datapoint {i} prompt {curr_steps}: model: {IDX_TO_ACTION[action]}\n")
                         curr_steps += 1
                         pbar.update(1)
                     else:
@@ -312,21 +306,9 @@ if __name__ == "__main__":
         TRAINING_DATA = [dp for dp in TRAINING_DATA if 3 <= len(dp["actions"]) <= 10]  # need ≥ three for listener task, not too many for speaker task
         NUM_TRAINING_EXAMPLES = len(TRAINING_DATA)
 
-    # output_file = f"intention_{'speaker' if args.speaker else 'listener'}_{'id' if args.id else 'ood'}.txt"
-    # output_file = output_file.replace(".txt", f"_{MODELS[args.model].split('-')[0]}.txt")
-    output_file = "intention_prompts.txt"
-    if "id_llama" in output_file:
-        llmengine.api_engine.api_key = SCALE_KEY
-    elif "ood_llama" in output_file:
-        llmengine.api_engine.api_key = BACKUP_SCALE_KEY
-    elif "id_mixtral" in output_file:
-        llmengine.api_engine.api_key = BACKUP_BACKUP_SCALE_KEY
-    elif "ood_mixtral" in output_file:
-        llmengine.api_engine.api_key = BBB_SCALE_KEY
-    elif "id_gemma" in output_file:
-        llmengine.api_engine.api_key = BBBB_SCALE_KEY
-    elif "ood_gemma" in output_file:
-        llmengine.api_engine.api_key = BBBBB_SCALE_KEY
+    output_file = f"intention_{'speaker' if args.speaker else 'listener'}_{'id' if args.id else 'ood'}.txt"
+    output_file = output_file.replace(".txt", f"_{MODELS[args.model].split('-')[0]}.txt")
+    llmengine.api_engine.api_key = SCALE_KEY
 
     output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "few_shot" if USING_FEW_SHOT else "zero_shot", output_file)
     if args.speaker:

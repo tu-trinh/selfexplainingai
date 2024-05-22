@@ -3,13 +3,11 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from mindgrid.skills import Skills
-from mindgrid.skills.skills import Primitive
-from mindgrid.infrastructure.basic_utils import to_enum
 from mindgrid.builder import make_env
 from mindgrid.infrastructure.config_utils import make_config
 from mindgrid.env import MindGridEnvState
 from mindgrid.infrastructure.env_utils import describe_state
-from mindgrid.infrastructure.env_constants import ACTION_TO_IDX, IDX_TO_ACTION
+from mindgrid.infrastructure.env_constants import ACTION_TO_IDX
 from mindgrid.envs.edits import Edits
 
 import argparse
@@ -73,7 +71,7 @@ def evaluate_intention_listener(output_dir):
     """
     Given a skill instruction, can the agent construct a trajectory?
     """
-    # csv = pd.read_csv(os.path.join(output_dir, "scores.csv"))
+    csv = pd.read_csv(os.path.join(output_dir, "scores.csv"))
     skill_metrics = {}
     for skill in Skills:
         skill_metrics[skill.name] = []  # 0/1 trajectory completed
@@ -106,30 +104,27 @@ def evaluate_intention_listener(output_dir):
                                 final_pred_obs = describe_state(MindGridEnvState(env))
                                 if final_true_obs.strip() == final_pred_obs.strip():
                                     score.append(1)
-                                    if model == "llama":
-                                        skill_metrics[data[curr_dp]["skill_name"]].append(1)
+                                    skill_metrics[data[curr_dp]["skill_name"]].append(1)
                             else:
                                 score.append(0)
-                                if model == "llama":
-                                    skill_metrics[data[curr_dp]["skill_name"]].append(0)
+                                skill_metrics[data[curr_dp]["skill_name"]].append(0)
                         curr_dp += 1
                         action_seq = [lines[i].split(":")[-1].strip()]
                     i += 1
-                # assert len(score) == len(data), f"Score has length {len(score)} and data has length {len(data)}"
-                # csv.loc[(csv["mismatch"] == "intention") & (csv["task"] == "listener") & (csv["shot"] == SHOTS[shot])
-                #         & (csv["distribution"] == dist) & (csv["model"] == model), "score"] = np.mean(score).round(5)
+                csv.loc[(csv["mismatch"] == "intention") & (csv["task"] == "listener") & (csv["shot"] == SHOTS[shot])
+                        & (csv["distribution"] == dist) & (csv["model"] == model), "score"] = np.mean(score).round(5)
                 print("Finished", shot, dist, model)
-    # csv.to_csv(os.path.join(output_dir, "scores.csv"), index = False)
+    csv.to_csv(os.path.join(output_dir, "scores.csv"), index = False)
     props = [(skill, np.mean(skill_metrics[skill])) for skill in skill_metrics]  # using mean but really this is just proportion since data is 0/1
     props.sort(key = lambda t: t[1], reverse = True)
-    plot_metrics(props, "Skills", "Proportion", "Proportion of Trajectories Completed Successfully", "il_llama.png", "darkmagenta")
+    plot_metrics(props, "Skills", "Proportion", "Proportion of Trajectories Completed Successfully", "il.png", "darkmagenta")
 
 
 def evaluate_intention_speaker(output_dir):
     """
     Given a trajectory, can the agent say what skill is being executed?
     """
-    # csv = pd.read_csv(os.path.join(output_dir, "scores.csv"))
+    csv = pd.read_csv(os.path.join(output_dir, "scores.csv"))
     skill_metrics = {}
     for skill in Skills:
         skill_metrics[skill.name] = [0, 0]  # (num identified, num appeared)
@@ -147,12 +142,10 @@ def evaluate_intention_speaker(output_dir):
                             if matches:
                                 correct = matches.group(1).lower().strip()
                                 model_answer = matches.group(2).lower()
-                                if model == "llama":
-                                    skill_metrics[correct][1] += 1
+                                skill_metrics[correct][1] += 1
                                 if correct in model_answer:
                                     score.append(1)
-                                    if model == "llama":
-                                        skill_metrics[correct][0] += 1
+                                    skill_metrics[correct][0] += 1
                                 else:
                                     score.append(0)
                         if lines[i] != "Datapoint":
@@ -161,14 +154,13 @@ def evaluate_intention_speaker(output_dir):
                             break
                     else:
                         dp_builder += lines[i].replace("\n", " ")
-                # assert len(score) == len(data), f"Score has length {len(score)} and data has length {len(data)}"
-                # csv.loc[(csv["mismatch"] == "intention") & (csv["task"] == "speaker") & (csv["shot"] == SHOTS[shot])
-                #         & (csv["distribution"] == dist) & (csv["model"] == model), "score"] = np.mean(score).round(5)
+                csv.loc[(csv["mismatch"] == "intention") & (csv["task"] == "speaker") & (csv["shot"] == SHOTS[shot])
+                        & (csv["distribution"] == dist) & (csv["model"] == model), "score"] = np.mean(score).round(5)
                 print("Finished", shot, dist, model)
-    # csv.to_csv(os.path.join(output_dir, "scores.csv"), index = False)
+    csv.to_csv(os.path.join(output_dir, "scores.csv"), index = False)
     props = [(skill, skill_metrics[skill][0] / skill_metrics[skill][1]) for skill in skill_metrics]
     props.sort(key = lambda t: t[1], reverse = True)
-    plot_metrics(props, "Skills", "Proportion", "Proportion of Times Identified Correctly", "is_llama.png", "darkmagenta")
+    plot_metrics(props, "Skills", "Proportion", "Proportion of Times Identified Correctly", "is.png", "darkmagenta")
 
 
 def evaluate_belief(args, output_dir):
@@ -182,7 +174,7 @@ def evaluate_belief_listener(output_dir):
     """
     Given a trajectory and environment edits, can the agent tell how the observations will change?
     """
-    # csv = pd.read_csv(os.path.join(output_dir, "scores.csv"))
+    csv = pd.read_csv(os.path.join(output_dir, "scores.csv"))
     edit_metrics = {}
     for edit in Edits:
         edit_metrics[edit.name] = []  # (sub)score when the edit appears
@@ -220,9 +212,8 @@ def evaluate_belief_listener(output_dir):
                             # ...and see which one gets higher score (probably the right one to split on)
                             sub_score = max(newline_score, comma_score)
                             score.append(sub_score / len(true_answers))
-                            if model == "llama":
-                                for edit in data[dp_idx]["edits"]:
-                                    edit_metrics[edit].append(sub_score / len(true_answers))
+                            for edit in data[dp_idx]["edits"]:
+                                edit_metrics[edit].append(sub_score / len(true_answers))
                             already_seen.add((dp_idx, q_idx))
                         # Get next datapoint
                         try:
@@ -234,22 +225,21 @@ def evaluate_belief_listener(output_dir):
                             break
                     else:
                         dp_builder += lines[i]
-                # assert len(score) == len(data), f"Score has length {len(score)} and data has length {len(data)}"
-                # csv.loc[(csv["mismatch"] == "belief") & (csv["task"] == "listener") & (csv["shot"] == SHOTS[shot])
-                #         & (csv["distribution"] == dist) & (csv["model"] == model), "score"] = np.mean(score).round(5)
+                csv.loc[(csv["mismatch"] == "belief") & (csv["task"] == "listener") & (csv["shot"] == SHOTS[shot])
+                        & (csv["distribution"] == dist) & (csv["model"] == model), "score"] = np.mean(score).round(5)
                 print("Finished", shot, dist, model)
-    # csv.to_csv(os.path.join(output_dir, "scores.csv"), index = False)
+    csv.to_csv(os.path.join(output_dir, "scores.csv"), index = False)
     scores = [(edit, np.mean(edit_metrics[edit])) for edit in edit_metrics]
     stds = [sem(edit_metrics[edit]) for edit in edit_metrics]
     scores.sort(key = lambda t: t[1], reverse = True)
-    plot_metrics(scores, "Edits", "Proportion", "Mean Proportion of Queries Answered Correctly", "bl_llama.png", "darkblue", stds = stds, std_color = "cornflowerblue")
+    plot_metrics(scores, "Edits", "Proportion", "Mean Proportion of Queries Answered Correctly", "bl.png", "darkblue", stds = stds, std_color = "cornflowerblue")
 
 
 def evaluate_belief_speaker(output_dir):
     """
     Given a trajectory and its own environment description, can the agent tell how the other environment has been changed?
     """
-    # csv = pd.read_csv(os.path.join(output_dir, "scores.csv"))
+    csv = pd.read_csv(os.path.join(output_dir, "scores.csv"))
     edit_metrics = {}
     for edit in Edits:
         edit_metrics[edit.name] = [0, 0]  # (num identified, num appeared)
@@ -270,12 +260,11 @@ def evaluate_belief_speaker(output_dir):
                             pred_edits = [edit.lower() for edit in dp_builder.split(",")]
                             pred_edits = [edit for edit in pred_edits if len(edit) != 0]
                             matches = 0
-                            if model == "llama":
-                                for true_edit in true_edits:
-                                    edit_metrics[true_edit][1] += 1
-                                    if any([true_edit in pred_edit for pred_edit in pred_edits]):
-                                        matches += 1
-                                        edit_metrics[true_edit][0] += 1
+                            for true_edit in true_edits:
+                                edit_metrics[true_edit][1] += 1
+                                if any([true_edit in pred_edit for pred_edit in pred_edits]):
+                                    matches += 1
+                                    edit_metrics[true_edit][0] += 1
                             score.append(matches / len(true_edits))
                             already_seen.add(curr_dp)
                         try:
@@ -285,14 +274,13 @@ def evaluate_belief_speaker(output_dir):
                         dp_builder = lines[i].replace("\n", ",")
                     else:
                         dp_builder += lines[i].replace("\n", ",")
-                assert len(score) == len(data), f"Score has length {len(score)} and data has length {len(data)}"
-                # csv.loc[(csv["mismatch"] == "belief") & (csv["task"] == "speaker") & (csv["shot"] == SHOTS[shot])
-                        # & (csv["distribution"] == dist) & (csv["model"] == model), "score"] = np.mean(score).round(5)
+                csv.loc[(csv["mismatch"] == "belief") & (csv["task"] == "speaker") & (csv["shot"] == SHOTS[shot])
+                        & (csv["distribution"] == dist) & (csv["model"] == model), "score"] = np.mean(score).round(5)
                 print("Finished", shot, dist, model)
-    # csv.to_csv(os.path.join(output_dir, "scores.csv"), index = False)
+    csv.to_csv(os.path.join(output_dir, "scores.csv"), index = False)
     props = [(edit, edit_metrics[edit][0] / edit_metrics[edit][1]) for edit in edit_metrics]
     props.sort(key = lambda t: t[1], reverse = True)
-    plot_metrics(props, "Edits", "Proportion", "Proportion of Times Identified Correctly", "bs_llama.png", "darkblue")
+    plot_metrics(props, "Edits", "Proportion", "Proportion of Times Identified Correctly", "bs.png", "darkblue")
 
 
 def plot_metrics(metrics, item, metric, title, name, color, figsize = (6, 6), stds = None, std_color = None):
@@ -305,16 +293,6 @@ def plot_metrics(metrics, item, metric, title, name, color, figsize = (6, 6), st
     ax.set_xlabel(metric, fontsize = 12)
     ax.set_ylabel(item, fontsize = 12)
     ax.set_title(title, fontsize = 14)
-    # for i, tick in enumerate(ax.get_xticklabels()):
-        # tick.set_rotation(20)
-        # tick.set_fontsize(8)
-        # if i % 2 == 0:
-        #     tick.set_y(tick.get_position()[1] + 0.02)
-        # else:
-        #     tick.set_y(tick.get_position()[1] - 0.02)
-        # tick.set_fontname(font)
-    # for tick in ax.get_yticklabels():
-        # tick.set_fontname(font)
     plt.savefig(os.path.join(output_dir, name), bbox_inches = "tight")
     plt.close()
 

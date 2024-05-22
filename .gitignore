@@ -10,3 +10,4 @@ baselines/wandb/
 baselines/logs/
 *.tar
 slurm/
+*.png

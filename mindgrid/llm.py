@@ -1,4 +1,4 @@
-from package.infrastructure.access_tokens import *
+from mindgrid.access_tokens import *
 from package.infrastructure.llm_constants import *
 from package.infrastructure.basic_utils import debug
 

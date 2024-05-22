@@ -3,7 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from mindgrid.envs.edits import Edits
-from package.infrastructure.access_tokens import *
+from mindgrid.access_tokens import *
 from mindgrid.builder import make_env
 from mindgrid.infrastructure.config_utils import make_config
 from mindgrid.env import MindGridEnv
@@ -268,8 +268,6 @@ def speaker_task(out_file: str, suffix: str, model_idx: int):
                     prompt = build_few_shot_prompt(datapoint, "speaker", game_layouts[game_id], env = env)
                 else:
                     prompt = build_prompt(datapoint, "speaker", game_layouts[game_id], env = env)
-                f.write(prompt)
-                return
                 resp = Completion.create(model = MODELS[model_idx], prompt = prompt, temperature = TEMPERATURE, max_new_tokens = 50)
                 model_answer = json.loads(resp.json())["output"]["text"]
                 f.write(f"Datapoint {i}: model: {model_answer}\n")
@@ -299,9 +297,9 @@ def listener_task(out_file: str, suffix: str, model_idx: int):
                             prompt = build_few_shot_prompt(datapoint, "listener", game_layouts[game_id], obs_window = obs_window, acts_window = acts_window, query_idx = j)
                         else:
                             prompt = build_prompt(datapoint, "listener", game_layouts[game_id], obs_window = obs_window, acts_window = acts_window, query_idx = j)
-                        # resp = Completion.create(model = MODELS[model_idx], prompt = prompt, temperature = TEMPERATURE, max_new_tokens = 30)
-                        # model_answer = json.loads(resp.json())["output"]["text"]
-                        # f.write(f"Datapoint {i} query {j}: model: {model_answer}\n\n")
+                        resp = Completion.create(model = MODELS[model_idx], prompt = prompt, temperature = TEMPERATURE, max_new_tokens = 30)
+                        model_answer = json.loads(resp.json())["output"]["text"]
+                        f.write(f"Datapoint {i} query {j}: model: {model_answer}\n\n")
                         if j == 2:
                             f.write(prompt)
                             return
@@ -339,21 +337,9 @@ if __name__ == "__main__":
         TRAINING_DATA = [dp for dp in TRAINING_DATA if 2 <= len(dp["actions"]) <= 5]  # need ≥ two for listener task, not too many for speaker task
         NUM_TRAINING_EXAMPLES = len(TRAINING_DATA)
 
-    # output_file = f"belief_{'speaker' if args.speaker else 'listener'}_{'id' if args.id else 'ood'}.txt"
-    # output_file = output_file.replace(".txt", f"_{MODELS[args.model].split('-')[0]}.txt")
-    output_file = "belief_prompts.txt"
-    if "id_llama" in output_file:
-        llmengine.api_engine.api_key = SCALE_KEY
-    elif "ood_llama" in output_file:
-        llmengine.api_engine.api_key = BACKUP_SCALE_KEY
-    elif "id_mixtral" in output_file:
-        llmengine.api_engine.api_key = BACKUP_BACKUP_SCALE_KEY
-    elif "ood_mixtral" in output_file:
-        llmengine.api_engine.api_key = BBB_SCALE_KEY
-    elif "id_gemma" in output_file:
-        llmengine.api_engine.api_key = BBBB_SCALE_KEY
-    elif "ood_gemma" in output_file:
-        llmengine.api_engine.api_key = BBBBB_SCALE_KEY
+    output_file = f"belief_{'speaker' if args.speaker else 'listener'}_{'id' if args.id else 'ood'}.txt"
+    output_file = output_file.replace(".txt", f"_{MODELS[args.model].split('-')[0]}.txt")
+    llmengine.api_engine.api_key = SCALE_KEY
     
     output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "few_shot" if USING_FEW_SHOT else "zero_shot", output_file)
     if args.speaker:

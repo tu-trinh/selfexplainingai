@@ -299,12 +299,9 @@ def listener_task(out_file: str, suffix: str, model_idx: int):
                             prompt = build_few_shot_prompt(datapoint, "listener", game_layouts[game_id], obs_window = obs_window, acts_window = acts_window, query_idx = j)
                         else:
                             prompt = build_prompt(datapoint, "listener", game_layouts[game_id], obs_window = obs_window, acts_window = acts_window, query_idx = j)
-                        # resp = Completion.create(model = MODELS[model_idx], prompt = prompt, temperature = TEMPERATURE, max_new_tokens = 30)
-                        # model_answer = json.loads(resp.json())["output"]["text"]
-                        # f.write(f"Datapoint {i} query {j}: model: {model_answer}\n\n")
-                        if j == 2:
-                            f.write(prompt)
-                            return
+                        resp = Completion.create(model = MODELS[model_idx], prompt = prompt, temperature = TEMPERATURE, max_new_tokens = 30)
+                        model_answer = json.loads(resp.json())["output"]["text"]
+                        f.write(f"Datapoint {i} query {j}: model: {model_answer}\n\n")
                         try:
                             obs_window.append(datapoint["partial_text_obs"][j])
                             acts_window.append(datapoint["actions"][j])

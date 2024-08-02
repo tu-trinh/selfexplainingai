@@ -147,9 +147,11 @@ class ActionEncoder(nn.Module):
     def __init__(self, action_vocab_size: int, d_model: int):
         super().__init__()
         self.embedder = nn.Embedding(action_vocab_size, d_model)
+        self.action_vocab_size = action_vocab_size
 
     def forward(self, actions: torch.tensor):
-        assert actions.dim() == 2; f"Expected 2D tensor (B, 2); got {actions.shape}"
+        assert actions.dim() == 2, f"Expected 2D tensor (B, 2); got {actions.shape}"
+        assert torch.max(actions) < self.action_vocab_size, f"Improper action somewhere: {actions}"
         action_embeddings = self.embedder(actions)
         return action_embeddings
 

@@ -38,7 +38,12 @@ Outputs:
 - Answers (text)
 """
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+if torch.cuda.is_available():
+    print("Using GPU")
+    DEVICE = torch.device("cuda")
+else:
+    print("Using CPU")
+    DEVICE = torch.device("cpu")
 
 
 
@@ -155,15 +160,12 @@ class QueryEncoder(nn.Module):
         self.encoder_layers = nn.ModuleList([EncoderLayer(d_model, num_heads) for _ in range(num_layers)])
 
     def forward(self, queries: torch.tensor):
-        assert queries.dim() == 3, f"Expected 3D tensor (B, Q, query_length); got {queries.shape}"
-        batch_size, num_queries, query_length = queries.size()
-        queries = queries.reshape(batch_size, -1)
+        assert queries.dim() == 2, f"Expected 2D tensor (B, Q * query_length); got {queries.shape}"
         query_embeddings = self.embedder(queries)
-        query_embeddings = query_embeddings.reshape(batch_size, num_queries, query_length, -1)
-        query_embeddings = query_embeddings.reshape(batch_size, -1, self.embedder.embedding_dim)
+        query_embeddings = query_embeddings.permute(1, 0, 2)
         for layer in self.encoder_layers:
             query_embeddings = layer(query_embeddings)
-        return query_embeddings
+        return query_embeddings.permute(1, 0, 2)
     
 
 class InputTransformer(nn.Module):
@@ -173,6 +175,7 @@ class InputTransformer(nn.Module):
 
     def forward(self, combined_inputs: torch.tensor):
         assert combined_inputs.dim() == 3, f"Expected 3D tensor (B, something, d_model); got {combined_inputs.shape}"
+        combined_inputs = combined_inputs.permute(1, 0, 2)
         for layer in self.encoder_layers:
             combined_inputs = layer(combined_inputs)
         return combined_inputs
@@ -181,21 +184,16 @@ class InputTransformer(nn.Module):
 class AnswerDecoder(nn.Module):
     def __init__(self, vocab_size: int, d_model: int, num_layers: int, num_heads: int):
         super().__init__()
-        self.embedder = nn.Embedding(vocab_size, d_model)
         self.decoder_layers = nn.ModuleList([DecoderLayer(d_model, num_heads) for _ in range(num_layers)])
         self.fc = nn.Linear(d_model, vocab_size)
 
     def forward(self, memory: torch.tensor, queries: torch.tensor):
         assert memory.dim() == 3, f"Expected 3D tensor (B, something, d_model); got {memory.shape}"
-        assert queries.dim() == 3, f"Expected 3D tensor (B, Q, query_length); got {queries.shape}"
-        batch_size, num_queries, query_length = queries.size()
-        queries = queries.reshape(batch_size, -1)
-        query_embeddings = self.embedder(queries)
-        query_embeddings = query_embeddings.view(batch_size, num_queries, query_length, -1)
-        query_embeddings = query_embeddings.view(batch_size, -1, self.embedder.embedding_dim)
+        assert queries.dim() == 3, f"Expected 3D tensor (B, Q, d_model); got {queries.shape}"
+        query_embeddings = queries.permute(1, 0, 2)
         for layer in self.decoder_layers:
             query_embeddings = layer(query_embeddings, memory)
-        answers = self.fc(query_embeddings)
+        answers = self.fc(query_embeddings.permute(1, 0, 2))
         return answers
 
 
@@ -211,11 +209,21 @@ class BLModel(nn.Module):
         self.ans_decoder = ans_decoder
     
     def forward(self, initial_state, initial_dir, edits, observations, actions, queries):
+        print(f"Initial state shape {initial_state.shape}, initial_dir shape {initial_dir.shape}")
         state_embedding = self.state_encoder(initial_state, initial_dir)
+        print(f"State embedding successful, shape {state_embedding.shape}")
+        print(f"Edits shape {edits.shape}")
         edit_embedding = self.edit_encoder(edits)
+        print(f"Edit embedding successful, shape {edit_embedding.shape}")
+        print(f"Observations shape {observations.shape}")
         obs_embedding = self.obs_encoder(observations)
+        print(f"Obs embedding successful, shape {obs_embedding.shape}")
+        print(f"Actions shape {actions.shape}")
         act_embedding = self.act_encoder(actions)
+        print(f"Act embedding successful, shape {act_embedding.shape}")
+        print(f"Queries shape {queries.shape}")
         query_embedding = self.query_encoder(queries)
+        print(f"Query embedding successful, shape {query_embedding.shape}")
         combined_embeddings = torch.cat((
             state_embedding.unsqueeze(1),  # (B, 1, d_model)
             edit_embedding,  # (B, C, d_model)
@@ -223,8 +231,11 @@ class BLModel(nn.Module):
             act_embedding.reshape(act_embedding.size(0), -1, act_embedding.size(-1)),  # (B, 2, d_model)
             query_embedding  # (B, Q, d_model)
         ), dim = 1)
+        print(f"Input combined embeddings shape {combined_embeddings.shape}")
         combined_output = self.input_trans(combined_embeddings)
+        print(f"Combined output successful, shape {combined_output.shape}")
         final_output = self.ans_decoder(combined_output, query_embedding)
+        print(f"Final output successful, shape", final_output.shape)
         return final_output
 
 
@@ -382,6 +393,9 @@ def preprocess_data(dataset: BLDataset, split: str,
     if split == "train":
         max_num_edits = 0
         max_num_queries = 0
+        # max_edit_length = 0
+        # max_query_length = 0
+        # max_answer_length = 0
     data_logs, edit_logs, obs_logs, query_logs = [], {}, {}, {}
 
     data, games = load_data(split)
@@ -404,6 +418,7 @@ def preprocess_data(dataset: BLDataset, split: str,
                 edit_logs[i] = list(range(edits_length, edits_length + len(training_dict["edits"])))
                 if split == "train":
                     max_num_edits = max(max_num_edits, len(training_dict["edits"]))
+                    # max_edit_length = max(max_edit_length, max([len(item) for item in training_dict["edits"]]))
             else:
                 observations_length = len(observations)
                 observations.append(training_dict["observations"][-1])
@@ -418,6 +433,8 @@ def preprocess_data(dataset: BLDataset, split: str,
             query_logs[i][j] = list(range(queries_length, queries_length + len(training_dict["queries"])))
             if split == "train":
                 max_num_queries = max(max_num_queries, len(training_dict["queries"]))
+                # max_query_length = max(max_query_length, max([len(item) for item in training_dict["queries"]]))
+                # max_answer_length = max(max_answer_length, max([len(item) for item in training_dict["answers"]]))
     
     # Pad/truncate necessary data objects
     if split == "train":
@@ -436,12 +453,15 @@ def preprocess_data(dataset: BLDataset, split: str,
     prev_edits_length = len(edits)
     edits = pad_sequence(edits, batch_first = True, padding_value = 0)
     assert len(edits) == prev_edits_length, f"messed up padding edits: {prev_edits_length} vs. {edits.shape}"
+    print("Edits shape after padding", edits.shape)
     prev_queries_length = len(queries)
-    queries = pad_sequence([torch.tensor(q) for q in queries], batch_first = True, padding_value = 0)
+    queries = pad_sequence([torch.tensor(q, dtype = torch.long) for q in queries], batch_first = True, padding_value = 0)
     assert len(queries) == prev_queries_length, f"messed up padding queries: {prev_queries_length} vs. {queries.shape}"
+    print("Queries shape after padding", queries.shape)
     prev_answers_length = len(answers)
-    answers = pad_sequence([torch.tensor(a) for a in answers], batch_first = True, padding_value = 0)
+    answers = pad_sequence([torch.tensor(a, dtype = torch.long) for a in answers], batch_first = True, padding_value = 0)
     assert len(answers) == prev_answers_length, f"messed up padding answers: {prev_answers_length} vs. {answers.shape}"
+    print("Answers shape after padding", answers.shape)
 
     # Regroup data back into their original Datapoints and put into the Dataset
     null_observations = pad_truncate_tensor([torch.zeros((1, 1, 3)), torch.zeros((1, 1, 3))], max_observation_shape)
@@ -467,10 +487,12 @@ def preprocess_data(dataset: BLDataset, split: str,
                 bl_datapoint.actions = torch.tensor([actions[obs_logs[i][j][0]], actions[obs_logs[i][j][0]]])
             assert bl_datapoint.observations.shape == (cat_obs_shape[0], *max_observation_shape[1:]), f"oops! datapoint obs is shaped {bl_datapoint.observations.shape} and we want {(cat_obs_shape[0], *max_observation_shape[1:])}"
             assert bl_datapoint.actions.shape == (2,), f"oops! datapoint act is shaped {bl_datapoint.actions.shape}"
-            bl_datapoint.queries = torch.stack([queries[k] for k in query_logs[i][j]])
-            bl_datapoint.queries = F.pad(bl_datapoint.queries, (0, 0, 0, max_num_queries - bl_datapoint.queries.size(0)))
-            bl_datapoint.answers = torch.stack([answers[k] for k in query_logs[i][j]])
-            bl_datapoint.answers = F.pad(bl_datapoint.answers, (0, 0, 0, max_num_queries - bl_datapoint.answers.size(0)))
+            bl_datapoint.queries = torch.cat([queries[k] for k in query_logs[i][j]])
+            # bl_datapoint.queries = F.pad(bl_datapoint.queries, (0, 0, 0, max_num_queries - bl_datapoint.queries.size(0)))
+            bl_datapoint.queries = F.pad(bl_datapoint.queries, (0, max_num_queries * queries.size(1) - bl_datapoint.queries.size(0)))
+            bl_datapoint.answers = torch.cat([answers[k] for k in query_logs[i][j]])
+            # bl_datapoint.answers = F.pad(bl_datapoint.answers, (0, 0, 0, max_num_queries - bl_datapoint.answers.size(0)))
+            bl_datapoint.answers = F.pad(bl_datapoint.answers, (0, max_num_queries * answers.size(1) - bl_datapoint.answers.size(0)))
             bl_datapoint.assert_tensors()
             dataset.add(bl_datapoint)
     
@@ -481,7 +503,7 @@ def preprocess_data(dataset: BLDataset, split: str,
     
     return (
         max_initial_state_shape, cat_obs_shape,
-        max_num_edits * edits.size(1), max_num_queries,
+        max_num_edits * edits.size(1), max_num_queries * queries.size(1),
         edit_length, query_length, answer_length,
         edit_spp.get_piece_size(), query_spp.get_piece_size(), answer_spp.get_piece_size()
     )
@@ -494,9 +516,12 @@ Training
 class Wrapper:
     def __init__(self, d_model: int, num_layers: int, num_heads: int, num_epochs: int = None, save_every: int = None, train_mode: bool = True):
         self.log_file = os.path.join(THIS_DIR, "log.txt")
+        with open(self.log_file, "w") as f:
+            f.write("")
         self.model_file = os.path.join(THIS_DIR, "model.pt")
 
         self.train_dataset = BLDataset()
+        print("Starting to load training data")
         start = time.time()
         (
             self.state_shape, self.obs_shape,
@@ -505,11 +530,13 @@ class Wrapper:
             self.edit_vocab_size, self.query_vocab_size, self.answer_vocab_size
         ) = preprocess_data(self.train_dataset, "train")
         end = time.time()
+        print("Finished loading training data, took", format_seconds(end - start))
         with open(self.log_file, "a") as f:
             f.write(f"Loading training data took {format_seconds(end - start)}\n")
         assert len(self.train_dataset) != 0, "Dataset is empty!!!"
         self.train_dataloader = DataLoader(self.train_dataset, batch_size = 4, shuffle = True)
         
+        print("Starting to load val/test data")
         start = time.time()
         if train_mode:
             self.val_in_dataset = BLDataset()
@@ -530,6 +557,7 @@ class Wrapper:
                 "out": DataLoader(self.test_out_dataset, batch_size = 1, shuffle = True)
             }
         end = time.time()
+        print("Finished loading val/test data, took", format_seconds(end - start))
         with open(self.log_file, "a") as f:
             f.write(f"Loading val/test data took {format_seconds(end - start)}\n")
         
@@ -540,8 +568,11 @@ class Wrapper:
                 f.write(f"Max num edits: {self.max_edits}\n")
                 f.write(f"Max num queries: {self.max_queries}\n")
                 f.write(f"Edit length: {self.edit_length}\n")
+                f.write(f"Edit vocab size: {self.edit_vocab_size}\n")
                 f.write(f"Query length: {self.query_length}\n")
+                f.write(f"Query vocab size: {self.query_vocab_size}\n")
                 f.write(f"Answer length: {self.ans_length}\n")
+                f.write(f"Answer vocab size: {self.answer_vocab_size}\n")
 
         self.d_model = d_model
         self.num_layers = num_layers
@@ -573,7 +604,8 @@ class Wrapper:
                 init_states, init_dirs, edits, observations, actions, queries, answers = [item.to(DEVICE) for item in batch]
                 output = self.model(init_states, init_dirs, edits, observations, actions, queries)
                 self.optimizer.zero_grad()
-                loss = F.cross_entropy(output.reshape(-1, self.answer_vocab_size), answers.reshape(-1))
+                print("Comparing with ground truth answers of shape", answers.shape)
+                loss = F.cross_entropy(output.reshape(-1, self.answer_vocab_size), answers[:, :self.answer_vocab_size].reshape(-1, self.answer_vocab_size))
                 loss.backward()
                 self.optimizer.step()
                 losses.append(loss.item())

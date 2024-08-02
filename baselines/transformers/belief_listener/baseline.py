@@ -151,7 +151,6 @@ class ActionEncoder(nn.Module):
 
     def forward(self, actions: torch.tensor):
         assert actions.dim() == 2, f"Expected 2D tensor (B, 2); got {actions.shape}"
-        assert torch.max(actions) < self.action_vocab_size, f"Improper action somewhere: {actions}"
         action_embeddings = self.embedder(actions)
         return action_embeddings
 
@@ -500,10 +499,10 @@ def preprocess_data(dataset: BLDataset, split: str,
                 bl_datapoint.observations = torch.cat([null_observations[0], null_observations[1]])
                 if not cat_obs_shape:
                     cat_obs_shape = bl_datapoint.observations.shape
-                bl_datapoint.actions = torch.tensor([-1, -1])
+                bl_datapoint.actions = torch.tensor([7, 7])
             elif j == 1:
                 bl_datapoint.observations = torch.cat([null_observations[0], observations[obs_logs[i][j][0]]])
-                bl_datapoint.actions = torch.tensor([-1, actions[obs_logs[i][j][0]]])
+                bl_datapoint.actions = torch.tensor([7, actions[obs_logs[i][j][0]]])
             else:
                 bl_datapoint.observations = torch.cat([observations[obs_logs[i][j][0]], observations[obs_logs[i][j][1]]])
                 bl_datapoint.actions = torch.tensor([actions[obs_logs[i][j][0]], actions[obs_logs[i][j][0]]])
@@ -603,7 +602,7 @@ class Wrapper:
             StateEncoder(self.state_shape[0], 4, self.d_model),
             EditEncoder(self.edit_vocab_size, self.d_model, self.num_layers, self.num_heads),
             ObservationEncoder(self.obs_shape[0], self.d_model),
-            ActionEncoder(7, self.d_model),
+            ActionEncoder(8, self.d_model),
             QueryEncoder(self.query_vocab_size, self.d_model, self.num_layers, self.num_heads),
             InputTransformer(self.d_model, self.num_layers, self.num_heads),
             AnswerDecoder(self.answer_vocab_size, self.d_model, self.num_layers, self.num_heads, self.max_queries, int(self.max_queries / self.query_length) * self.ans_length)

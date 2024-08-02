@@ -181,16 +181,32 @@ class InputTransformer(nn.Module):
         return combined_inputs
 
 
-class AnswerDecoder(nn.Module):
-    def __init__(self, vocab_size: int, d_model: int, num_layers: int, num_heads: int):
+class SequenceReductionLayer(nn.Module):
+    def __init__(self, input_dim: int, output_seq_len: int):
         super().__init__()
+        self.output_seq_len = output_seq_len
+        self.transform = nn.Linear(input_dim, input_dim * output_seq_len)
+
+    def forward(self, x):
+        batch_size, seq_len, features = x.shape
+        x = self.transform(x)
+        x = x.view(batch_size, seq_len, self.output_seq_len, features)
+        x = torch.mean(x, dim = 1)
+        return x
+
+
+class AnswerDecoder(nn.Module):
+    def __init__(self, vocab_size: int, d_model: int, num_layers: int, num_heads: int, target_seq_len: int):
+        super().__init__()
+        self.seq_reduction = SequenceReductionLayer(d_model, target_seq_len)
         self.decoder_layers = nn.ModuleList([DecoderLayer(d_model, num_heads) for _ in range(num_layers)])
         self.fc = nn.Linear(d_model, vocab_size)
 
     def forward(self, memory: torch.tensor, queries: torch.tensor):
         assert memory.dim() == 3, f"Expected 3D tensor (B, something, d_model); got {memory.shape}"
         assert queries.dim() == 3, f"Expected 3D tensor (B, Q, d_model); got {queries.shape}"
-        query_embeddings = queries.permute(1, 0, 2)
+        queries = queries.permute(1, 0, 2)
+        query_embeddings = self.seq_reduction(queries)
         for layer in self.decoder_layers:
             query_embeddings = layer(query_embeddings, memory)
         answers = self.fc(query_embeddings.permute(1, 0, 2))
@@ -584,7 +600,7 @@ class Wrapper:
             ActionEncoder(7, self.d_model),
             QueryEncoder(self.query_vocab_size, self.d_model, self.num_layers, self.num_heads),
             InputTransformer(self.d_model, self.num_layers, self.num_heads),
-            AnswerDecoder(self.answer_vocab_size, self.d_model, self.num_layers, self.num_heads)
+            AnswerDecoder(self.answer_vocab_size, self.d_model, self.num_layers, self.num_heads, (self.max_queries / self.query_length) * self.ans_length)
         ).to(DEVICE)
         
         if train_mode:

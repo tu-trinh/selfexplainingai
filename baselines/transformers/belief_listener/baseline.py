@@ -1,6 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 
 from mindgrid.envs.edits import Edits
 from mindgrid.builder import make_env
@@ -196,17 +197,20 @@ class SequenceReductionLayer(nn.Module):
 
 
 class AnswerDecoder(nn.Module):
-    def __init__(self, vocab_size: int, d_model: int, num_layers: int, num_heads: int, target_seq_len: int):
+    def __init__(self, vocab_size: int, d_model: int, num_layers: int, num_heads: int, intermediate_len: int, target_seq_len: int):
         super().__init__()
-        self.seq_reduction = SequenceReductionLayer(d_model, target_seq_len)
+        self.target_seq_len = target_seq_len
+        self.seq_reduction = nn.Linear(d_model * intermediate_len, d_model * target_seq_len)
         self.decoder_layers = nn.ModuleList([DecoderLayer(d_model, num_heads) for _ in range(num_layers)])
         self.fc = nn.Linear(d_model, vocab_size)
 
     def forward(self, memory: torch.tensor, queries: torch.tensor):
         assert memory.dim() == 3, f"Expected 3D tensor (B, something, d_model); got {memory.shape}"
         assert queries.dim() == 3, f"Expected 3D tensor (B, Q, d_model); got {queries.shape}"
-        queries = queries.permute(1, 0, 2)
+        B, _, d_model = queries.shape
+        queries = queries.reshape(B, -1)
         query_embeddings = self.seq_reduction(queries)
+        query_embeddings = query_embeddings.reshape(B, self.target_seq_len, d_model).permute(1, 0, 2)
         for layer in self.decoder_layers:
             query_embeddings = layer(query_embeddings, memory)
         answers = self.fc(query_embeddings.permute(1, 0, 2))
@@ -600,7 +604,7 @@ class Wrapper:
             ActionEncoder(7, self.d_model),
             QueryEncoder(self.query_vocab_size, self.d_model, self.num_layers, self.num_heads),
             InputTransformer(self.d_model, self.num_layers, self.num_heads),
-            AnswerDecoder(self.answer_vocab_size, self.d_model, self.num_layers, self.num_heads, (self.max_queries / self.query_length) * self.ans_length)
+            AnswerDecoder(self.answer_vocab_size, self.d_model, self.num_layers, self.num_heads, self.max_queries, int(self.max_queries / self.query_length) * self.ans_length)
         ).to(DEVICE)
         
         if train_mode:
@@ -621,7 +625,7 @@ class Wrapper:
                 output = self.model(init_states, init_dirs, edits, observations, actions, queries)
                 self.optimizer.zero_grad()
                 print("Comparing with ground truth answers of shape", answers.shape)
-                loss = F.cross_entropy(output.reshape(-1, self.answer_vocab_size), answers[:, :self.answer_vocab_size].reshape(-1, self.answer_vocab_size))
+                loss = F.cross_entropy(output.reshape(-1, self.answer_vocab_size), answers.reshape(-1))
                 loss.backward()
                 self.optimizer.step()
                 losses.append(loss.item())

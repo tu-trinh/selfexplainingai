@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inflect
+from copy import deepcopy as dc
 from abc import ABC, abstractmethod
 from typing import List, Tuple
 
@@ -66,8 +67,20 @@ class BaseSkill(ABC):
     def recognize(self, t: Trajectory):
         raise NotImplementedError
 
+    @classmethod
+    def get_template(cls, env: MindGridEnv):
+        return cls.TEMPLATE
+
 
 class Primitive(BaseSkill):
+
+    TEMPLATE = { "pickup" : "pick up the object in the forward cell",
+                 "toggle" : "toggle the object in the forward cell",
+                 "left" : "rotate left 90 degrees",
+                 "right" : "rotate right 90 degrees",
+                 "drop" : "drop the object in the inventory",
+                 "forward": "go to the forward cell"
+    }
 
     def __init__(self, action: Actions = None):
         self.action = action
@@ -81,7 +94,7 @@ class Primitive(BaseSkill):
         return {"action": t.last_action}
 
     def verbalize(self, env):
-        return self.action.name
+        return self.TEMPLATE[self.action.name]
 
     @staticmethod
     def describe():
@@ -89,6 +102,8 @@ class Primitive(BaseSkill):
 
 
 class GoTo(BaseSkill):
+
+    TEMPLATE = "go to column {col} row {row}"
 
     def __init__(self, pos: Tuple[int, int] = None):
         self.pos = pos
@@ -131,7 +146,7 @@ class GoTo(BaseSkill):
         return None
 
     def verbalize(self, env):
-        return f"go to the cell at column {self.pos[0]} and row {self.pos[1]}"
+        return self.TEMPLATE.format(col=self.pos[0], row=self.pos[1])
 
     @staticmethod
     def describe():
@@ -141,6 +156,8 @@ class GoTo(BaseSkill):
 
 
 class RotateTowardsObject(BaseSkill):
+
+    TEMPLATE = "rotate towards the {obj} at column {col} row {row}"
 
     def __init__(self, obj: WorldObj = None):
         self.obj = obj
@@ -178,7 +195,7 @@ class RotateTowardsObject(BaseSkill):
         return None
 
     def verbalize(self, env):
-        return f"rotate towards the {self.obj.type}"
+        return self.TEMPLATE.format(obj=self.obj.type, col=self.obj.cur_pos[0], row=self.obj.cur_pos[1])
 
     @staticmethod
     def describe():
@@ -186,6 +203,8 @@ class RotateTowardsObject(BaseSkill):
 
 
 class RotateTowardsDirection(BaseSkill):
+
+    TEMPLATE = "rotate towards the {direction}"
 
     def __init__(self, dir: int = None):
         self.dir = dir
@@ -207,7 +226,7 @@ class RotateTowardsDirection(BaseSkill):
         return {"dir": VEC_TO_DIR[t.last_state.dir_vec]}
 
     def verbalize(self, env):
-        return f"rotate towards the {IDX_TO_DIR[self.dir]}"
+        return self.TEMPLATE.format(direction=IDX_TO_DIR[self.dir])
 
     @staticmethod
     def describe():
@@ -215,6 +234,8 @@ class RotateTowardsDirection(BaseSkill):
 
 
 class GoAdjacentToObject(BaseSkill):
+
+    TEMPLATE = "go to the cell adjacent to the {obj} at column {col} row {row}"
 
     def __init__(self, obj: WorldObj = None):
         self.obj = obj
@@ -282,7 +303,7 @@ class GoAdjacentToObject(BaseSkill):
         return None
 
     def verbalize(self, env):
-        return f"go adjacent to the {describe_object(self.obj, env.objects, relative=False, partial=True)}"
+        return self.TEMPLATE.format(obj=self.obj.type, col=self.obj.cur_pos[0], row=self.obj.cur_pos[1])
 
     @staticmethod
     def describe():
@@ -290,6 +311,8 @@ class GoAdjacentToObject(BaseSkill):
 
 
 class GoAdjacentToPosition(BaseSkill):
+
+    TEMPLATE = "go next to the cell at column {col} row {row}"
 
     def __init__(self, pos: Tuple[int, int] = None):
         self.pos = pos
@@ -307,7 +330,7 @@ class GoAdjacentToPosition(BaseSkill):
         return {"pos": t.last_state.front_pos}
 
     def verbalize(self, env):
-        return f"go adjacent to the location {describe_position(self.pos, env.grid.encode().shape, relative=False)}"
+        return self.TEMPLATE.format(col=self.pos[0], row=self.pos[1])
 
     @staticmethod
     def describe():
@@ -315,6 +338,8 @@ class GoAdjacentToPosition(BaseSkill):
 
 
 class DropAt(BaseSkill):
+
+    TEMPLATE = "drop object in inventory at column {col} row {row}"
 
     def __init__(self, pos: Tuple[int, int] = None):
         self.pos = pos
@@ -342,7 +367,7 @@ class DropAt(BaseSkill):
         return pos
 
     def verbalize(self, env):
-        return f"drop the carried object at {describe_position(self.pos, env.grid.encode().shape, relative=False)}"
+        return self.TEMPLATE.format(col=self.pos[0], row=self.pos[1])
 
     @staticmethod
     def describe():
@@ -350,6 +375,8 @@ class DropAt(BaseSkill):
 
 
 class EmptyInventory(BaseSkill):
+
+    TEMPLATE = "empty inventory"
 
     def __init__(self):
         pass
@@ -381,7 +408,7 @@ class EmptyInventory(BaseSkill):
         return {}
 
     def verbalize(self, env):
-        return "empty inventory"
+        return self.TEMPLATE
 
     @staticmethod
     def describe():
@@ -389,6 +416,8 @@ class EmptyInventory(BaseSkill):
 
 
 class OpenBox(BaseSkill):
+
+    TEMPLATE = "open the box at column {col} row {row}"
 
     def __init__(self, box: Box = None):
         assert box.type == "box", "OpenBox is applicable to only boxes"
@@ -398,7 +427,7 @@ class OpenBox(BaseSkill):
         box = self.box
         # box has been opened, skill is not applicable
         o = env.grid.get(*box.cur_pos)
-        if o.type != "box":
+        if o is None or o.type != "box":
             return NullTrajectory()
         # go to the box and toggle it
         t = GoAdjacentToObject(box)(env)
@@ -420,7 +449,7 @@ class OpenBox(BaseSkill):
         return None
 
     def verbalize(self, env):
-        return f"open the {describe_object(self.box, env.objects, relative=False, partial=True)}"
+        return self.TEMPLATE.format(col=self.box.cur_pos[0], row=self.box.cur_pos[1])
 
     @staticmethod
     def describe():
@@ -428,6 +457,8 @@ class OpenBox(BaseSkill):
 
 
 class GetObject(BaseSkill):
+
+    TEMPLATE = "get the {obj} at column {col} row {row}"
 
     def __init__(self, obj: WorldObj = None):
         self.obj = obj
@@ -495,7 +526,7 @@ class GetObject(BaseSkill):
         return None
 
     def verbalize(self, env):
-        return f"get the {describe_object(self.obj, env.objects, relative=False, partial=True)}"
+        return self.TEMPLATE.format(obj=self.obj.type, col=self.obj.cur_pos[0], row=self.obj.cur_pos[1])
 
     @staticmethod
     def describe():
@@ -504,9 +535,12 @@ class GetObject(BaseSkill):
 
 class MoveObject(BaseSkill):
 
+    TEMPLATE = "move the {obj} at column {col1} row {col2} to column {col2} row {row2}"
+
     def __init__(self, obj: WorldObj = None, pos: Tuple[int, int] = None):
         self.obj = obj
         self.pos = pos
+        self.old_pos = dc(self.obj.cur_pos)
 
     def __call__(self, env: MindGridEnv):
         obj, pos = self.obj, self.pos
@@ -538,7 +572,7 @@ class MoveObject(BaseSkill):
         return None
 
     def verbalize(self, env):
-        return f"move the {describe_object(self.obj, env.objects, relative=False, partial=True)} to the cell at {describe_position(self.pos, env.grid.encode().shape, relative=False)}"
+        return self.TEMPLATE.format(obj=self.obj.type, col1=self.old_pos[0], row1=self.old_pos[1], col2=self.pos[0], row2=self.pos[1])
 
     @staticmethod
     def describe():
@@ -546,6 +580,8 @@ class MoveObject(BaseSkill):
 
 
 class GoDirNSteps(BaseSkill):
+
+    TEMPLATE = "go {number} steps in the {direction} direction"
 
     def __init__(self, dir: int = None, n: int = None):
         self.dir = dir
@@ -571,7 +607,7 @@ class GoDirNSteps(BaseSkill):
         return None
 
     def verbalize(self, env):
-        return f"go {IDX_TO_DIR[self.dir]} {self.n} {inflect.engine().plural('step', self.n)}"
+        return self.TEMPLATE.format(number=self.n, direction=IDX_TO_DIR[self.dir])
 
     @staticmethod
     def describe():
@@ -579,6 +615,8 @@ class GoDirNSteps(BaseSkill):
 
 
 class Unblock(BaseSkill):
+
+    TEMPLATE = "unblock the {obj} at column {col} row {row}"
 
     def __init__(self, obj: DoorWithDirection | Bridge = None):
         assert obj.type in [
@@ -633,7 +671,7 @@ class Unblock(BaseSkill):
         return None
 
     def verbalize(self, env):
-        return f"unblock the {describe_object(self.obj, env.objects, relative=False, partial=True)}"
+        return self.TEMPLATE.format(obj=self.obj.type, col=self.obj.cur_pos[0], row=self.obj.cur_pos[1])
 
     @staticmethod
     def describe():
@@ -642,6 +680,8 @@ class Unblock(BaseSkill):
 
 class OpenDoor(BaseSkill):
     """Open a door"""
+
+    TEMPLATE = "open the door at column {col} row {row}"
 
     def __init__(self, door: DoorWithDirection = None):
         self.door = door
@@ -689,7 +729,7 @@ class OpenDoor(BaseSkill):
         return None
 
     def verbalize(self, env):
-        return f"open the {describe_object(self.door, env.objects, relative=False, partial=True)}"
+        return self.TEMPLATE.format(col=self.door.cur_pos[0], row=self.door.cur_pos[1])
 
     @staticmethod
     def describe():
@@ -698,6 +738,8 @@ class OpenDoor(BaseSkill):
 
 class FixBridge(BaseSkill):
     """Fix a bridge"""
+
+    TEMPLATE = "fix the bridge at column {col} row {row}"
 
     def __init__(self, bridge: Bridge = None):
         self.bridge = bridge
@@ -747,7 +789,7 @@ class FixBridge(BaseSkill):
         return None
 
     def verbalize(self, env):
-        return f"fix the {describe_object(self.bridge, env.objects, relative=False, partial=True)}"
+        return self.TEMPLATE.format(col=self.bridge.cur_pos[0], row=self.bridge.cur_pos[1])
 
     @staticmethod
     def describe():

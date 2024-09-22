@@ -769,8 +769,8 @@ def find_rectangles(grid, target_value):
     rectangles = []
 
     # Iterate over each cell in the grid
-    for r in range(rows):
-        for c in range(cols):
+    for r in range(1, rows - 1):
+        for c in range(1, cols - 1):
             # Check if current cell is the target value and not already included
             if grid[r, c] == target_value and not included[r, c]:
                 # Start a new rectangle
@@ -841,7 +841,7 @@ def describe_state(state, relative=True):
         dd += " " + carrying.type
         d += [f"You are carrying {inflect.engine().a(dd)}."]
     else:
-        d += ["Your inventory is empty."]
+        d += ["You are not carrying any object."]
     # describe objects within view
     object_descriptions = []
     if objects:

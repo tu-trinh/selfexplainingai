@@ -41,7 +41,7 @@ def create_env_class(task: Task, layout: Layout):
             MindGridEnv,
             task.value,
             layout.value,
-            layout.value.editor,
+            #layout.value.editor,
             layout.value.solver,
         ),
         {"__init__": _custom_init},
@@ -74,4 +74,6 @@ def _custom_init(
 
     self._init_task()
     self._init_layout()
-    self.edit(edits)
+    self.edit([e.value(self) for e in edits])
+    self.reset()
+

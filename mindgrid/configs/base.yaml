@@ -1,12 +1,8 @@
 task: pickup
-roles:
-  executor: human
-  observer: ai
-  solver: ai
-human:
+true_agent:
   preference:
     - reward_carry_object_hof: 1
-  skillset:
+  skill:
     - left
     - right
     - forward
@@ -14,16 +10,16 @@ human:
     - drop
     - toggle
     - done
-  world_model:
+  env:
     task: pickup
     layout: room_door_key
     edits: [double_grid_size, flip_vertical, change_target_color, hide_target_in_box, change_agent_view_size, add_opening, toggle_opening, block_opening, hide_tool_in_box, toggle_opening]
     seed: 35
     allowed_object_colors: ["green", "blue"]
-ai:
+false_agent:
   preference:
     - reward_carry_object_hof: 1
-  skillset:
+  skill:
     - left
     - right
     - forward
@@ -31,7 +27,7 @@ ai:
     - drop
     - toggle
     - done
-  world_model:
+  env:
     task: pickup
     layout: treasure_island
     edits: [double_grid_size, flip_vertical, change_target_color, hide_target_in_box, change_agent_view_size, add_opening, toggle_opening, add_passage, block_opening, put_agent_inside_section, hide_tool_in_box]

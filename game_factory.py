@@ -1,4 +1,5 @@
 import os
+import argparse
 import pickle
 import random
 import sys
@@ -11,7 +12,7 @@ from typing import Dict, List, Tuple, Union
 import yaml
 
 from mindgrid.builder import make_env
-from mindgrid.envs.editors import Edits
+from mindgrid.envs.edits import Edits
 from mindgrid.infrastructure.config_utils import make_config
 from mindgrid.infrastructure.env_constants import COLOR_NAMES
 from mindgrid.infrastructure.env_utils import describe_state, get_obs_desc
@@ -95,31 +96,27 @@ def fix_edit_order(edits):
 def make_init_config(colors):
     config = make_config(file_path="mindgrid/configs/base.yaml")
 
-    # set roles
-    config.roles.observer = "human"
-    config.roles.executor = "human"
-    config.roles.solver = "ai"
+    # env
+    env_config = config.false_agent.env
+    env_config.task = "pickup"
+    env_config.layout = random.choice(["room_door_key", "treasure_island"])
+    env_config.allowed_object_colors = colors
 
-    # world model
-    wm_config = config.ai.world_model
-    wm_config.task = "pickup"
-    wm_config.layout = random.choice(["room_door_key", "treasure_island"])
-    wm_config.allowed_object_colors = colors
-
-    edits = [s.value for s in Edits]
-    if wm_config.layout == "room_door_key":
+    edits = [s.name for s in Edits]
+    if env_config.layout == "room_door_key":
         edits.remove("add_fireproof_shoes")
         edits.remove("make_lava_safe")
 
     skills = list(Skills)
-    if wm_config.layout == "room_door_key":
+    if env_config.layout == "room_door_key":
         skills.remove(Skills.fix_bridge)
-    elif wm_config.layout == "treasure_island":
+    elif env_config.layout == "treasure_island":
         skills.remove(Skills.open_door)
+
     return config, edits, skills
 
 
-def create_skillset_datapoint(task, split, i, colors, skill_count):
+def create_skill_datapoint(task, split, i, colors, skill_count):
 
     print(colors)
 
@@ -130,14 +127,14 @@ def create_skillset_datapoint(task, split, i, colors, skill_count):
     item = {}
 
     config, edits, skills = make_init_config(colors)
-    wm_config = config.ai.world_model
+    env_config = config.ai.world_model
 
     must_have_skill = sample_inversely(skill_count, skills)
     print(must_have_skill.name)
 
     while True:
 
-        wm_config.seed = random.randint(0, 1000000) * primes[splits.index(split)]
+        env_config.seed = random.randint(0, 1000000) * primes[splits.index(split)]
 
         if split == "train":
             n_edits = 2
@@ -148,11 +145,11 @@ def create_skillset_datapoint(task, split, i, colors, skill_count):
             n_edits = random.choice(n_edits_pool)
 
         # NOTE: sample WITHOUT replacement
-        wm_config.edits = list(random.sample(edits, n_edits))
-        fix_edit_order(wm_config.edits)
+        env_config.edits = list(random.sample(edits, n_edits))
+        fix_edit_order(env_config.edits)
 
-        env = make_env(wm_config)
-        planner = Planner(wm_config)
+        env = make_env(env_config)
+        planner = Planner(env_config)
 
         p1 = try_generate_plan(planner, env, skills, must_have_skill=must_have_skill)
         if p1 is None:
@@ -173,7 +170,7 @@ def create_skillset_datapoint(task, split, i, colors, skill_count):
     for x in p1_skillset:
         skill_count[x] += 1
 
-    print(wm_config.edits)
+    print(env_config.edits)
     print([x.name for x in p1_skillset])
     print([x.name for x in p2_skillset])
     print(i, [(x.name, v) for x, v in list(skill_count.most_common())])
@@ -182,7 +179,7 @@ def create_skillset_datapoint(task, split, i, colors, skill_count):
     t1 = execute_plan(env, p1)
     t2 = execute_plan(env, p2)
 
-    config.human.world_model = config.ai.world_model = wm_config
+    config.human.world_model = config.ai.world_model = env_config
     executor = config.roles.executor
     nonexecutor = "ai" if executor == "human" else "human"
 
@@ -197,97 +194,71 @@ def create_skillset_datapoint(task, split, i, colors, skill_count):
     item["ref_plan"][executor] = [(x[0].name, x[1]) for x in p1]
     item["ref_plan"][nonexecutor] = [(x[0].name, x[1]) for x in p2]
 
+
     return item
 
 
-def create_worldmodel_datapoint(task, split, i, colors, skill_count):
-
-    # only create dataset for listener task
-    # speaker task dataset will be derived from listener task dataset
-    assert task in ["listen"]
+def create_env_datapoint(split, i, colors, skill_count):
 
     item = {}
 
     config, edits, skills = make_init_config(colors)
 
-    observer = config.roles.observer
-    nonobserver = "human" if observer == "ai" else "ai"
-
     while True:
 
-        config.ai.world_model.seed = random.randint(0, 1000000) * primes[splits.index(split)]
-        config.human.world_model = config.ai.world_model.clone()
+        config.false_agent.env.seed = random.randint(0, 1000000) * primes[splits.index(split)]
+        config.true_agent.env = config.false_agent.env.clone()
 
         if split == "train":
-            nonobserver_edits = []
-            observer_edits = random.sample(edits, 2)
-            fix_edit_order(observer_edits)
+            false_agent_edits = []
+            true_agent_edits = random.sample(edits, 2)
+            fix_edit_order(true_agent_edits)
         else:
-            nonobserver_edits = random.sample(edits, 2)
-            fix_edit_order(nonobserver_edits)
+            false_agent_edits = random.sample(edits, 2)
+            fix_edit_order(false_agent_edits)
+            left_edits = [x for x in edits if x not in false_agent_edits and x != "double_grid_size"]
+            n_true_agent_edits = random.randint(0, len(left_edits) - 1)
+            true_agent_edits = false_agent_edits + random.sample(left_edits, n_true_agent_edits)
 
-            left_edits = []
-            for x in edits:
-                if x in nonobserver_edits or x == "double_grid_size":
-                    continue
-                left_edits.append(x)
+        config.true_agent.env.edits = true_agent_edits
+        config.false_agent.env.edits = false_agent_edits
 
-            n_observer_edits = random.randint(0, len(left_edits) - 1)
-            observer_edits = nonobserver_edits + random.sample(left_edits, n_observer_edits)
+        true_agent_env_config = config.true_agent.env
+        true_agent_env = make_env(true_agent_env_config)
+        true_agent_planner = Planner(true_agent_env_config)
+        p_true_agent = true_agent_planner(true_agent_env, skills)
 
-        getattr(config, observer).world_model.edits = observer_edits
-        getattr(config, nonobserver).world_model.edits = nonobserver_edits
+        false_agent_env_config = config.false_agent.env
+        false_agent_env = make_env(false_agent_env_config)
+        false_agent_planner = Planner(false_agent_env_config)
+        p_false_agent = false_agent_planner(false_agent_env, skills)
 
-        observer_wm_config = getattr(config, observer).world_model
-        observer_env = make_env(observer_wm_config)
-        observer_planner = Planner(observer_wm_config)
-        p_observer = observer_planner(observer_env, skills)
-
-        nonobserver_wm_config = getattr(config, nonobserver).world_model
-        nonobserver_env = make_env(nonobserver_wm_config)
-        nonobserver_planner = Planner(nonobserver_wm_config)
-        p_nonobserver = nonobserver_planner(nonobserver_env, skills)
-
-        if p_observer is not None and p_nonobserver is not None:
+        if p_true_agent is not None and p_false_agent is not None:
             break
 
-    print(observer_edits)
-    print(nonobserver_edits)
+    print(true_agent_edits)
+    print(false_agent_edits)
 
-    for i in range(1, len(observer_edits)):
-        assert observer_edits[i] != "double_grid_size"
+    # NOTE: re-create environment and make sure plan works!
+    true_agent_env = make_env(config.true_agent.env)
+    execute_plan(true_agent_env, p_true_agent)
+    false_agent_env = make_env(config.false_agent.env)
+    execute_plan(false_agent_env, p_false_agent)
 
-    """
-    print("observer env")
-    observer_env.render_mode = "human"
-    observer_env.reset()
-    observer_env.render()
-    input()
-    print("nonobserver env")
-    nonobserver_env.render_mode = "human"
-    nonobserver_env.reset()
-    nonobserver_env.render()
-    input()
-    """
-
-    execute_plan(observer_env, p_observer)
-    execute_plan(nonobserver_env, p_nonobserver)
-
-    getattr(config, observer).skillset = [s.name for s in skills]
-    getattr(config, nonobserver).skillset = [s.name for s in skills]
+    config.true_agent.skill = [s.name for s in skills]
+    config.false_agent.skill = [s.name for s in skills]
 
     config_dict = config.to_dict()
     config_str = yaml.safe_dump(config_dict, default_flow_style=False, sort_keys=False)
     item["config"] = config_str
     item["ref_plan"] = {}
-    item["ref_plan"][observer] = [(x[0].name, x[1]) for x in p_observer]
-    item["ref_plan"][nonobserver] = [(x[0].name, x[1]) for x in p_nonobserver]
-
+    item["ref_plan"]["true_agent"] = [(x[0].name, x[1]) for x in p_true_agent]
+    item["ref_plan"]["false_agent"] = [(x[0].name, x[1]) for x in p_false_agent]
 
     return item
 
 
-def create_split(task, split, dataset, datapoint_creation_fn):
+def create_split(split, dataset, datapoint_creation_fn):
 
     dataset[split] = []
     n = split_size[split]
@@ -302,7 +273,7 @@ def create_split(task, split, dataset, datapoint_creation_fn):
     for i in range(n):
         print(split.upper(), i)
         dataset[split].append(
-            datapoint_creation_fn(task, split, i, colors, skill_count)
+            datapoint_creation_fn(split, i, colors, skill_count)
         )
 
 
@@ -325,13 +296,13 @@ def print_stats(dataset):
         print(f" * Split {s}: {len(dataset[s])} datapoints")
 
 
-def create_dataset(prefix, task, save_path, datapoint_creation_fn):
+def create_dataset(prefix, save_path, datapoint_creation_fn):
 
     dataset = {}
     for split in splits:
         if "_in" in split:
             continue
-        create_split(task, split, dataset, datapoint_creation_fn)
+        create_split(split, dataset, datapoint_creation_fn)
 
     dataset["test_in"] = dataset["train"][-split_size["test_in"] :]
     dataset["val_in"] = dataset["train"][
@@ -344,7 +315,7 @@ def create_dataset(prefix, task, save_path, datapoint_creation_fn):
     # assign id
     for split in dataset:
         for i, item in enumerate(dataset[split]):
-            item["id"] = f"{prefix}-{task}-{split}-{i}"
+            item["id"] = f"{prefix}-{split}-{i}"
 
     final_check(dataset)
     print_stats(dataset)
@@ -360,6 +331,11 @@ def create_dataset(prefix, task, save_path, datapoint_creation_fn):
 
 if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--version", type=str, required=True)
+    parser.add_argument("--prefix", type=str, required=True)
+    args = parser.parse_args()
+
     random.seed(100)
     color_split = split_attributes(COLOR_NAMES)
 
@@ -367,12 +343,11 @@ if __name__ == "__main__":
 
     primes = [2, 3, 5, 7, 11]
 
-    version = 2
-    #prefix = "skillset"
-    prefix = "worldmodel"
-    task = "listen"
+    version = args.version
+    #prefix = "skill"
+    prefix = args.prefix
 
-    if prefix == "skillset":
+    if prefix == "skill":
         split_size = {
             "train": 1000,
             "val_in": 100,
@@ -381,8 +356,7 @@ if __name__ == "__main__":
             "test_out": 100,
         }
 
-    elif prefix == "worldmodel":
-
+    elif prefix == "env":
         split_size = {
             "train": 5000,
             "val_in": 500,
@@ -391,20 +365,11 @@ if __name__ == "__main__":
             "test_out": 500,
         }
 
-
-    """
-    split_size = {
-        "train": 2,
-        "val_in": 2,
-        "test_in": 2,
-        "val_out": 2,
-        "test_out": 2,
-    }
-    """
-
-
     #save_path = "datasets/temp_games.pickle"
-    save_path = f"datasets/{prefix}_{task}_games_{split_size['train']}_v{version}.pickle"
+    save_path = f"datasets/{prefix}_games_{split_size['train']}_v{version}.pickle"
+
+    print(f"Save to {save_path}?")
+    input()
 
     if os.path.exists(save_path):
         print(f"File {save_path} exists!")
@@ -412,7 +377,7 @@ if __name__ == "__main__":
     else:
         print(f"Will save to {save_path}")
 
-    if prefix == "skillset":
-        create_dataset(prefix, task, save_path, create_skillset_datapoint)
-    elif prefix == "worldmodel":
-        create_dataset(prefix, task, save_path, create_worldmodel_datapoint)
+    if prefix == "skill":
+        create_dataset(prefix, save_path, create_skill_datapoint)
+    elif prefix == "env":
+        create_dataset(prefix, save_path, create_env_datapoint)

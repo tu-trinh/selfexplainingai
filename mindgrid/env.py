@@ -11,10 +11,12 @@ from minigrid.minigrid_env import MiniGridEnv
 
 #from mindgrid.envs.editors import Edit
 #from mindgrid.envs.layouts import Layout
+from mindgrid.envs.edits import EditError
 from mindgrid.envs.objects import FireproofShoes
 #from mindgrid.envs.tasks import Task
 from mindgrid.infrastructure.env_constants import COLOR_NAMES
 from mindgrid.infrastructure.env_utils import are_objects_equal
+from mindgrid.infrastructure.basic_utils import DeterministicRandom
 
 
 class MindGridEnv(MiniGridEnv):
@@ -32,7 +34,7 @@ class MindGridEnv(MiniGridEnv):
     ):
 
         self.seed = seed
-        self.random = random.Random(seed)
+        self.random = DeterministicRandom(seed)
 
         self.task = task
         self.layout = layout
@@ -56,13 +58,24 @@ class MindGridEnv(MiniGridEnv):
         # Unique environment configs
         self.env_id = f"{self.task}-{self.layout}-{self.seed}"
 
+    def random_choice(self, array):
+        try:
+            array = sorted(array)
+        except:
+            pass
+        return self.random.choice(array)
+
     def edit(self, edits):
         self.applied_edits = []
         for e in edits:
             self.reset()
-            e = e.value(self)
-            e.apply()
-            self.applied_edits.append(e)
+            #e = e.value(self)
+            try:
+                e.apply()
+                self.applied_edits.append(e)
+            except EditError as exception:
+                print(exception.message, ":", type(e), e.args)
+        self.reset()
 
     def reset(self, seed=None, options=None):
 

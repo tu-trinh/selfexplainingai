@@ -71,9 +71,9 @@ def make_config(file_path: str = None, config_str = None):
     return config
 
 def check(config: Dict):
-    assert "human" in config, "Must define a human agent"
-    assert "ai" in config, "Must define an ai agent"
-    human_reps = set(config["human"].keys())
-    ai_reps = set(config["ai"].keys())
-    assert set(["preference", "skillset", "world_model"]) <= human_reps, f"Human mental representations are missing {human_reps}"
-    assert set(["preference", "skillset", "world_model"]) <= ai_reps, f"Human mental representations are missing {ai_reps}"
+    assert "true_agent" in config, "Must define an agent with true world model"
+    assert "false_agent" in config, "Must define an agent with false world model"
+    true_reps = set(config["true_agent"].keys())
+    false_reps = set(config["false_agent"].keys())
+    assert set(["preference", "skill", "env"]) <= true_reps, f"Human mental representations are missing {true_reps}"
+    assert set(["preference", "skill", "env"]) <= false_reps, f"Human mental representations are missing {false_reps}"

@@ -10,7 +10,7 @@ from mindgrid.infrastructure.obj_constants import *
 class BaseTask(ABC):
 
     def _init_task(self):
-        self.target_color = self.random.choice(self.allowed_object_colors)
+        self.target_color = self.random.choice(sorted(self.allowed_object_colors))
         self._set_mission()
 
     @abstractmethod
@@ -25,7 +25,7 @@ class BaseTask(ABC):
 class PickUpTask(BaseTask):
 
     def _set_mission(self):
-        self.mission = f"pick up all {self.target_color} {OBJ_NAME_MAPPING[self.target_cls]}s"
+        self.mission = f"pick up the {self.target_color} {OBJ_NAME_MAPPING[self.target_cls]}"
 
     def _gen_mission(object: str):
         return f"pick up the {object}"

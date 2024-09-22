@@ -164,7 +164,7 @@ class Bridge(WorldObj):
 
 
 class Hammer(WorldObj):
-    def __init__(self, color: str = "blue"):
+    def __init__(self, color: str = "grey"):
         super().__init__("hammer", color)
 
     def can_pickup(self):

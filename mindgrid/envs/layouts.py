@@ -6,7 +6,7 @@ from typing import List, Tuple, Type
 
 from minigrid.core.world_object import Ball, Key, Lava, Wall
 
-from mindgrid.envs.editors import *
+from mindgrid.envs.edits import *
 from mindgrid.envs.objects import Bridge, DoorWithDirection, Hammer
 from mindgrid.envs.solvers import *
 from mindgrid.infrastructure.basic_utils import (
@@ -200,7 +200,7 @@ class RoomDoorKeyLayout(BaseLayout):
     layout_name = "room_door_key"
     opening_name = "door"
     tool_name = "key"
-    editor = RoomDoorKeyEditor
+    #editor = RoomDoorKeyEditor
     solver = RoomDoorKeySolver
 
     @property
@@ -317,10 +317,10 @@ class TreasureIslandLayout(BaseLayout):
     layout_name = "treasure_island"
     opening_name = "bridge"
     tool_name = "hammer"
-    editor = RoomDoorKeyEditor
-    solver = RoomDoorKeySolver
+    #editor = RoomDoorKeyEditor
+    #solver = RoomDoorKeySolver
 
-    editor = TreasureIslandEditor
+    #editor = TreasureIslandEditor
     solver = TreasureIslandSolver
 
     @property

@@ -256,7 +256,7 @@ def speaker_task(out_file: str, suffix: str, model_idx: int):
     start_idx = find_start_idx(out_file, len(data))
     if start_idx is None:
         return
-    
+
     with get_open_file(out_file) as f:
         for i, datapoint in enumerate(tqdm(data)):
             if i >= start_idx:
@@ -326,7 +326,7 @@ if __name__ == "__main__":
     parser.add_argument("--model", "-m", type = int, required = True)
     parser.add_argument("--few_shot", "-f", action = "store_true", default = False)
     args = parser.parse_args()
-    
+
     assert args.speaker or args.listener, "Choose either speaker or listener"
     assert args.ood or args.id, "Choose either _in or _out"
     USING_FEW_SHOT = args.few_shot
@@ -340,7 +340,7 @@ if __name__ == "__main__":
     output_file = f"belief_{'speaker' if args.speaker else 'listener'}_{'id' if args.id else 'ood'}.txt"
     output_file = output_file.replace(".txt", f"_{MODELS[args.model].split('-')[0]}.txt")
     llmengine.api_engine.api_key = SCALE_KEY
-    
+
     output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "few_shot" if USING_FEW_SHOT else "zero_shot", output_file)
     if args.speaker:
         speaker_task(output_path, "out" if args.ood else "in", args.model)

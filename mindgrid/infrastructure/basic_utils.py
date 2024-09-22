@@ -1,8 +1,26 @@
 from minigrid.core.world_object import WorldObj
+from random import Random
 
 import numpy as np
 from enum import Enum
 from typing import Union, List, Tuple, Dict
+
+
+class DeterministicRandom(Random):
+
+    def choice(self, x):
+        try:
+            x = sorted(x)
+        except:
+            pass
+        return super().choice(x)
+
+    def sample(self, x, k):
+        try:
+            x = sorted(x)
+        except:
+            pass
+        return super().sample(x, k)
 
 
 class CustomEnum(Enum):

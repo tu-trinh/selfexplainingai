@@ -1,0 +1,100 @@
+env-test_out-0	The door at column 5 row 5 is no longer in the original state. A new closed door has been installed at column 7 row 9. There is a saffron ball at column 2 row 9 blocking a path to the target object.
+env-test_out-1	The target object has been hidden inside a box. The agent's starting location has been moved to column 5 row 1.
+env-test_out-2	The target object has been hidden inside a box. A damaged bridge has been constructed at column 2 row 3. A purple ball at column 1 row 8 is blocking a path to the target object.
+env-test_out-3	The lava is safe to walk on. The target object has been hidden inside a box. The agent's starting location has been moved to column 3 row 5.
+env-test_out-4	The bridge at column 3 row 4 is no longer in the original state. A lime ball at column 7 row 8 is blocking a path to the target object.
+env-test_out-5	The target object has been hidden inside a box. The door at column 7 row 6 is no longer in the original state.
+env-test_out-6	The target object has been hidden inside a box. The agent's starting location has been moved to column 1 row 7. There is a walkable passage at column 5 row 6.
+env-test_out-7	A grey ball at column 5 row 7 is blocking a path to the target object. The agent's starting location has been moved to column 1 row 8.
+env-test_out-8	The target object has been hidden inside a box. The door at column 7 row 5 is no longer in the original state. There is a walkable passage at column 3 row 5.
+env-test_out-9	The color of the target object has been changed to saffron. A saffron ball at column 6 row 1 is blocking a path to the target object.
+env-test_out-10	The target object has been hidden inside a box. A new intact bridge has been constructed at column 6 row 5. A lime ball at column 5 row 4 is blocking a path to the target object.
+env-test_out-11	The bridge at column 5 row 8 is no longer in the original state. A grey ball at column 6 row 8 is blocking a path to the target object.
+env-test_out-12	The target object has been hidden inside a box. A new open door has been installed at column 5 row 9.
+env-test_out-13	The target object has been hidden inside a box. A new locked door has been installed at column 5 row 8.
+env-test_out-14	The color of the target object has been changed to brown. The door at column 6 row 6 is no longer in the original state.
+env-test_out-15	The color of the target object has been changed to saffron. The target object has been hidden inside a box. A new locked door has been installed at column 3 row 6.
+env-test_out-16	The color of the target object has been changed to lime. A lime ball at column 3 row 2 is blocking a path to the target object. The bridge at column 2 row 5 is no longer in the original state. The agent's starting location has been moved to column 1 row 7.
+env-test_out-17	The color of the target object has been changed to lime. A wall at column 5 row 2 is blocking a path to the target object.
+env-test_out-18	The color of the target object has been changed to grey. The target object has been hidden inside a box. A new intact bridge has been constructed at column 1 row 6. The bridge at column 4 row 6 is no longer in the original state.
+env-test_out-19	The target object has been hidden inside a box. The bridge at column 5 row 7 is no longer in the original state. There is a saffron ball at column 4 row 8 blocking a path to the target object.
+env-test_out-20	The target object has been hidden inside a box. The agent's starting location has been moved to column 4 row 2.
+env-test_out-21	The target object has been hidden inside a box. The bridge at column 2 row 6 is no longer in the original state.
+env-test_out-22	A new open door has been installed at column 5 row 6. The target object has been hidden inside a box.
+env-test_out-23	The door at column 5 row 7 is no longer in the original state. The target object has been hidden inside a box.
+env-test_out-24	The color of the target object has been changed to purple. A new intact bridge has been constructed at column 8 row 3. The lava is safe to walk on.
+env-test_out-25	The bridge at column 5 row 8 is no longer in the original state. A lime ball at column 6 row 8 is blocking a path to the target object.
+env-test_out-26	The target object has been hidden inside a box. The bridge at column 5 row 6 is no longer in the original state. There is a walkable passage at column 2 row 6.
+env-test_out-27	The color of the target object has been changed to saffron. The target object has been hidden inside a box. The door at column 7 row 8 is no longer in the original state.
+env-test_out-28	The color of the target object has been changed to blue. The target object has been hidden inside a box. A new locked door has been installed at column 7 row 5. The door at column 5 row 7 is no longer in the original state.
+env-test_out-29	The target object has been hidden inside a box. The bridge at column 6 row 3 is no longer in the original state. There is a walkable passage at column 2 row 6.
+env-test_out-30	The color of the target object has been changed to saffron. The target object has been hidden inside a box.
+env-test_out-31	The target object has been hidden inside a box. The bridge at column 8 row 4 is no longer in the original state.
+env-test_out-32	The target object has been hidden inside a box. There is a walkable passage at column 6 row 5.
+env-test_out-33	The color of the target object has been changed to grey. The bridge at column 6 row 8 is no longer in the original state. There is a walkable passage at column 7 row 5. A grey ball at column 5 row 8 is blocking a path to the target object.
+env-test_out-34	A grey ball at column 7 row 2 is blocking a path to the target object.
+env-test_out-35	The target object has been hidden inside a box. The agent's starting location has been moved to column 8 row 9. There is a walkable passage at column 8 row 3.
+env-test_out-36	The color of the target object has been changed to purple. A saffron ball at column 6 row 2 is blocking a path to the target object.
+env-test_out-37	The target object has been hidden inside a box. The bridge at column 7 row 6 is no longer in the original state. The agent's starting location has been moved to column 6 row 1.
+env-test_out-38	The color of the target object has been changed to grey. The grey box at column 7 row 8 is blocking a path to the target object. The lava is safe to walk on.
+env-test_out-39	The grid has been flipped along the vertical axis. The target object has been hidden inside a box. There is a walkable passage at column 1 row 9.
+env-test_out-40	A new closed door has been installed at column 8 row 6. The door at column 4 row 6 is no longer in the original state. The target object has been hidden inside a box.
+env-test_out-41	The target object has been hidden inside a box. A new locked door has been installed at column 6 row 5.
+env-test_out-42	The door at column 4 row 4 is no longer in the original state. A new closed door has been installed at column 4 row 4. The grid has been flipped along the vertical axis.
+env-test_out-43	The color of the target object has been changed to lime. A grey ball at column 2 row 8 is blocking a path to the target object.
+env-test_out-44	The target object has been hidden inside a box. The door at column 9 row 5 is no longer in the original state.
+env-test_out-45	The purple target object has been hidden inside a box. The agent's starting location has been moved to column 1 row 8. A grey ball at column 5 row 8 is blocking a path to the target object.
+env-test_out-46	The target object has been hidden inside a box. The door at column 4 row 4 is no longer in the original state.
+env-test_out-47	The door at column 4 row 5 is no longer in the original state. A new locked saffron door has been installed at column 4 row 6. A grey ball at column 5 row 5 is blocking a path to the target object. The target object has been hidden inside a box.
+env-test_out-48	The target object has been hidden inside a box. A lime ball at column 8 row 5 is blocking a path to the target object.
+env-test_out-49	The grid has been flipped along the vertical axis. A new closed door has been installed at column 6 row 6. There is a walkable passage at column 5 row 6. A grey ball at column 1 row 4 is blocking a path to the target object.
+env-test_out-50	The color of the target object has been changed to lime. The target object has been hidden inside a box. The door at column 2 row 4 is no longer in the original state.
+env-test_out-51	A new closed door has been installed at column 7 row 5. The door at column 6 row 5 is no longer in the original state. The purple ball at column 8 row 9 has been hidden inside a box.
+env-test_out-52	The lava is safe to walk on. A new damaged bridge has been constructed at column 7 row 5. The target object has been hidden inside a box. The agent's starting location has been moved to column 1 row 8.
+env-test_out-53	The color of the target object has been changed to lime. The bridge at column 7 row 3 is no longer in the original state. There is a walkable passage at column 7 row 2.
+env-test_out-54	The color of the target object has been changed to lime. The target object has been hidden inside a box. The bridge at column 4 row 6 is no longer in the original state. There is a walkable passage at column 5 row 6. The agent's starting location has been moved to column 6 row 8.
+env-test_out-55	The target object has been hidden inside a box. The bridge at column 7 row 4 is no longer in the original state.
+env-test_out-56	The target object has been hidden inside a box. The bridge at column 2 row 6 is no longer in the original state. There is a walkable passage at column 6 row 8.
+env-test_out-57	The color of the target object has been changed to grey. A grey ball at column 8 row 9 is blocking a path to the target object.
+env-test_out-58	The target object has been hidden inside a box. The bridge at column 8 row 6 is no longer in the original state. There is a walkable passage at column 6 row 9. The agent's starting location has been moved to column 9 row 8.
+env-test_out-59	The bridge at column 7 row 7 is no longer in the original state. The target object has been hidden inside a box. The agent's starting location has been moved to column 5 row 8.
+env-test_out-60	The door at column 6 row 5 is no longer in the original state. The target object has been hidden inside a box.
+env-test_out-61	The color of the target object has been changed to purple. A purple ball at column 8 row 7 is blocking a path to the target object.
+env-test_out-62	The target object has been hidden inside a box. The bridge at column 5 row 8 is no longer in the original state. There is a walkable passage at column 4 row 4. There is a walkable passage at column 6 row 7.
+env-test_out-63	The target object has been hidden inside a box. The door at column 5 row 6 is no longer in the original state. A new closed door has been installed at column 4 row 4.
+env-test_out-64	The agent's starting location has been moved to column 1 row 4. The color of the target object has been changed to grey. The target object has been hidden inside a box.
+env-test_out-65	The lava is safe to walk on. A new intact bridge has been constructed at column 4 row 8.
+env-test_out-66	The grid has been flipped along the vertical axis. The purple ball at column 1 row 6 is no longer in the original state.
+env-test_out-67	The color of the target object has been changed to purple. A purple ball at column 8 row 5 is blocking a path to the target object.
+env-test_out-68	A new closed door has been installed at column 7 row 6. The door at column 3 row 6 is no longer in the original state. The grey ball at column 3 row 5 is blocking a path to the target object.
+env-test_out-69	The target object has been hidden inside a box. The door at column 7 row 4 is no longer in the original state. There is a walkable passage at column 6 row 8.
+env-test_out-70	The target object has been hidden inside a box. A lime box at column 4 row 9 is blocking a path to the target object. The bridge at column 2 row 6 is no longer in the original state.
+env-test_out-71	The color of the target object has been changed to purple. The target object has been hidden inside a box. A new locked saffron door has been installed at column 8 row 3. There is a walkable passage at column 7 row 3.
+env-test_out-72	The target object has been hidden inside a box. A new locked door has been installed at column 8 row 6.
+env-test_out-73	A new open door has been installed at column 2 row 4. There is a walkable passage at column 4 row 4. A grey ball at column 5 row 5 is blocking a path to the target object.
+env-test_out-74	The grid has been flipped along the vertical axis. The target object has been hidden inside a box. There is a walkable passage at column 6 row 7. A damaged bridge at column 6 row 8 is no longer in the original state.
+env-test_out-75	The color of the target object has been changed to saffron. A saffron ball at column 9 row 4 is blocking a path to the target object.
+env-test_out-76	The target object has been hidden inside a box. The door at column 3 row 7 is no longer in the original state.
+env-test_out-77	The target object has been hidden inside a box. A new intact bridge has been constructed at column 7 row 4. A grey ball at column 2 row 9 is blocking a path to the target object.
+env-test_out-78	The target object has been hidden inside a box. The lava is safe to walk on.
+env-test_out-79	The bridge at column 3 row 6 is no longer in the original state. The target object has been hidden inside a box. There is a walkable passage at column 5 row 9.
+env-test_out-80	The target object has been hidden inside a box. A new closed door has been installed at column 7 row 6. A purple ball at column 8 row 6 is blocking a path to the target object.
+env-test_out-81	The lava is safe to walk on. The target object has been hidden inside a box. The bridge at column 4 row 7 is no longer in the original state. There is a walkable passage at column 4 row 8. The agent's starting location has been moved to column 2 row 7.
+env-test_out-82	The door at column 5 row 7 is no longer in the original state. The target object has been hidden inside a box. A new closed door has been installed at column 8 row 8.
+env-test_out-83	The target object has been hidden inside a box. A new intact bridge has been constructed at column 5 row 6. A lime ball at column 5 row 4 is blocking a path to the target object.
+env-test_out-84	A new closed door has been installed at column 8 row 3. The door at column 6 row 5 is no longer in the original state. A grey ball at column 8 row 2 is blocking a path to the target object.
+env-test_out-85	The target object has been hidden inside a box. A new closed door has been installed at column 3 row 5.
+env-test_out-86	The target object has been hidden inside a box. There is a walkable passage at column 6 row 6. A saffron ball at column 3 row 8 is blocking a path to the target object.
+env-test_out-87	The bridge at column 3 row 5 is no longer in the original state. A wall at column 3 row 7 is blocking a path to the target object.
+env-test_out-88	The target object has been hidden inside a box. The door at column 3 row 6 is no longer in the original state. There is a walkable passage at column 3 row 9.
+env-test_out-89	The target object has been hidden inside a box. The bridge at column 7 row 6 is no longer in the original state.
+env-test_out-90	The grid has been flipped along the vertical axis. The damaged bridge at column 4 row 6 is no longer in the original state. The target object has been hidden inside a box. The agent's starting location has been moved to column 6 row 5.
+env-test_out-91	A new damaged bridge has been constructed at column 2 row 4. The color of the target object has been changed to purple. The target object has been hidden inside a box. There is a walkable passage at column 5 row 8. The agent's starting location has been moved to column 3 row 9.
+env-test_out-92	The target object has been hidden inside a box. A purple ball at column 4 row 4 is blocking a path to the target object.
+env-test_out-93	The target object has been hidden inside a box. The agent's starting location has been moved to column 1 row 8. A new damaged bridge has been constructed at column 5 row 7. There is a walkable passage at column 5 row 8. The lava is safe to walk on.
+env-test_out-94	The door at column 4 row 7 is no longer in the original state. A new closed door has been installed at column 4 row 5.
+env-test_out-95	The target object has been hidden inside a box. The door at column 7 row 6 is no longer in the original state. A new closed door has been installed at column 9 row 6.
+env-test_out-96	The target object has been hidden inside a box. A purple ball at column 8 row 6 is blocking a path to the target object. The agent's starting location has been moved to column 9 row 8.
+env-test_out-97	The target object has been hidden inside a box. The bridge at column 4 row 6 is no longer in the original state. There is a walkable passage at column 7 row 7.
+env-test_out-98	The color of the target object has been changed to purple. A new closed door has been installed at column 5 row 6. There is a walkable passage at column 5 row 7.
+env-test_out-99	The target object has been hidden inside a box. A new intact bridge has been constructed at column 4 row 4. There is a pair of fire-proof shoes at column 2 row 6.

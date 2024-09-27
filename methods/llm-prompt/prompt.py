@@ -17,12 +17,15 @@ from mindgrid.infrastructure.trajectory import Trajectory
 from mindgrid.infrastructure.basic_utils import to_enum
 from mindgrid.skills import Skills
 
+from openai import OpenAI
+import openai
+
 import llmengine
 from llmengine import Completion
 import json
 from typing import Dict
 
-MODELS = ["llama-3-70b-instruct", "mixtral-8x7b-instruct", "gemma-7b-instruct"]
+MODELS = ["llama-3-70b-instruct", "mixtral-8x7b-instruct", "gemma-7b-instruct", "gpt-4o-mini", "gpt-4o"]
 TEMPERATURE = 0.01
 RDK_INTRO = """
 You are an AI agent helping a human play a 2D grid-based game. The goal of the game is to {goal} on the grid. Here are the key rules of the game:
@@ -240,6 +243,9 @@ if __name__ == "__main__":
     few_shot = args.few_shot
     model = MODELS[args.model_id]
 
+    if "gpt" in model:
+        openai_client = OpenAI(api_key=OPENAI_KEY)
+
     train_games = load_data(version, prefix, "train")
     test_games = load_data(version, prefix, "test_out")
     save_file = f"methods/llm-prompt/results/{prefix}_{task}_5000_v{version}.{few_shot}-shot.{model}.prompt-v{args.prompt_version}.out"
@@ -257,14 +263,27 @@ if __name__ == "__main__":
         if i >= start_idx:
             prompt = build_prompt(game, args.few_shot, train_games)
 
-            resp = Completion.create(
-                model=model,
-                prompt=prompt,
-                temperature=TEMPERATURE,
-                max_new_tokens=250,
-            )
+            if "gpt" in model:
+                resp = openai_client.chat.completions.create(
+                        model=model,
+                        messages=[
+                            {"role": "system", "content": "You are a helpful assistant."},
+                            {
+                                "role": "user",
+                                "content": prompt
+                            }
+                        ]
+                    )
+                model_answer = resp.choices[0].message.content
+            else:
+                resp = Completion.create(
+                    model=model,
+                    prompt=prompt,
+                    temperature=TEMPERATURE,
+                    max_new_tokens=250,
+                )
 
-            model_answer = json.loads(resp.json())["output"]["text"]
+                model_answer = json.loads(resp.json())["output"]["text"]
             # print(model_answer)
             # input()
             with open(save_file, "a") as f:

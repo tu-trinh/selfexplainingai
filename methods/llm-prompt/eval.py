@@ -18,7 +18,7 @@ from mindgrid.planner import Planner
 from mindgrid.envs.edits import parse_from_description
 
 
-MODELS = ["llama-3-70b-instruct", "mixtral-8x7b-instruct", "gemma-7b-instruct"]
+MODELS = ["llama-3-70b-instruct", "mixtral-8x7b-instruct", "gemma-7b-instruct", "gpt-4o-mini", "gpt-4o"]
 
 
 def show_env(env):
@@ -135,6 +135,9 @@ if __name__ == "__main__":
     test_games = load_data(version, prefix, "test_out")
 
     score_diffs = []
+
+    print(f"Eval {result_file}")
+    input()
 
     data = read_result_file(result_file)
 

@@ -18,7 +18,7 @@ from mindgrid.planner import Planner
 from mindgrid.envs.edits import parse_from_description
 
 
-MODELS = ["llama-3-70b-instruct", "mixtral-8x7b-instruct", "gemma-7b-instruct", "gpt-4o-mini", "gpt-4o"]
+MODELS = ["llama-3-70b-instruct", "mixtral-8x7b-instruct", "gemma-7b-instruct", "gpt-4o-mini", "gpt-4o", "claude-3-5-sonnet-20240620"]
 
 
 def show_env(env):

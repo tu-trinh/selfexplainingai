@@ -4,6 +4,7 @@ import os
 import time
 import anthropic
 from tqdm import tqdm
+from PIL import Image
 
 sys.path.append(".")
 import pickle
@@ -183,31 +184,6 @@ def execute_plan(env, plan):
     return success * 100 - env.step_count
 
 
-def check_value_diff():
-    cnt = 0
-    for i, game in enumerate(games):
-        # if i != 2:
-        #    continue
-        game_config = make_config(config_str=game["config"])
-        false_agent_env = make_env(game_config.false_agent.env)
-        true_agent_env = make_env(game_config.true_agent.env)
-
-        # true_agent_env.render_mode = "human"
-        # true_agent_env.reset()
-        # true_agent_env.render()
-        # input()
-
-        true_r = execute_plan(true_agent_env, game["ref_plan"]["true_agent"])
-        false_r = execute_plan(true_agent_env, game["ref_plan"]["false_agent"])
-
-        cnt += true_r - false_r
-
-        print(i, cnt, true_r, false_r)
-
-    print(cnt / len(games))
-
-    input()
-
 def find_start_idx(result_file):
     data = []
     cnt = 0
@@ -224,6 +200,17 @@ def find_start_idx(result_file):
     return cnt
 
 
+def create_image(game):
+    config = make_config(config_str=game["config"])
+    true_agent_env = make_env(config.true_agent.env)
+    true_agent_env.render_mode = "rgb_array"
+    img = true_agent_env.render()
+    print(img)
+    img = Image.fromarray(img)
+    img.save("methods/llm-prompt/images/test.jpg")
+    print("saved")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--prompt_version", type=int, required=True)
@@ -234,7 +221,10 @@ if __name__ == "__main__":
     parser.add_argument("--num_games", type=int, default=100)
     parser.add_argument("--few_shot", type=int, default=0)
 
+
     args = parser.parse_args()
+
+    assert args.model_id >= 3
 
     llmengine.api_engine.api_key = SCALE_KEY
 
@@ -252,7 +242,7 @@ if __name__ == "__main__":
 
     train_games = load_data(version, prefix, "train")
     test_games = load_data(version, prefix, "test_out")
-    save_file = f"methods/llm-prompt/results/{prefix}_{task}_5000_v{version}.{few_shot}-shot.{model}.prompt-v{args.prompt_version}.out"
+    save_file = f"methods/llm-prompt/results/{prefix}_{task}_5000_v{version}.{few_shot}-shot.{model}.chat-prompt-v{args.prompt_version}.out"
 
     print(f"Save to {save_file} ?")
     input()
@@ -260,6 +250,11 @@ if __name__ == "__main__":
     start_idx = 0
     if os.path.exists(save_file):
         start_idx = find_start_idx(save_file)
+
+    for game in train_games[:5]:
+        create_image(game)
+
+    sys.exit(0)
 
     print(f"Starting from {start_idx}")
 

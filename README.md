@@ -20,8 +20,6 @@ OPENAI_KEY = "yourkeyhere"
 ANTHROPIC_KEY = "yourkeyhere"
 ```
 
-Unzip the file `datasets.zip` and put it in the repo directory so that the file `datasets/env_games_5000_v4.pickle` exists.
-
 Zero-shot experiment
 ```
 python methods/llm-prompt/prompt.py --prefix env --version 4 --model_id $ID --few_shot 0 --prompt_version 0

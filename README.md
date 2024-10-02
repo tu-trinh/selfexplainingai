@@ -1,7 +1,5 @@
 # MindGrid
 
-We present MindGrid, a research toolkit for studying practical alignment in human-AI collaboration tasks via assistive communication processes.
-
 ## Installation
 Clone the repository.
 ```

@@ -5,7 +5,7 @@ import numpy as np
 
 sys.path.append(".")
 import pickle
-
+import scipy
 
 from nltk.tokenize import sent_tokenize
 
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     few_shot = args.few_shot
     model = MODELS[args.model_id]
 
-    result_file = f"methods/llm-prompt/results/{prefix}_{task}_5000_v{version}.{few_shot}-shot.{model}.prompt-v{args.prompt_version}.out"
+    result_file = f"methods/llm-prompt/results2/{prefix}_{task}_5000_v{version}.{few_shot}-shot.{model}.prompt-v{args.prompt_version}.out"
     test_games = load_data(version, prefix, "test_out")
 
     score_diffs = []
@@ -152,6 +152,9 @@ if __name__ == "__main__":
         true_agent_env = make_env(config.true_agent.env)
         false_agent_env = make_env(config.false_agent.env)
 
+        #show_env(true_agent_env)
+        #input()
+
         if not args.no_edit:
             edits = []
             for d in edit_descriptions:
@@ -171,4 +174,4 @@ if __name__ == "__main__":
 
         score_diffs.append(true_score - model_score)
 
-    print(np.mean(score_diffs))
+    print("Result:", np.mean(score_diffs), "$\\pm$", round(scipy.stats.sem(score_diffs), 2))

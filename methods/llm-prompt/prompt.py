@@ -27,7 +27,7 @@ import json
 from typing import Dict
 
 MODELS = ["llama-3-70b-instruct", "mixtral-8x7b-instruct", "gemma-7b-instruct", "gpt-4o-mini", "gpt-4o", "claude-3-5-sonnet-20240620"]
-TEMPERATURE = 0.01
+TEMPERATURE = 0
 RDK_INTRO = """
 You are an AI agent helping a human play a 2D grid-based game. The goal of the game is to {goal} on the grid. Here are the key rules of the game:
 1. You can pick up objects like keys, balls, boxes, but your inventory can hold only one object at a time (a pair of shoes counts as one object).
@@ -252,7 +252,7 @@ if __name__ == "__main__":
 
     train_games = load_data(version, prefix, "train")
     test_games = load_data(version, prefix, "test_out")
-    save_file = f"methods/llm-prompt/results/{prefix}_{task}_5000_v{version}.{few_shot}-shot.{model}.prompt-v{args.prompt_version}.out"
+    save_file = f"methods/llm-prompt/results2/{prefix}_{task}_5000_v{version}.{few_shot}-shot.{model}.prompt-v{args.prompt_version}.out"
 
     print(f"Save to {save_file} ?")
     input()
@@ -270,6 +270,8 @@ if __name__ == "__main__":
             if "gpt" in model:
                 resp = openai_client.chat.completions.create(
                         model=model,
+                        max_tokens=250,
+                        temperature=TEMPERATURE,
                         messages=[
                             {"role": "system", "content": "You are a helpful assistant."},
                             {
@@ -281,8 +283,9 @@ if __name__ == "__main__":
                 model_answer = resp.choices[0].message.content
             elif "claude" in model:
                 message = client.messages.create(
-                    model="claude-3-5-sonnet-20240620",
-                    max_tokens=1024,
+                    model=model,
+                    max_tokens=250,
+                    temperature=TEMPERATURE,
                     messages=[
                         {"role": "user", "content": prompt}
                     ]

@@ -65,7 +65,7 @@ def score_action_plan(env, actions):
         and env.carrying.type == "ball"
         and env.carrying.color == env.target_color
     )
-    return success * 100 - env.step_count
+    return success * 100 #- env.step_count
 
 
 def get_score(planner, skills, pred_env, true_env):

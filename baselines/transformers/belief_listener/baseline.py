@@ -230,21 +230,21 @@ class BLModel(nn.Module):
         self.ans_decoder = ans_decoder
     
     def forward(self, initial_state, initial_dir, edits, observations, actions, queries):
-        print(f"Initial state shape {initial_state.shape}, initial_dir shape {initial_dir.shape}")
+        # print(f"Initial state shape {initial_state.shape}, initial_dir shape {initial_dir.shape}")
         state_embedding = self.state_encoder(initial_state, initial_dir)
-        print(f"State embedding successful, shape {state_embedding.shape}")
-        print(f"Edits shape {edits.shape}")
+        # print(f"State embedding successful, shape {state_embedding.shape}")
+        # print(f"Edits shape {edits.shape}")
         edit_embedding = self.edit_encoder(edits)
-        print(f"Edit embedding successful, shape {edit_embedding.shape}")
-        print(f"Observations shape {observations.shape}")
+        # print(f"Edit embedding successful, shape {edit_embedding.shape}")
+        # print(f"Observations shape {observations.shape}")
         obs_embedding = self.obs_encoder(observations)
-        print(f"Obs embedding successful, shape {obs_embedding.shape}")
-        print(f"Actions shape {actions.shape}")
+        # print(f"Obs embedding successful, shape {obs_embedding.shape}")
+        # print(f"Actions shape {actions.shape}")
         act_embedding = self.act_encoder(actions)
-        print(f"Act embedding successful, shape {act_embedding.shape}")
-        print(f"Queries shape {queries.shape}")
+        # print(f"Act embedding successful, shape {act_embedding.shape}")
+        # print(f"Queries shape {queries.shape}")
         query_embedding = self.query_encoder(queries)
-        print(f"Query embedding successful, shape {query_embedding.shape}")
+        # print(f"Query embedding successful, shape {query_embedding.shape}")
         combined_embeddings = torch.cat((
             state_embedding.unsqueeze(1),  # (B, 1, d_model)
             edit_embedding,  # (B, C, d_model)
@@ -252,11 +252,11 @@ class BLModel(nn.Module):
             act_embedding.reshape(act_embedding.size(0), -1, act_embedding.size(-1)),  # (B, 2, d_model)
             query_embedding  # (B, Q, d_model)
         ), dim = 1)
-        print(f"Input combined embeddings shape {combined_embeddings.shape}")
+        # print(f"Input combined embeddings shape {combined_embeddings.shape}")
         combined_output = self.input_trans(combined_embeddings)
-        print(f"Combined output successful, shape {combined_output.shape}")
+        # print(f"Combined output successful, shape {combined_output.shape}")
         final_output = self.ans_decoder(combined_output, query_embedding)
-        print(f"Final output successful, shape", final_output.shape)
+        # print(f"Final output successful, shape", final_output.shape)
         return final_output
 
 
@@ -535,7 +535,7 @@ def preprocess_data(dataset: BLDataset, split: str,
 Training
 """
 class Wrapper:
-    def __init__(self, d_model: int, num_layers: int, num_heads: int, num_epochs: int = None, save_every: int = None, train_mode: bool = True):
+    def __init__(self, d_model: int, num_layers: int, num_heads: int, batch_size: int, num_epochs: int = None, save_every: int = None, train_mode: bool = True):
         self.log_file = os.path.join(THIS_DIR, "log.txt")
         with open(self.log_file, "w") as f:
             f.write("")
@@ -555,7 +555,7 @@ class Wrapper:
         with open(self.log_file, "a") as f:
             f.write(f"Loading training data took {format_seconds(end - start)}\n")
         assert len(self.train_dataset) != 0, "Dataset is empty!!!"
-        self.train_dataloader = DataLoader(self.train_dataset, batch_size = 4, shuffle = True)
+        self.train_dataloader = DataLoader(self.train_dataset, batch_size = batch_size, shuffle = True)
         
         print("Starting to load val/test data")
         start = time.time()
@@ -565,8 +565,8 @@ class Wrapper:
             self.val_out_dataset = BLDataset()
             preprocess_data(self.val_out_dataset, "test_out", self.state_shape, self.obs_shape, self.max_edits, self.max_queries, self.edit_length, self.query_length, self.ans_length)
             self.val_dataloaders = {
-                "in": DataLoader(self.val_in_dataset, batch_size = 1, shuffle = True),
-                "out": DataLoader(self.val_out_dataset, batch_size = 1, shuffle = True)
+                "in": DataLoader(self.val_in_dataset, batch_size = batch_size, shuffle = True),
+                "out": DataLoader(self.val_out_dataset, batch_size = batch_size, shuffle = True)
             }
         else:
             self.test_in_dataset = BLDataset()
@@ -574,8 +574,8 @@ class Wrapper:
             self.test_out_dataset = BLDataset()
             preprocess_data(self.test_out_dataset, "test_out", self.state_shape, self.obs_shape, self.max_edits, self.max_queries, self.edit_length, self.query_length, self.ans_length)
             self.test_dataloaders = {
-                "in": DataLoader(self.test_in_dataset, batch_size = 1, shuffle = True),
-                "out": DataLoader(self.test_out_dataset, batch_size = 1, shuffle = True)
+                "in": DataLoader(self.test_in_dataset, batch_size = batch_size, shuffle = True),
+                "out": DataLoader(self.test_out_dataset, batch_size = batch_size, shuffle = True)
             }
         end = time.time()
         print("Finished loading val/test data, took", format_seconds(end - start))
@@ -598,6 +598,7 @@ class Wrapper:
         self.d_model = d_model
         self.num_layers = num_layers
         self.num_heads = num_heads
+        self.batch_size = batch_size
         self.model = BLModel(
             StateEncoder(self.state_shape[0], 4, self.d_model),
             EditEncoder(self.edit_vocab_size, self.d_model, self.num_layers, self.num_heads),
@@ -618,6 +619,7 @@ class Wrapper:
 
     def train(self):
         self.model.train()
+        print(f"Going through {self.num_epochs} of {len(self.train_dataloader)} batches")
         for i in tqdm(range(self.num_epochs)):
             losses = []
             start = time.time()
@@ -727,7 +729,7 @@ if __name__ == "__main__":
             [(4, N, N, 3), (4,), (4, C, EN), (4, 2*M, M, 3), (4, 2), (4, Q, QN)]
         ))
     elif args.train:
-        wrapper = Wrapper(d_model = 256, num_layers = 4, num_heads = 4, num_epochs = 10, save_every = 1)
+        wrapper = Wrapper(d_model = 256, num_layers = 4, num_heads = 4, batch_size = 4, num_epochs = 10, save_every = 1)
         wrapper.train()
     elif args.eval:
         wrapper = Wrapper(d_model = 256, num_layers = 4, num_heads = 4, train_mode = False)

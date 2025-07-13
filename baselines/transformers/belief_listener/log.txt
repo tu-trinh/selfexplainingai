@@ -1,0 +1,14 @@
+Loading training data took 00:01:01
+Loading val/test data took 00:00:31
+Init state shape: (11, 11, 3)
+Concatenated observation shape: torch.Size([24, 12, 3])
+Max num edits: 84
+Max num queries: 190
+Edit length: 42
+Edit vocab size: 181
+Query length: 38
+Query vocab size: 115
+Answer length: 13
+Answer vocab size: 54
+Epoch 0 training time: 01:01:29
+Epoch 0 loss: 0.2711584022993941
